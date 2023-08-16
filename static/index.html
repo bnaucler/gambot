@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Gambot</title>
+	<link rel="stylesheet" type="text/css" href="default.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+
+</head>
+<body>
+    <div id="container">
+        <div class="smallgap"></div>
+        <div id="header">
+            <div id="hicon" onclick="gettournamentstatus(); return false;"></div>
+            <h1>GAMBOT</h1>
+        </div>
+        <div class="smallgap"></div>
+
+        <div id="tnmt">
+            <div id="games"></div>
+            <div id="topfive">
+                <p id="topfiveheader">TOP 5</p>
+                <div id="topfivecontents"></div>
+            </div>
+        </div>
+
+        <div class="smallgap"></div>
+
+        <button id="tstart" type="button" onclick="newtournament(); return false;">Start new tournament</button>
+        <div id="startgap" class="smallgap"></div>
+        <button id="tend" type="button" onclick="endtournament(); return false;">End tournament</button>
+        <div id="endgap" class="smallgap"></div>
+
+        <div id="playermgmt">
+            <form id="addplayer" onsubmit="addplayer(this); return false;" method="post">
+                <input type="text" name="name" Placeholder="Player name"></input><br>
+                <input type="submit" value="Add new player">
+            </form>
+
+            <div class="smallgap"></div>
+
+            <form id="getplayers" onsubmit="getplayers(this); return false;" method="post">
+                <input type="text" name="ID" Placeholder="User ID"></input><br>
+                <input type="text" name="name" Placeholder="Name contains"></input><br>
+                <input type="submit" value="Get players">
+            </form>
+
+            <div id="playerdata"></div>
+            <div class="smallgap"></div>
+            <button id="closepmgmt" onclick="playermgmt(HIDE); return false;">Close</button>
+            <div class="smallgap"></div>
+        </div>
+
+        <button id="showpmgmt" onclick="playermgmt(SHOW); return false;">Player management</button>
+        <div class="smallgap"></div>
+
+        <div id="logwin">
+            <button id="closelog" onclick="logwin(HIDE); return false;">Close log</button>
+            <div class="smallgap"></div>
+        </div>
+
+        <button type="button" onclick="logwin(SHOW); return false;">Show log</button>
+        <div class="smallgap"></div>
+
+        <p id="credit">Björn Westerberg Nauclér 2023 (<a href="https://github.com/bnaucler/">src</a>)</p>
+        <div class="smallgap"></div>
+    </div>
+
+</body>
+<script type="text/javascript" src="js/gambot.js"></script>
+</html>
