@@ -412,7 +412,6 @@ func blackwhite(p1 int, p2 int, t Tournament) (int, int) {
 func seed(t Tournament) Tournament {
 
     ap := availableplayers(t)
-    // fmt.Printf("ap: %+v\n", ap)
 
     for _, pid := range ap {
         if ingame(pid, t) { continue }
@@ -421,8 +420,6 @@ func seed(t Tournament) Tournament {
         game := mkgame(t)
         game.W, game.B = blackwhite(pid, opp, t)
         t.G = append(t.G, game)
-        // fmt.Printf("pid: %d, opp: %d\n", pid, opp)
-        // fmt.Printf("%+v\n", t)
     }
 
     return t

@@ -161,8 +161,6 @@ function updatewindow(t) {
 
     var glen = t.G.length;
 
-    console.log(t);
-
     for(var i = 0; i < glen; i++) {
         if(timezero(t.G[i].End)) addgame(t.G[i], t);
     }
@@ -369,8 +367,6 @@ function updatetopplayers(xhr) {
         gid("topfive").style.display = "none";
     }
 
-    console.log(obj);
-
     var olen = obj.P.length;
 
     for(var i = 0; i < olen; i++) {
@@ -404,8 +400,6 @@ function updatestatus(xhr) {
         updatewindow(obj);
         gettopplayers(5, "c");
     }
-
-    console.log(obj);
 }
 
 // Requests tournament status
