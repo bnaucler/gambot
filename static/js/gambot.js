@@ -218,8 +218,6 @@ function createtlistitem(t) {
     var id = document.createElement("p");
     var stime = document.createElement("p");
 
-    console.log(t);
-
     td.className = "tlitm";
     id.className = "tid";
     stime.className = "ttime";
@@ -255,8 +253,6 @@ function updatethist(xhr) {
         log("No data received!");
         return;
     }
-
-    console.log(ts);
 
     for(var i = 0; i < tlen; i++) createtlistitem(ts[i]);
 }
