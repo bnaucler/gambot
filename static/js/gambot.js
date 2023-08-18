@@ -169,6 +169,98 @@ function updatewindow(t) {
     popbench(t);
 }
 
+// Formats server date codes to a more easily readable format
+function formatdate(d) {
+
+    var date = d.substring(0, 10);
+    var time = d.substring(11, 16);
+
+    return date + " " + time;
+}
+
+// Returns names & score for n# of top players in tournament t
+function ttop(n, t) {
+
+    var tc = structuredClone(t.P)
+    var ret = [];
+    var plen = tc.length;
+
+    tc.sort((i, j) => i.Points - j.Points);
+    tc.reverse();
+
+    if(n > plen) n = plen;
+
+    for(var i = 0; i < n; i++) ret.push(tc[i].Name + " " + tc[i].Points)
+
+    return ret;
+
+}
+
+// Adds individual player & score to tournament history list
+function createtlistplayer(t, td) {
+
+    var tpl = ttop(3, t);
+    var tplen = tpl.length;
+
+    for(var i = 0; i < tplen; i++) {
+        var tp = document.createElement("p");
+        tp.className = "ttp";
+        tp.appendChild(document.createTextNode(tpl[i]));
+        td.appendChild(tp);
+    }
+}
+
+// Creates list item for tournament history
+function createtlistitem(t) {
+
+    var pdiv = gid("thist");
+    var td = document.createElement("div");
+    var id = document.createElement("p");
+    var stime = document.createElement("p");
+
+    console.log(t);
+
+    td.className = "tlitm";
+    id.className = "tid";
+    stime.className = "ttime";
+
+    id.appendChild(document.createTextNode(t.ID));
+    stime.appendChild(document.createTextNode(
+        formatdate(t.Start) + " - " + formatdate(t.End)));
+
+    td.appendChild(id);
+    td.appendChild(stime);
+
+    if(!(t.P == null)) {
+        createtlistplayer(t, td);
+
+    } else {
+        var tp = document.createElement("p");
+        tp.className = "ttp";
+        tp.appendChild(document.createTextNode("No players in tournament!"));
+        td.appendChild(tp);
+    }
+
+    pdiv.appendChild(td);
+}
+
+// Displays tournament history
+function updatethist(xhr) {
+
+    var ts = JSON.parse(xhr.responseText);
+    var tlen = ts.length;
+    gid("thist").innerHTML = "";
+
+    if(tlen == 0) {
+        log("No data received!");
+        return;
+    }
+
+    console.log(ts);
+
+    for(var i = 0; i < tlen; i++) createtlistitem(ts[i]);
+}
+
 // Call updatewindow() if request contains players
 function playersadded(xhr) {
 
@@ -408,7 +500,17 @@ function gettournamentstatus() {
     mkxhr("/ts", "", updatestatus);
 }
 
-// Requests all time top players
+// Requests tournament history (n games starting at index i)
+function getthist(elem) {
+
+    var id = elem.elements["ID"].value;
+    var n = elem.elements["n"].value;
+    var params = "i=" + id + "&n=" + n;
+
+    mkxhr("/th", params, updatethist);
+}
+
+// Requests top players (n players of type t: (a)ll or (c)urrent)
 function gettopplayers(n, t) {
 
     mkxhr("/gtp", "n=" + n + "&t=" + t, updatetopplayers);
@@ -429,13 +531,29 @@ function logwin(state) {
 // Shows / hides player management window
 function playermgmt(state) {
 
-    var logwin = gid("playermgmt");
+    var pwin = gid("playermgmt");
 
     if(state === SHOW) {
-        logwin.style.display = "block";
+        pwin.style.display = "block";
         gid("playerdata").style.display = "none";
+
     } else if (state == HIDE) {
-        logwin.style.display = "none";
+        pwin.style.display = "none";
+    }
+
+}
+
+// Shows / hides tournament management window
+function tmgmt(state) {
+
+    var twin = gid("tmgmt");
+
+    if(state === SHOW) {
+        twin.style.display = "block";
+        // gid("thist").style.display = "none";
+
+    } else if (state == HIDE) {
+        twin.style.display = "none";
     }
 
 }

@@ -34,8 +34,6 @@
 
         <div class="smallgap"></div>
 
-        <button id="tstart" type="button" onclick="newtournament(); return false;">Start new tournament</button>
-        <div id="startgap" class="smallgap"></div>
         <button id="tend" type="button" onclick="endtournament(); return false;">End tournament</button>
         <div id="endgap" class="smallgap"></div>
 
@@ -61,6 +59,23 @@
 
         <button id="showpmgmt" onclick="playermgmt(SHOW); return false;">Player management</button>
         <div class="smallgap"></div>
+
+        <button id="showtmgmt" onclick="tmgmt(SHOW); return false;">Tournament management</button>
+        <div class="smallgap"></div>
+
+        <div id="tmgmt">
+            <button id="tstart" type="button" onclick="newtournament(); return false;">Start new tournament</button>
+            <div id="startgap" class="smallgap"></div>
+
+            <form id="getthist" onsubmit="getthist(this); return false;" method="post">
+                <input type="text" name="ID" Placeholder="Tournament ID"></input><br>
+                <input type="text" name="n" Placeholder="Last # of tournaments"></input><br>
+                <input type="submit" value="Get tournament history">
+            </form>
+
+            <div id="thist"></div>
+            <button id="closetmgmt" onclick="tmgmt(HIDE); return false;">Close window</button>
+        </div>
 
         <div id="logwin">
             <button id="closelog" onclick="logwin(HIDE); return false;">Close log</button>

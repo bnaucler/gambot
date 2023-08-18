@@ -94,6 +94,30 @@ func rdb(db *bolt.DB, k int, cbuc []byte) (v []byte, e error) {
     return
 }
 
+// Returns slice containing all tournament objects in db
+func getalltournaments(db *bolt.DB) []Tournament {
+
+    var ts []Tournament
+    var t Tournament
+
+    db.View(func(tx *bolt.Tx) error {
+
+        b := tx.Bucket(tbuc)
+        c := b.Cursor()
+
+        for k, v := c.First(); k != nil; k, v = c.Next() {
+            t = Tournament{}
+            json.Unmarshal(v, &t)
+            ts = append(ts, t)
+        }
+
+        return nil
+   })
+
+    return ts
+
+}
+
 // Returns slice containing all player objects in db
 func getallplayers(db *bolt.DB) []Player {
 
@@ -106,6 +130,7 @@ func getallplayers(db *bolt.DB) []Player {
         c := b.Cursor()
 
         for k, v := c.First(); k != nil; k, v = c.Next() {
+            cp = Player{}
             json.Unmarshal(v, &cp)
             players = append(players, cp)
         }
@@ -523,6 +548,47 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournamen
     return t
 }
 
+// Sorts tournament slice by ID and returns
+func revtslice(ts []Tournament) []Tournament {
+
+    sort.Slice(ts, func(i, j int) bool {
+        return ts[i].ID > ts[j].ID
+    })
+
+    return ts
+}
+
+// HTTP handler - get tournament history
+func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    wn := r.FormValue("n")
+    wi := r.FormValue("i")
+
+    n, e := strconv.Atoi(wn)
+    if e != nil { n = 10 }
+
+    i, e := strconv.Atoi(wi)
+    if e != nil { i = 1 }
+    i--
+
+    ts := revtslice(getalltournaments(db))
+
+    tlen := len(ts)
+
+    if i > tlen || i < 0 {
+        i = 0
+        n = 0
+
+    } else if i + n > tlen {
+        n = tlen - i;
+
+    } else if n > tlen {
+        n = tlen
+    }
+
+    enc := json.NewEncoder(w)
+    enc.Encode(ts[i:(i + n)])
+}
 
 // HTTP handler - get tournament status
 func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) {
@@ -609,7 +675,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
     return t
 }
 
-// HTTP handler - end current tournament TODO: method instead of sep handler
+// HTTP handler - end current tournament
 func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) Tournament {
 
     t.End = time.Now()
@@ -699,6 +765,11 @@ func main() {
     // Get tournament status
     http.HandleFunc("/ts", func(w http.ResponseWriter, r *http.Request) {
         tshandler(w, r, db, t)
+    })
+
+    // Get tournament history
+    http.HandleFunc("/th", func(w http.ResponseWriter, r *http.Request) {
+        thhandler(w, r, db)
     })
 
     // add players to tournament

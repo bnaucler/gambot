@@ -17,9 +17,9 @@ Pull requests welcome!
 * Admin login
 * Mobile friendly interface
 * Logic to determine 2nd game with reversed colors
-* API call to get previous tournaments and top players
 * User interface to activate/deactivate players
 * Better (and consistent) error handling
+* Tournament history search by date
 
 ## License
 MIT (do whatever you want)
