@@ -139,6 +139,7 @@ function addgame(g, t) {
     pdiv.appendChild(game);
 }
 
+// Creates bench element
 function makebench(pdiv) {
 
     var bench = document.createElement("div");
@@ -193,7 +194,6 @@ function ttop(n, t) {
     for(var i = 0; i < n; i++) ret.push(tc[i].Name + " " + tc[i].Points)
 
     return ret;
-
 }
 
 // Adds individual player & score to tournament history list
@@ -539,7 +539,6 @@ function playermgmt(state) {
     } else if (state == HIDE) {
         pwin.style.display = "none";
     }
-
 }
 
 // Shows / hides tournament management window
@@ -556,7 +555,6 @@ function tmgmt(state) {
     } else if (state == HIDE) {
         twin.style.display = "none";
     }
-
 }
 
 // Request necessary data after window refresh
