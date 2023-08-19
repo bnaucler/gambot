@@ -39,15 +39,15 @@
 
         <div id="playermgmt">
             <form id="addplayer" onsubmit="addplayer(this); return false;" method="post">
-                <input type="text" name="name" Placeholder="Player name"></input><br>
+                <input id="pnatxt" type="text" name="name" Placeholder="Player name"></input><br>
                 <input type="submit" value="Add new player">
             </form>
 
             <div class="smallgap"></div>
 
             <form id="getplayers" onsubmit="getplayers(this); return false;" method="post">
-                <input type="text" name="ID" Placeholder="User ID"></input><br>
-                <input type="text" name="name" Placeholder="Name contains"></input><br>
+                <input id="pidtxt" type="text" name="ID" Placeholder="User ID"></input><br>
+                <input id="pntxt" type="text" name="name" Placeholder="Name contains"></input><br>
                 <input type="submit" value="Get players">
             </form>
 
@@ -68,8 +68,8 @@
             <div id="startgap" class="smallgap"></div>
 
             <form id="getthist" onsubmit="getthist(this); return false;" method="post">
-                <input type="text" name="ID" Placeholder="Tournament ID"></input><br>
-                <input type="text" name="n" Placeholder="Last # of tournaments"></input><br>
+                <input id="tidtxt" type="text" name="ID" Placeholder="steps back in time"></input><br>
+                <input id="tntxt" type="text" name="n" Placeholder="# to fetch"></input><br>
                 <input type="submit" value="Get tournament history">
             </form>
 

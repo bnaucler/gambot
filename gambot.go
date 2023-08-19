@@ -565,7 +565,7 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     wi := r.FormValue("i")
 
     n, e := strconv.Atoi(wn)
-    if e != nil { n = 10 }
+    if e != nil { n = 1 }
 
     i, e := strconv.Atoi(wi)
     if e != nil { i = 1 }

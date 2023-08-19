@@ -532,6 +532,9 @@ function playermgmt(state) {
     if(state === SHOW) {
         pwin.style.display = "block";
         gid("playerdata").style.display = "none";
+        gid("pidtxt").value = "";
+        gid("pntxt").value = "";
+        gid("pnatxt").value = "";
 
     } else if (state == HIDE) {
         pwin.style.display = "none";
@@ -546,7 +549,9 @@ function tmgmt(state) {
 
     if(state === SHOW) {
         twin.style.display = "block";
-        // gid("thist").style.display = "none";
+        gid("thist").innerHTML = "";
+        gid("tidtxt").value = "";
+        gid("tntxt").value = "";
 
     } else if (state == HIDE) {
         twin.style.display = "none";
