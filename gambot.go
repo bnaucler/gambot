@@ -13,16 +13,24 @@ import (
     "encoding/json"
 
     bolt "go.etcd.io/bbolt"
+    bcrypt "golang.org/x/crypto/bcrypt"
 )
 
-const dbname = ".arena.db"
-const datakey = 0
-const S_OK = 0
-const S_ERR = 1
+const dbname = ".arena.db"      // Database filename
 
+const S_OK = 0                  // Status code: OK
+const S_ERR = 1                 // Status code: error
+const A_ID = 0                  // Administrator ID
+
+var abuc = []byte("abuc")       // admin bucket
 var pbuc = []byte("pbuc")       // player bucket
 var gbuc = []byte("gbuc")       // game bucket
 var tbuc = []byte("tbuc")       // tournament bucket
+
+type Admin struct {
+    Skey string
+    Pass []byte
+}
 
 type Player struct {
     ID int
@@ -67,6 +75,18 @@ func cherr(e error) {
     if e != nil { log.Fatal(e) }
 }
 
+// Create random string of length ln
+func randstr(ln int) (string){
+
+    const charset = "0123456789abcdefghijklmnopqrstuvwxyz"
+    var cslen = len(charset)
+
+    b := make([]byte, ln)
+    for i := range b { b[i] = charset[rand.Intn(cslen)] }
+
+    return string(b)
+}
+
 // Write byte slice to DB
 func wrdb(db *bolt.DB, k int, v []byte, cbuc []byte) (e error) {
 
@@ -93,6 +113,81 @@ func rdb(db *bolt.DB, k int, cbuc []byte) (v []byte, e error) {
         return nil
     })
     return
+}
+
+// Validates password to stored hash
+func validateuser(a Admin, pass string) (bool) {
+
+    e := bcrypt.CompareHashAndPassword(a.Pass, []byte(pass))
+
+    if e == nil { return true
+    } else { return false }
+}
+
+// Retrieves admin object from database
+func getadmin(db *bolt.DB) Admin {
+
+    a := Admin{}
+
+    ab, e := rdb(db, A_ID, abuc)
+    cherr(e)
+
+    json.Unmarshal(ab, &a)
+
+    return a
+}
+
+// Stores admin object to database
+func writeadmin(a Admin, db *bolt.DB) {
+
+    buf, e := json.Marshal(a)
+    cherr(e)
+
+    e = wrdb(db, A_ID, buf, abuc)
+    cherr(e)
+}
+
+// HTTP handler - admin registration
+func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    e := r.ParseForm()
+    cherr(e)
+
+    a := Admin{}
+
+    hash, e := bcrypt.GenerateFromPassword([]byte(r.FormValue("pass")), bcrypt.DefaultCost)
+    cherr(e)
+
+    a.Pass = hash
+    a.Skey = randstr(30)
+    writeadmin(a, db)
+    a.Pass = []byte("")
+
+    enc := json.NewEncoder(w)
+    enc.Encode(a)
+}
+
+// HTTP handler - admin login
+func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    e := r.ParseForm()
+    cherr(e)
+
+    a := getadmin(db)
+
+    if validateuser(a, r.FormValue("pass")) {
+        fmt.Printf("Admin login successful\n")
+        a.Skey = randstr(30)
+        writeadmin(a, db)
+        a.Pass = []byte("")
+
+    } else {
+        fmt.Printf("Admin login failed\n")
+        a = Admin{}
+    }
+
+    enc := json.NewEncoder(w)
+    enc.Encode(a)
 }
 
 // Returns slice containing all tournament objects in db
@@ -141,6 +236,7 @@ func getallplayers(db *bolt.DB) []Player {
 
    return players
 }
+
 
 // Returns slice with top n players from tournament t
 func currenttop(db *bolt.DB, n int, t Tournament) []Player {
@@ -743,10 +839,18 @@ func main() {
 
     t := Tournament{}
 
-    cherr(e)
-
     // static
     http.Handle("/", http.FileServer(http.Dir("static")))
+
+    // admin registration
+    http.HandleFunc("/reg", func(w http.ResponseWriter, r *http.Request) {
+        reghandler(w, r, db)
+    })
+
+    // admin login
+    http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+        loginhandler(w, r, db)
+    })
 
     // add player
     http.HandleFunc("/ap", func(w http.ResponseWriter, r *http.Request) {
