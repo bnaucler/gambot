@@ -28,6 +28,7 @@ type Player struct {
     ID int
     Name string
     Ngames int
+    TNgames int
     Points int
     TPoints int
     Active bool
@@ -597,12 +598,25 @@ func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
     enc.Encode(t)
 }
 
+// Increments the Ngames parameter per user
+func incrngame(g Game, t Tournament) Tournament {
+
+    for i := 0; i < len(t.P); i++ {
+        if g.W == t.P[i].ID { t.P[i].Ngames++ }
+        if g.B == t.P[i].ID { t.P[i].Ngames++ }
+    }
+
+    return t
+}
+
 // Ends game by ID
 func endgame(gid string, t Tournament) Tournament {
 
     for i := 0; i < len(t.G); i++ {
         if t.G[i].ID == gid {
             t.G[i].End = time.Now();
+            t = incrngame(t.G[i], t)
+            break
         }
     }
 
@@ -694,6 +708,8 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
         cherr(e)
 
         dbp.TPoints += p.Points
+        dbp.TNgames += p.Ngames
+
         wp, e := json.Marshal(dbp)
 
         e = wrdb(db, p.ID, []byte(wp), pbuc)
