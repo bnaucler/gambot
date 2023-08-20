@@ -14,12 +14,13 @@ Pull requests welcome!
 ## TODO
 * Server side logging
 * Replace local log with API call for server log
-* Admin login
 * Mobile friendly interface
 * Logic to determine 2nd game with reversed colors
 * User interface to activate/deactivate players
 * Better (and consistent) error handling
 * Tournament history search by date
+* Reorganize main screen buttons
+* Skey verification on all handlers
 
 ## License
 MIT (do whatever you want)
