@@ -125,16 +125,15 @@ func validateuser(a Admin, pass string) (bool) {
 }
 
 // Retrieves admin object from database
-func getadmin(db *bolt.DB) Admin {
+func getadmin(db *bolt.DB) (Admin, error) {
 
     a := Admin{}
 
     ab, e := rdb(db, A_ID, abuc)
-    cherr(e)
 
     json.Unmarshal(ab, &a)
 
-    return a
+    return a, e
 }
 
 // Stores admin object to database
@@ -153,15 +152,20 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     e := r.ParseForm()
     cherr(e)
 
-    a := Admin{}
+    a, e := getadmin(db)
+    if e != nil { a = Admin{} }
 
-    hash, e := bcrypt.GenerateFromPassword([]byte(r.FormValue("pass")), bcrypt.DefaultCost)
-    cherr(e)
+    if len(a.Pass) < 1 || validateuser(a, r.FormValue("opass")) {
+        a.Pass, e = bcrypt.GenerateFromPassword([]byte(r.FormValue("pass")), bcrypt.DefaultCost)
+        cherr(e)
+        a.Skey = randstr(30)
+        writeadmin(a, db)
+        a.Pass = []byte("")
 
-    a.Pass = hash
-    a.Skey = randstr(30)
-    writeadmin(a, db)
-    a.Pass = []byte("")
+    } else if len(a.Pass) > 1 && !validateuser(a, r.FormValue("pass")) {
+        fmt.Printf("Illegal admin registration attempt\n")
+        a = Admin{}
+    }
 
     enc := json.NewEncoder(w)
     enc.Encode(a)
@@ -173,7 +177,8 @@ func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     e := r.ParseForm()
     cherr(e)
 
-    a := getadmin(db)
+    a, e := getadmin(db)
+    if e != nil { a = Admin{} }
 
     if validateuser(a, r.FormValue("pass")) {
         fmt.Printf("Admin login successful\n")
