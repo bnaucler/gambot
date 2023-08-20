@@ -201,6 +201,27 @@ input[type=checkbox] {
     opacity: 1;
 }
 
+#login {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    height: 100vh;
+    width: 100%;
+    background-color: #222;
+    z-index: 10;
+}
+
+#logincontainer {
+    width: 80%;
+    height: 100vh;
+    padding: 0 100px;
+}
+
+#loginform {
+    padding-top: 200px;
+}
+
 .log {
     background-color: #333;
     display: block;

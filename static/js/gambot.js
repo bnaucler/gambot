@@ -1,5 +1,6 @@
 // Alias to reduce typing
 var gid = document.getElementById.bind(document);
+var gss = sessionStorage.getItem.bind(sessionStorage);
 
 const S_OK = 0;
 const S_ERR = 1;
@@ -381,7 +382,8 @@ function tournamentend(xhr) {
 // Requests start of new tournament
 function newtournament() {
 
-    mkxhr("/ct", "", tournamentstart);
+    var params = "skey=" + gss("gambotkey");
+    mkxhr("/ct", params, tournamentstart);
     gettopplayers(5);
 }
 
@@ -555,6 +557,35 @@ function tmgmt(state) {
     } else if (state == HIDE) {
         twin.style.display = "none";
     }
+}
+
+// Checks for session key
+function trylogin(xhr) {
+
+    var obj = JSON.parse(xhr.responseText);
+
+    if(obj.Skey) {
+        sessionStorage.gambotkey = obj.Skey;
+        gid("login").style.display = "none";
+    }
+}
+
+// Initiates login procedure
+function login(elem) {
+
+    var pass = elem.elements["pass"].value;
+    var params = "pass=" + pass;
+
+    gid("loginform").reset();
+
+    mkxhr("/login", params, trylogin);
+}
+
+// Resets skey and shows login screen
+function logout() {
+
+    gid("login").style.display = "block";
+    sessionStorage.gabmotkey = "";
 }
 
 // Request necessary data after window refresh

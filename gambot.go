@@ -552,14 +552,33 @@ func seed(t Tournament) Tournament {
     return t
 }
 
+// Returns true if skey matches current admin skey
+func valskey(db *bolt.DB, skey string) bool {
+
+    a, e := getadmin(db)
+    cherr(e)
+
+    if skey == a.Skey { return true }
+
+    return false
+}
+
 // HTTP handler - create new tournament
 func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) Tournament {
+
+    rskey := r.FormValue("skey")
 
     if t.ID != 0 {
         t.Status = S_ERR;
         enc := json.NewEncoder(w)
         enc.Encode(t)
         fmt.Printf("Tournament already ongoing!\n")
+        return t
+
+    } else if !valskey(db, rskey) {
+        enc := json.NewEncoder(w)
+        enc.Encode(t)
+        fmt.Printf("Admin verification failed\n")
         return t
     }
 

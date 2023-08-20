@@ -16,6 +16,15 @@
 
 </head>
 <body>
+    <div id="login">
+        <div id="logincontainer">
+            <form id="loginform" onsubmit="login(this); return false;" method="post">
+                <input type="password" name="pass" placeholder="Password"><br>
+                <input type="submit" value="Login">
+            </form>
+        </div>
+    </div>
+
     <div id="container">
         <div class="smallgap"></div>
         <div id="header">
@@ -83,6 +92,9 @@
         </div>
 
         <button type="button" onclick="logwin(SHOW); return false;">Show log</button>
+        <div class="smallgap"></div>
+
+        <button type="button" onclick="logout(); return false;">Logout</button>
         <div class="smallgap"></div>
 
         <p id="credit">Björn Westerberg Nauclér 2023 (<a href="https://github.com/bnaucler/gambot/">src</a>)</p>
