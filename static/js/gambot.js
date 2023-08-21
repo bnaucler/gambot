@@ -404,6 +404,8 @@ function addplayer(elem) {
     var id = elem.elements["name"].value;
     var params = "name=" + id + "&skey=" + gss("gambotkey");
 
+    gid("addplayer").reset();
+
     mkxhr("/ap", params, showplayers);
 }
 
@@ -423,7 +425,7 @@ function tournamentstarted() {
     gid("tstart").style.display = "none";
     gid("startgap").style.display = "none";
 
-    gid("tend").style.display = "inline-block";
+    gid("tend").style.display = "block";
     gid("endgap").style.display = "block";
 
 }
