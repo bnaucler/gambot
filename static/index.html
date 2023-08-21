@@ -19,6 +19,11 @@
     <div id="login">
         <div id="logincontainer">
             <form id="loginform" onsubmit="login(this); return false;" method="post">
+                <div class="header">
+                    <div class="hicon"></div>
+                    <h1>GAMBOT</h1>
+                </div>
+                <div class="smallgap"></div>
                 <input type="password" name="pass" placeholder="Password"><br>
                 <input type="submit" value="Login">
             </form>
@@ -27,8 +32,8 @@
 
     <div id="container">
         <div class="smallgap"></div>
-        <div id="header">
-            <div id="hicon" onclick="gettournamentstatus(); return false;"></div>
+        <div class="header">
+            <div class="hicon" onclick="gettournamentstatus(); return false;"></div>
             <h1>GAMBOT</h1>
         </div>
         <div class="smallgap"></div>

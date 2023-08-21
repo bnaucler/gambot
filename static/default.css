@@ -167,7 +167,7 @@ input[type=checkbox] {
     margin: 10px;
 }
 
-#header {
+.header {
     width: 310px;
     overflow: auto;
     margin: 0 auto;
@@ -185,7 +185,7 @@ input[type=checkbox] {
     top: 100px;
 }
 
-#hicon {
+.hicon {
     display: inline-block;
     height: 60px;
     width: 60px;
@@ -197,7 +197,7 @@ input[type=checkbox] {
     float: left;
 }
 
-#hicon:hover {
+.hicon:hover {
     opacity: 1;
 }
 
