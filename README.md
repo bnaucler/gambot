@@ -1,6 +1,6 @@
 
 # GAMBOT
-Chess tournament arena manager cobbled together for use at the local chess club.
+Arena tournament manager cobbled together for use at the local chess club.
 
 ## Created by
 Björn W Nauclér (mail@bnaucler.se)
@@ -16,11 +16,13 @@ Pull requests welcome!
 * Replace local log with API call for server log
 * Mobile friendly interface
 * Logic to determine 2nd game with reversed colors
-* User interface to activate/deactivate players
+* UI to activate/deactivate players
 * Better (and consistent) error handling
 * Tournament history search by date
 * Reorganize main screen buttons
 * Refactor (go & js) and divide in multiple source files
+* Check for empty database and enable admin registration
+* UI for changing admin password
 
 ## License
 MIT (do whatever you want)
