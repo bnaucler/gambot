@@ -350,6 +350,15 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     e := r.ParseForm()
     cherr(e)
 
+    rskey := r.FormValue("skey")
+
+    if !valskey(db, rskey) {
+        ep := Player{}
+        enc := json.NewEncoder(w)
+        enc.Encode(ep)
+        return
+    }
+
     req := Req{ID: r.FormValue("id"), Action: r.FormValue("action")}
     id, e := strconv.Atoi(req.ID)
     cherr(e)
@@ -387,6 +396,16 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     cherr(e)
 
     var players []Player
+
+    rskey := r.FormValue("skey")
+
+    if !valskey(db, rskey) {
+        ep := Player{}
+        enc := json.NewEncoder(w)
+        players := append(players, ep)
+        enc.Encode(players)
+        return
+    }
 
     p := Player{Name: r.FormValue("name"), Active: true}
 
@@ -644,24 +663,28 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournamen
 
     var regexnum = regexp.MustCompile(`[^\p{N} ]+`)
 
+
     e := r.ParseForm()
     cherr(e)
 
+    rskey := r.FormValue("skey")
     qmap := r.Form["?id"]
     qstr := strings.Split(qmap[0], ",")
 
-    for _, elem := range qstr {
-        clean := regexnum.ReplaceAllString(elem, "")
-        if clean == "" {
-            fmt.Printf("No players to add\n")
-            break
+    if valskey(db, rskey) {
+        for _, elem := range qstr {
+            clean := regexnum.ReplaceAllString(elem, "")
+            if clean == "" {
+                fmt.Printf("No players to add\n")
+                break
+            }
+            ie, e := strconv.Atoi(clean)
+            cherr(e)
+            t = apt(db, t, ie)
         }
-        ie, e := strconv.Atoi(clean)
-        cherr(e)
-        t = apt(db, t, ie)
-    }
 
-    t = seed(t)
+        t = seed(t)
+    }
 
     enc := json.NewEncoder(w)
     enc.Encode(t)
@@ -682,40 +705,59 @@ func revtslice(ts []Tournament) []Tournament {
 // HTTP handler - get tournament history
 func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
+    e := r.ParseForm()
+    cherr(e)
+
     wn := r.FormValue("n")
     wi := r.FormValue("i")
+    rskey := r.FormValue("skey")
 
-    n, e := strconv.Atoi(wn)
-    if e != nil { n = 1 }
+    if valskey(db, rskey) {
+        n, e := strconv.Atoi(wn)
+        if e != nil { n = 1 }
 
-    i, e := strconv.Atoi(wi)
-    if e != nil { i = 1 }
-    i--
+        i, e := strconv.Atoi(wi)
+        if e != nil { i = 1 }
+        i--
 
-    ts := revtslice(getalltournaments(db))
+        ts := revtslice(getalltournaments(db))
 
-    tlen := len(ts)
+        tlen := len(ts)
 
-    if i > tlen || i < 0 {
-        i = 0
-        n = 0
+        if i > tlen || i < 0 {
+            i = 0
+            n = 0
 
-    } else if i + n > tlen {
-        n = tlen - i;
+        } else if i + n > tlen {
+            n = tlen - i;
 
-    } else if n > tlen {
-        n = tlen
+        } else if n > tlen {
+            n = tlen
+        }
+
+        enc := json.NewEncoder(w)
+        enc.Encode(ts[i:(i + n)])
+
+    } else {
+        ts := []Tournament{}
+        enc := json.NewEncoder(w)
+        enc.Encode(ts)
     }
-
-    enc := json.NewEncoder(w)
-    enc.Encode(ts[i:(i + n)])
 }
 
 // HTTP handler - get tournament status
 func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) {
 
+    rskey := r.FormValue("skey")
     enc := json.NewEncoder(w)
-    enc.Encode(t)
+
+    if valskey(db, rskey) {
+        enc.Encode(t)
+
+    } else {
+        et := Tournament{}
+        enc.Encode(et)
+    }
 }
 
 // Increments the Ngames parameter per user
@@ -787,6 +829,14 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
 
     wid := r.FormValue("id")
     gid := r.FormValue("game")
+    rskey := r.FormValue("skey")
+
+    if !valskey(db, rskey) {
+        et := Tournament{}
+        enc := json.NewEncoder(w)
+        enc.Encode(et)
+        return t
+    }
 
     iid, e := strconv.Atoi(wid)
     cherr(e)
@@ -811,6 +861,15 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
 
 // HTTP handler - end current tournament
 func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) Tournament {
+
+    rskey := r.FormValue("skey")
+
+    if !valskey(db, rskey) {
+        et := Tournament{}
+        enc := json.NewEncoder(w)
+        enc.Encode(et)
+        return t
+    }
 
     t.End = time.Now()
 

@@ -20,7 +20,7 @@ Pull requests welcome!
 * Better (and consistent) error handling
 * Tournament history search by date
 * Reorganize main screen buttons
-* Skey verification on all handlers
+* Refactor (go & js) and divide in multiple source files
 
 ## License
 MIT (do whatever you want)

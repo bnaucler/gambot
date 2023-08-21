@@ -42,7 +42,9 @@ function declareresult(gid, pid, wname) {
     if(pid === 0) log("Game " + gid + " is a draw.")
     else log("Game " + gid + " won by " + wname)
 
-    mkxhr("/dr", "id=" + pid + "&game=" + gid, playersadded); // TOOD temp
+    var params = "id=" + pid + "&game=" + gid + "&skey=" + gss("gambotkey");
+
+    mkxhr("/dr", params, playersadded); // TOOD temp
 }
 
 // Returns name of player from tournament struct, by ID
@@ -276,7 +278,7 @@ function playertotournament(elem) {
     });
 
     var olen = ids.length;
-    var params = "?id=" + JSON.stringify(ids);
+    var params = "?id=" + JSON.stringify(ids) + "&skey=" + gss("gambotkey");
 
     mkxhr("/apt", params, playersadded);
 
@@ -383,6 +385,7 @@ function tournamentend(xhr) {
 function newtournament() {
 
     var params = "skey=" + gss("gambotkey");
+
     mkxhr("/ct", params, tournamentstart);
     gettopplayers(5);
 }
@@ -390,14 +393,16 @@ function newtournament() {
 // Requests ending current tournament
 function endtournament() {
 
-    mkxhr("/et", "", tournamentend);
+    var params = "skey=" + gss("gambotkey");
+
+    mkxhr("/et", params, tournamentend);
 }
 
 // Requests adding new player to database
 function addplayer(elem) {
 
     var id = elem.elements["name"].value;
-    var params = "name=" + id;
+    var params = "name=" + id + "&skey=" + gss("gambotkey");
 
     mkxhr("/ap", params, showplayers);
 }
@@ -495,7 +500,8 @@ function updatestatus(xhr) {
 // Requests tournament status
 function gettournamentstatus() {
 
-    mkxhr("/ts", "", updatestatus);
+    var params = "skey=" + gss("gambotkey");
+    mkxhr("/ts", params, updatestatus);
 }
 
 // Requests tournament history (n games starting at index i)
@@ -503,7 +509,7 @@ function getthist(elem) {
 
     var id = elem.elements["ID"].value;
     var n = elem.elements["n"].value;
-    var params = "i=" + id + "&n=" + n;
+    var params = "i=" + id + "&n=" + n + "&skey=" + gss("gambotkey");
 
     mkxhr("/th", params, updatethist);
 }
