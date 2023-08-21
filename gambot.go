@@ -702,6 +702,45 @@ func revtslice(ts []Tournament) []Tournament {
     return ts
 }
 
+// HTTP handler - Verifies skey against database
+func verskeyhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    var ret bool
+
+    e := r.ParseForm()
+    cherr(e)
+
+    rskey := r.FormValue("skey")
+
+    a, e := getadmin(db)
+    if e != nil || rskey != a.Skey {
+        ret = false
+
+    } else {
+        ret = true
+    }
+
+    enc := json.NewEncoder(w)
+    enc.Encode(ret)
+}
+
+// HTTP handler - Check if admin exists in db
+func chkadmhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    var ret bool
+
+    a, e := getadmin(db)
+    if e != nil || len(a.Pass) < 1 {
+        ret = false
+
+    } else {
+        ret = true
+    }
+
+    enc := json.NewEncoder(w)
+    enc.Encode(ret)
+}
+
 // HTTP handler - get tournament history
 func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
@@ -973,6 +1012,16 @@ func main() {
     // Get tournament history
     http.HandleFunc("/th", func(w http.ResponseWriter, r *http.Request) {
         thhandler(w, r, db)
+    })
+
+    // Checks if admin exists in database (for new instance)
+    http.HandleFunc("/chkadm", func(w http.ResponseWriter, r *http.Request) {
+        chkadmhandler(w, r, db)
+    })
+
+    // Verifies provided skey with database
+    http.HandleFunc("/verskey", func(w http.ResponseWriter, r *http.Request) {
+        verskeyhandler(w, r, db)
     })
 
     // add players to tournament

@@ -577,7 +577,7 @@ function trylogin(xhr) {
 }
 
 // Initiates login procedure
-function login(elem) {
+function loginuser(elem) {
 
     var pass = elem.elements["pass"].value;
     var params = "pass=" + pass;
@@ -591,15 +591,77 @@ function login(elem) {
 function logout() {
 
     gid("login").style.display = "block";
-    sessionStorage.gabmotkey = "";
+    sessionStorage.gambotkey = "";
+    adminindb();
+}
+
+// Receives data on if admin exists in db and opens appropriate window
+function veradminindb(xhr) {
+
+    var res = JSON.parse(xhr.responseText);
+
+    if(res == true) {
+        gid("regbutton").style.display = "none";
+        gid("loginbutton").style.display = "block";
+
+    } else {
+        gid("regbutton").style.display = "block";
+        gid("loginbutton").style.display = "none";
+    }
+}
+
+// Verifies skey match and shows appropriate window
+function verskey(xhr) {
+
+    var res = JSON.parse(xhr.responseText);
+    var lgwin = gid("login");
+
+    if(res == true) {
+        lgwin.style.display = "none";
+
+    } else {
+        lgwin.style.display = "block";
+    }
+}
+
+// Validates local skey with backend
+function chkskey() {
+
+    var params = "skey=" + gss("gambotkey");
+
+    mkxhr("/verskey", params, verskey);
+}
+
+// Checks if admin account exists in db
+function adminindb() {
+
+    mkxhr("/chkadm", "", veradminindb);
+}
+
+// Registers new admin user
+function register() {
+
+    var params = "pass=" + gid("loginpass").value;
+
+    gid("loginform").reset();
+    mkxhr("/reg", params, trylogin);
+}
+
+// Checks if admin is logged in
+function checklogin() {
+
+    var skey = gss("gambotkey");
+
+    adminindb();
+    chkskey();
 }
 
 // Request necessary data after window refresh
 window.onbeforeunload = function() {
-    gettournamentstatus();
+    checklogin();
 };
 
 // Request necessary data after load
 window.onload = function() {
-    gettournamentstatus();
+    checklogin();
 }

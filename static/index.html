@@ -18,15 +18,16 @@
 <body>
     <div id="login">
         <div id="logincontainer">
-            <form id="loginform" onsubmit="login(this); return false;" method="post">
+            <form id="loginform" onsubmit="loginuser(this); return false;" method="post">
                 <div class="header">
                     <div class="hicon"></div>
                     <h1>GAMBOT</h1>
                 </div>
                 <div class="smallgap"></div>
-                <input type="password" name="pass" placeholder="Password"><br>
-                <input type="submit" value="Login">
+                <input id="loginpass" type="password" name="pass" placeholder="Password"><br>
+                <input id="loginbutton" type="submit" name="login" value="Login">
             </form>
+            <button id="regbutton" type="button" onclick="register(); return false;">Register</button>
         </div>
     </div>
 

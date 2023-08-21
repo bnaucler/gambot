@@ -21,7 +21,6 @@ Pull requests welcome!
 * Tournament history search by date
 * Reorganize main screen buttons
 * Refactor (go & js) and divide in multiple source files
-* Check for empty database and enable admin registration
 * UI for changing admin password
 
 ## License
