@@ -16,7 +16,7 @@ import (
     bcrypt "golang.org/x/crypto/bcrypt"
 )
 
-const dbname = ".arena.db"      // Database filename
+const dbname = ".gambot.db"      // Database filename
 
 const S_OK = 0                  // Status code: OK
 const S_ERR = 1                 // Status code: error
