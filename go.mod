@@ -1,4 +1,4 @@
-module github.com/bnaucler/arena
+module github.com/bnaucler/gambot
 
 go 1.19
 
