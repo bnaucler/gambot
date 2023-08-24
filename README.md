@@ -29,9 +29,9 @@ Pull requests welcome!
 * UI to activate/deactivate players
 * Better (and consistent) error handling
 * Tournament history search by date
-* Reorganize main screen buttons
 * Refactor (go & js) and divide in multiple source files
 * UI for changing admin password
+* Show 'end tournament' button after page refresh
 
 ## License
 MIT (do whatever you want)

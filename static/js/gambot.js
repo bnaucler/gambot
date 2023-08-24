@@ -423,10 +423,7 @@ function getplayers(elem) {
 function tournamentstarted() {
 
     gid("tstart").style.display = "none";
-    gid("startgap").style.display = "none";
-
     gid("tend").style.display = "block";
-    gid("endgap").style.display = "block";
 
 }
 
@@ -434,10 +431,7 @@ function tournamentstarted() {
 function tournamentended() {
 
     gid("tstart").style.display = "inline-block";
-    gid("startgap").style.display = "block";
-
     gid("tend").style.display = "none";
-    gid("endgap").style.display = "none";
 }
 
 // Updates top list

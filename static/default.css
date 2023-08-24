@@ -79,7 +79,9 @@ input[type=checkbox] {
 }
 
 #container {
-    padding: 0 100px;
+    width: 800px;
+    margin: 0 auto;
+    /* padding: 0 100px; */
 }
 
 .post {
@@ -266,6 +268,13 @@ input[type=checkbox] {
 .hsz {
     width: 60% !important;
     float: left;
+}
+
+.msb {
+    width: 256px;
+    float: left;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .topplayer {

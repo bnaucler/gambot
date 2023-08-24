@@ -49,9 +49,6 @@
 
         <div class="smallgap"></div>
 
-        <button id="tend" type="button" onclick="endtournament(); return false;">End tournament</button>
-        <div id="endgap" class="smallgap"></div>
-
         <div id="playermgmt">
             <form id="addplayer" onsubmit="addplayer(this); return false;" method="post">
                 <input id="pnatxt" type="text" name="name" Placeholder="Player name"></input><br>
@@ -88,14 +85,7 @@
             <button id="closeadmin" onclick="adminwin(HIDE); return false;">Close</button>
         </div>
 
-        <button id="showpmgmt" onclick="playermgmt(SHOW); return false;">Player management</button>
-        <div class="smallgap"></div>
-
-        <button id="showtmgmt" onclick="tmgmt(SHOW); return false;">Tournament management</button>
-        <div class="smallgap"></div>
-
         <div id="tmgmt">
-            <button id="tstart" type="button" onclick="newtournament(); return false;">Start new tournament</button>
             <div id="startgap" class="smallgap"></div>
 
             <form id="getthist" onsubmit="getthist(this); return false;" method="post">
@@ -113,15 +103,16 @@
             <div class="smallgap"></div>
         </div>
 
-        <button type="button" onclick="adminwin(SHOW); return false;">Admin settings</button>
-        <div class="smallgap"></div>
+        <button id="tstart" class="msb" type="button" onclick="newtournament(); return false;">Start new tournament</button>
+        <button id="tend" class="msb" type="button" onclick="endtournament(); return false;">End tournament</button>
+        <button id="showpmgmt" class="msb" onclick="playermgmt(SHOW); return false;">Player management</button>
+        <button id="showtmgmt" class="msb" onclick="tmgmt(SHOW); return false;">Tournament history</button>
+        <button type="button" class="msb" onclick="adminwin(SHOW); return false;">Admin settings</button>
+        <button type="button" class="msb" onclick="logwin(SHOW); return false;">Show log</button>
+        <button type="button" class="msb" onclick="logout(); return false;">Logout</button>
 
-        <button type="button" onclick="logwin(SHOW); return false;">Show log</button>
+        <div class="clear"></div>
         <div class="smallgap"></div>
-
-        <button type="button" onclick="logout(); return false;">Logout</button>
-        <div class="smallgap"></div>
-
         <p id="credit">Björn Westerberg Nauclér 2023 (<a href="https://github.com/bnaucler/gambot/">src</a>)</p>
         <div class="smallgap"></div>
     </div>
