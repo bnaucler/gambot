@@ -4,6 +4,7 @@ import (
     "fmt"
     "log"
     "sort"
+    "flag"
     "strings"
     "regexp"
     "strconv"
@@ -16,20 +17,21 @@ import (
     bcrypt "golang.org/x/crypto/bcrypt"
 )
 
-const dbname = ".gambot.db"     // Database filename
 
-const S_OK = 0                  // Status code: OK
-const S_ERR = 1                 // Status code: error
-const A_ID = 0                  // Administrator ID
+const S_OK = 0                      // Status code: OK
+const S_ERR = 1                     // Status code: error
+const A_ID = 0                      // Administrator ID
 
-const DEF_PWIN = 2              // Default point value for win
-const DEF_PDRAW = 1             // Default point value for draw
-const DEF_PLOSS = 0             // Default point value for loss
+const DEF_PWIN = 2                  // Default point value for win
+const DEF_PDRAW = 1                 // Default point value for draw
+const DEF_PLOSS = 0                 // Default point value for loss
+const DEF_DBNAME = ".gambot.db"     // Default database filename
+const DEF_PORT = 9001               // Default server port
 
-var abuc = []byte("abuc")       // admin bucket
-var pbuc = []byte("pbuc")       // player bucket
-var gbuc = []byte("gbuc")       // game bucket
-var tbuc = []byte("tbuc")       // tournament bucket
+var abuc = []byte("abuc")           // admin bucket
+var pbuc = []byte("pbuc")           // player bucket
+var gbuc = []byte("gbuc")           // game bucket
+var tbuc = []byte("tbuc")           // tournament bucket
 
 type Admin struct {
     Skey string
@@ -992,9 +994,13 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
 
 func main() {
 
+    pptr := flag.Int("p", DEF_PORT, "port number to listen")
+    dbptr := flag.String("d", DEF_DBNAME, "specify database to open")
+    flag.Parse()
+
     rand.Seed(time.Now().UnixNano())
 
-    db, e := bolt.Open(dbname, 0640, nil)
+    db, e := bolt.Open(*dbptr, 0640, nil)
     cherr(e)
     defer db.Close()
 
@@ -1073,6 +1079,7 @@ func main() {
         t = drhandler(w, r, db, t)
     })
 
-    e = http.ListenAndServe(":9001", nil)
+    lport := fmt.Sprintf(":%d", *pptr)
+    e = http.ListenAndServe(lport, nil)
     cherr(e)
 }

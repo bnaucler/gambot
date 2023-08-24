@@ -5,12 +5,18 @@ Arena tournament manager cobbled together for use at the local chess club.
 ## Created by
 Björn W Nauclér (mail@bnaucler.se)
 
+## Building
+`bin/build.sh`
+
 ## Usage
+Output of `bin/gambot -h`:  
 ```
-bin/build.sh
-bin/gambot
+Usage of bin/gambot:
+  -d string
+    	specify database to open (default ".gambot.db")
+  -p int
+    	port number to listen (default 9001)
 ```
-By default, the web server listens at port `9001`.
 
 ## Contributing
 Pull requests welcome!
@@ -27,7 +33,6 @@ Pull requests welcome!
 * Refactor (go & js) and divide in multiple source files
 * UI for changing admin password
 * Adjustable points for win/loss/draw
-* Launch flags to set port & database name
 
 ## License
 MIT (do whatever you want)
