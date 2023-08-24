@@ -39,6 +39,7 @@ type Admin struct {
     Pwin int
     Pdraw int
     Ploss int
+    Status int
 }
 
 type Player struct {
@@ -212,6 +213,46 @@ func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         fmt.Printf("Admin login failed\n")
         a = Admin{}
     }
+
+    enc := json.NewEncoder(w)
+    enc.Encode(a)
+}
+
+// HTTP handler - admin settings
+func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    e := r.ParseForm()
+    cherr(e)
+
+    rskey := r.FormValue("skey")
+
+    a, e := getadmin(db)
+    cherr(e)
+
+    if !valskey(db, rskey) {
+        ea := Admin{}
+        ea.Status = S_ERR
+        enc := json.NewEncoder(w)
+        enc.Encode(ea)
+        return
+    }
+
+    rpwin := r.FormValue("pwin")
+    pwin, e := strconv.Atoi(rpwin)
+    if e == nil { a.Pwin = pwin }
+
+    rpdraw := r.FormValue("pdraw")
+    pdraw, e := strconv.Atoi(rpdraw)
+    if e == nil { a.Pdraw = pdraw }
+
+    rploss := r.FormValue("ploss")
+    ploss, e := strconv.Atoi(rploss)
+    if e == nil { a.Ploss = ploss }
+
+    writeadmin(a, db)
+
+    a.Status = S_OK
+    a.Pass = []byte("")
 
     enc := json.NewEncoder(w)
     enc.Encode(a)
@@ -1017,6 +1058,11 @@ func main() {
     // admin login
     http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
         loginhandler(w, r, db)
+    })
+
+    // admin settings
+    http.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
+        adminhandler(w, r, db)
     })
 
     // add player
