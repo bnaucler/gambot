@@ -226,6 +226,17 @@ input[type=checkbox] {
     padding-top: 200px;
 }
 
+#admin {
+    position: absolute;
+    background-color: #222;
+    border: 1px #fff solid;
+    border-radius: 5px;
+    display: none;
+    padding: 20px;
+    left: 100px;
+    top: 100px;
+}
+
 .log {
     background-color: #333;
     display: block;
@@ -237,6 +248,24 @@ input[type=checkbox] {
 .pname {
     padding: 5px;
     color: #ccc;
+}
+
+.clear {
+    clear: both;
+}
+
+.cval {
+    display: flex;
+    height: 46px;
+    width: 40% !important;
+    float: left;
+    align-items: center;
+    justify-content: center;
+}
+
+.hsz {
+    width: 60% !important;
+    float: left;
 }
 
 .topplayer {

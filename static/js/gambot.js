@@ -516,6 +516,48 @@ function getthist(elem) {
     mkxhr("/th", params, updatethist);
 }
 
+// Verifies server response after adjustment of admin settings
+function verchangeadmin(xhr) {
+
+    var obj = JSON.parse(xhr.responseText);
+
+    console.log(obj);
+}
+
+// Updates fields of current values for pwin, pdraw & ploss
+function updatepcur(xhr) {
+
+    var obj = JSON.parse(xhr.responseText);
+
+    gid("pwincur").innerHTML = "Cur: " + obj.Pwin;
+    gid("pdrawcur").innerHTML = "Cur: " + obj.Pdraw;
+    gid("plosscur").innerHTML = "Cur: " + obj.Ploss;
+}
+
+// Gets current values for pwin, pdraw and ploss
+function getpcur() {
+
+    var params = "skey=" + gss("gambotkey");
+
+    mkxhr("/admin", params, updatepcur);
+}
+
+// Submits change of admin settings
+function changeadmin(elem) {
+
+    console.log(elem);
+
+    var pwin = elem.elements["pwin"].value;
+    var pdraw = elem.elements["pdraw"].value;
+    var ploss = elem.elements["ploss"].value;
+    var params = "pwin=" + pwin + "&pdraw=" + pdraw + "&ploss=" + ploss + "&skey=" + gss("gambotkey");
+
+    gid("adminform").reset();
+    adminwin(HIDE);
+
+    mkxhr("/admin", params, verchangeadmin);
+}
+
 // Requests top players (n players of type t: (a)ll or (c)urrent)
 function gettopplayers(n, t) {
 
@@ -564,6 +606,20 @@ function tmgmt(state) {
 
     } else if (state == HIDE) {
         twin.style.display = "none";
+    }
+}
+
+// Shows / hides admin window
+function adminwin(state) {
+
+    var awin = gid("admin");
+
+    if(state == SHOW) {
+        awin.style.display = "block";
+        getpcur();
+
+    } else if(state == HIDE) {
+        awin.style.display = "none";
     }
 }
 

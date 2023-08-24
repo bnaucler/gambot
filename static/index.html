@@ -72,6 +72,22 @@
             <div class="smallgap"></div>
         </div>
 
+        <div id="admin">
+            <form id="adminform" onsubmit="changeadmin(this); return false;" method="post">
+                <input type="text" class="hsz" name="pwin" Placeholder="Points per win"></input>
+                <div id="pwincur" class="cval"></div><br>
+                <div class="clear"></div>
+                <input type="text" class="hsz" name="pdraw" Placeholder="Points per draw"></input>
+                <div id="pdrawcur" class="cval"></div><br>
+                <div class="clear"></div>
+                <input type="text" class="hsz" name="ploss" Placeholder="Points per loss"></input>
+                <div id="plosscur" class="cval"></div><br>
+                <div class="clear"></div>
+                <input type="submit" value="Submit">
+            </form>
+            <button id="closeadmin" onclick="adminwin(HIDE); return false;">Close</button>
+        </div>
+
         <button id="showpmgmt" onclick="playermgmt(SHOW); return false;">Player management</button>
         <div class="smallgap"></div>
 
@@ -96,6 +112,9 @@
             <button id="closelog" onclick="logwin(HIDE); return false;">Close log</button>
             <div class="smallgap"></div>
         </div>
+
+        <button type="button" onclick="adminwin(SHOW); return false;">Admin settings</button>
+        <div class="smallgap"></div>
 
         <button type="button" onclick="logwin(SHOW); return false;">Show log</button>
         <div class="smallgap"></div>
