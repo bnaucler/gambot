@@ -6,7 +6,11 @@ Arena tournament manager cobbled together for use at the local chess club.
 Björn W Nauclér (mail@bnaucler.se)
 
 ## Usage
-`go run gambot.go` - the web server listens at port 9001.
+```
+bin/build.sh
+bin/gambot
+```
+By default, the web server listens at port `9001`.
 
 ## Contributing
 Pull requests welcome!
@@ -23,6 +27,7 @@ Pull requests welcome!
 * Refactor (go & js) and divide in multiple source files
 * UI for changing admin password
 * Adjustable points for win/loss/draw
+* Launch flags to set port & database name
 
 ## License
 MIT (do whatever you want)
