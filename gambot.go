@@ -16,11 +16,15 @@ import (
     bcrypt "golang.org/x/crypto/bcrypt"
 )
 
-const dbname = ".gambot.db"      // Database filename
+const dbname = ".gambot.db"     // Database filename
 
 const S_OK = 0                  // Status code: OK
 const S_ERR = 1                 // Status code: error
 const A_ID = 0                  // Administrator ID
+
+const DEF_PWIN = 2              // Default point value for win
+const DEF_PDRAW = 1             // Default point value for draw
+const DEF_PLOSS = 0             // Default point value for loss
 
 var abuc = []byte("abuc")       // admin bucket
 var pbuc = []byte("pbuc")       // player bucket
@@ -30,6 +34,9 @@ var tbuc = []byte("tbuc")       // tournament bucket
 type Admin struct {
     Skey string
     Pass []byte
+    Pwin int
+    Pdraw int
+    Ploss int
 }
 
 type Player struct {
@@ -146,6 +153,16 @@ func writeadmin(a Admin, db *bolt.DB) {
     cherr(e)
 }
 
+// Initializes points for win/draw/loss to default values
+func setdefaultpoints(a Admin) Admin {
+
+    a.Pwin = DEF_PWIN
+    a.Pdraw = DEF_PDRAW
+    a.Ploss = DEF_PLOSS
+
+    return a
+}
+
 // HTTP handler - admin registration
 func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
@@ -153,7 +170,10 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     cherr(e)
 
     a, e := getadmin(db)
-    if e != nil { a = Admin{} }
+    if e != nil {
+        a = Admin{}
+        a = setdefaultpoints(a)
+    }
 
     if len(a.Pass) < 1 || validateuser(a, r.FormValue("opass")) {
         a.Pass, e = bcrypt.GenerateFromPassword([]byte(r.FormValue("pass")), bcrypt.DefaultCost)
@@ -836,12 +856,12 @@ func addpoints(id int, p int, t Tournament) Tournament {
 }
 
 // Awards points to both players in a draw
-func declaredraw(gid string, t Tournament) Tournament {
+func declaredraw(gid string, p int, t Tournament) Tournament {
 
     for i := 0; i < len(t.G) ; i++ {
         if t.G[i].ID == gid {
-            t = addpoints(t.G[i].W, 1, t)
-            t = addpoints(t.G[i].B, 1, t)
+            t = addpoints(t.G[i].W, p, t)
+            t = addpoints(t.G[i].B, p, t)
         }
     }
 
@@ -858,6 +878,21 @@ func getplayername(db *bolt.DB, id int) string  {
     cherr(e)
 
     return p.Name
+}
+
+// Returns losing player id based on winner id
+func gloser(winner int, t Tournament) int {
+
+    for _, g := range t.G {
+        if g.W == winner {
+            return g.B
+
+        } else if g.B == winner {
+            return g.W
+        }
+    }
+
+    return 0
 }
 
 // HTTP handler - declare game result
@@ -880,12 +915,16 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
     iid, e := strconv.Atoi(wid)
     cherr(e)
 
+    a, e := getadmin(db)
+    cherr(e)
+
     if iid == 0 {
-        t = declaredraw(gid, t)
+        t = declaredraw(gid, a.Pdraw, t)
         fmt.Printf("Game %s is a draw!\n", gid)
 
     } else {
-        t = addpoints(iid, 2, t)
+        t = addpoints(iid, a.Pwin, t)
+        if a.Ploss != 0 { t = addpoints(gloser(iid, t), a.Ploss, t) }
         fmt.Printf("Game %s won by %s\n", gid, getplayername(db, iid))
     }
 

@@ -22,6 +22,7 @@ Pull requests welcome!
 * Reorganize main screen buttons
 * Refactor (go & js) and divide in multiple source files
 * UI for changing admin password
+* Adjustable points for win/loss/draw
 
 ## License
 MIT (do whatever you want)
