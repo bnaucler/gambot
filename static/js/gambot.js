@@ -670,6 +670,7 @@ function verskey(xhr) {
 
     if(res == true) {
         lgwin.style.display = "none";
+        gettournamentstatus();
 
     } else {
         lgwin.style.display = "block";

@@ -31,7 +31,6 @@ Pull requests welcome!
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
 * UI for changing admin password
-* Show 'end tournament' button after page refresh
 
 ## License
 MIT (do whatever you want)
