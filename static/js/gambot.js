@@ -45,18 +45,6 @@ function declareresult(gid, pid, wname) {
     mkxhr("/dr", params, playersadded); // TOOD temp
 }
 
-// Returns name of player from tournament struct, by ID
-function getplayername(id, t) {
-
-    var plen = t.P.length;
-
-    for(var i = 0; i < plen; i++) {
-        if(t.P[i].ID === id) return t.P[i].Name;
-    }
-
-    return null
-}
-
 // Returns true if player with name ID is currently in a game
 function ingame(id, t) {
 
