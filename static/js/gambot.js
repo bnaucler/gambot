@@ -611,6 +611,7 @@ function showpopup(popup) {
 
         case "pmgmt":
             setdisp(elems, ["pmgmt"]);
+            gid("playerdata").innerHTML = "";
             gid("addplayer").reset();
             gid("getplayers").reset();
             break;
