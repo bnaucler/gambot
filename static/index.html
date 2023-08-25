@@ -49,7 +49,7 @@
 
         <div class="smallgap"></div>
 
-        <div id="playermgmt">
+        <div id="playermgmt" class="popup">
             <form id="addplayer" onsubmit="addplayer(this); return false;" method="post">
                 <input id="pnatxt" type="text" name="name" Placeholder="Player name"></input><br>
                 <input type="submit" value="Add new player">
@@ -69,7 +69,7 @@
             <div class="smallgap"></div>
         </div>
 
-        <div id="admin">
+        <div id="admin" class="popup">
             <form id="adminform" onsubmit="changeadmin(this); return false;" method="post">
                 <input type="text" class="hsz" name="pwin" Placeholder="Points per win"></input>
                 <div id="pwincur" class="cval"></div><br>
@@ -86,7 +86,7 @@
             <button id="closeadmin" onclick="adminwin(HIDE); return false;">Close</button>
         </div>
 
-        <div id="tmgmt">
+        <div id="tmgmt" class="popup">
             <form id="getthist" onsubmit="getthist(this); return false;" method="post">
                 <input id="tidtxt" type="text" name="ID" Placeholder="steps back in time"></input><br>
                 <input id="tntxt" type="text" name="n" Placeholder="# to fetch"></input><br>
@@ -97,7 +97,7 @@
             <button id="closetmgmt" onclick="tmgmt(HIDE); return false;">Close</button>
         </div>
 
-        <div id="apass">
+        <div id="apass" class="popup">
             <form id="apassform" onsubmit="chpass(this); return false;" method="post">
                 <input id="opasstxt" type="password" name="opass" Placeholder="Current password"></input><br>
                 <input id="npasstxt" type="password" name="npass" Placeholder="New password"></input><br>
@@ -107,7 +107,7 @@
             <button id="closeapass" onclick="apasswin(HIDE); return false;">Cancel</button>
         </div>
 
-        <div id="logwin">
+        <div id="logwin" class="popup">
             <button id="closelog" onclick="logwin(HIDE); return false;">Close</button>
             <div class="smallgap"></div>
         </div>
