@@ -853,13 +853,9 @@ func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
     rskey := r.FormValue("skey")
     enc := json.NewEncoder(w)
 
-    if valskey(db, rskey) {
-        enc.Encode(t)
+    if !valskey(db, rskey) { t = Tournament{} }
 
-    } else {
-        et := Tournament{}
-        enc.Encode(et)
-    }
+    enc.Encode(t)
 }
 
 // Increments the Ngames parameter per user
