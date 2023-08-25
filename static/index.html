@@ -82,12 +82,11 @@
                 <div class="clear"></div>
                 <input type="submit" value="Submit">
             </form>
+            <button onclick="apasswin(SHOW); return false;">Change admin password</button>
             <button id="closeadmin" onclick="adminwin(HIDE); return false;">Close</button>
         </div>
 
         <div id="tmgmt">
-            <div id="startgap" class="smallgap"></div>
-
             <form id="getthist" onsubmit="getthist(this); return false;" method="post">
                 <input id="tidtxt" type="text" name="ID" Placeholder="steps back in time"></input><br>
                 <input id="tntxt" type="text" name="n" Placeholder="# to fetch"></input><br>
@@ -96,6 +95,16 @@
 
             <div id="thist"></div>
             <button id="closetmgmt" onclick="tmgmt(HIDE); return false;">Close</button>
+        </div>
+
+        <div id="apass">
+            <form id="apassform" onsubmit="chpass(this); return false;" method="post">
+                <input id="opasstxt" type="password" name="opass" Placeholder="Current password"></input><br>
+                <input id="npasstxt" type="password" name="npass" Placeholder="New password"></input><br>
+                <input type="submit" value="Change password">
+            </form>
+
+            <button id="closeapass" onclick="apasswin(HIDE); return false;">Cancel</button>
         </div>
 
         <div id="logwin">

@@ -124,6 +124,17 @@ input[type=checkbox] {
     top: 150px;
 }
 
+#apass {
+    display: none;
+    position: absolute;
+    background-color: #222;
+    border: 1px #fff solid;
+    border-radius: 5px;
+    padding: 20px;
+    left: 150px;
+    top: 150px;
+}
+
 #tnmt {
     width: 100%;
     min-height: 100px;

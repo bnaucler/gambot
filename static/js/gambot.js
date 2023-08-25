@@ -620,6 +620,19 @@ function adminwin(state) {
     }
 }
 
+// Shows / hides admin password change window
+function apasswin(state) {
+
+    var awin = gid("apass");
+
+    if(state == SHOW) {
+        awin.style.display = "block";
+
+    } else if(state == HIDE) {
+        awin.style.display = "none";
+    }
+}
+
 // Checks for session key
 function trylogin(xhr) {
 
@@ -640,6 +653,20 @@ function loginuser(elem) {
     gid("loginform").reset();
 
     mkxhr("/login", params, trylogin);
+}
+
+// Changes admin password
+function chpass(elem) {
+
+    var opass = elem.elements["opass"].value;
+    var npass = elem.elements["npass"].value;
+
+    var params = "pass=" + npass + "&opass=" + opass;
+
+    gid("apassform").reset();
+
+    mkxhr("/reg", params, trylogin); // TODO: Update with proper logging / user feedback
+    apasswin(HIDE);
 }
 
 // Resets skey and shows login screen

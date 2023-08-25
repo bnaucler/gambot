@@ -30,7 +30,7 @@ Pull requests welcome!
 * Better (and consistent) error handling
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
-* UI for changing admin password
+* Adjust display of tournament history for currently ongoing
 
 ## License
 MIT (do whatever you want)
