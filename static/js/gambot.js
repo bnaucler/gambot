@@ -255,7 +255,11 @@ function updatethist(xhr) {
         return;
     }
 
-    for(var i = 0; i < tlen; i++) createtlistitem(ts[i]);
+    console.log(ts);
+
+    for(var i = 0; i < tlen; i++) {
+        if(!timezero(ts[i].End)) createtlistitem(ts[i]);
+    }
 }
 
 // Call updatewindow() if request contains players

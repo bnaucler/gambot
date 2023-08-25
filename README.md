@@ -31,7 +31,6 @@ Pull requests welcome!
 * Better (and consistent) error handling
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
-* Adjust display of tournament history for currently ongoing
 * Player statistics
 * Better looking popups
 

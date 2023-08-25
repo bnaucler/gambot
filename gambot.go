@@ -726,7 +726,6 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournamen
 
     var regexnum = regexp.MustCompile(`[^\p{N} ]+`)
 
-
     e := r.ParseForm()
     cherr(e)
 
@@ -745,7 +744,6 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournamen
             cherr(e)
             t = apt(db, t, ie)
         }
-
         t = seed(t)
     }
 
@@ -814,37 +812,41 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     wi := r.FormValue("i")
     rskey := r.FormValue("skey")
 
-    if valskey(db, rskey) {
-        n, e := strconv.Atoi(wn)
-        if e != nil { n = 1 }
-
-        i, e := strconv.Atoi(wi)
-        if e != nil { i = 1 }
-        i--
-
-        ts := revtslice(getalltournaments(db))
-
-        tlen := len(ts)
-
-        if i > tlen || i < 0 {
-            i = 0
-            n = 0
-
-        } else if i + n > tlen {
-            n = tlen - i;
-
-        } else if n > tlen {
-            n = tlen
-        }
-
-        enc := json.NewEncoder(w)
-        enc.Encode(ts[i:(i + n)])
-
-    } else {
+    if !valskey(db, rskey) {
         ts := []Tournament{}
         enc := json.NewEncoder(w)
         enc.Encode(ts)
+        return
     }
+
+    n, e := strconv.Atoi(wn)
+    if e != nil { n = 1 }
+
+    i, e := strconv.Atoi(wi)
+    if e != nil { i = 1 }
+    i--
+
+    ts := revtslice(getalltournaments(db))
+
+    tlen := len(ts)
+
+    if ts[0].End.IsZero() {
+        i++
+    }
+
+    if i > tlen || i < 0 {
+        i = 0
+        n = 0
+
+    } else if i + n > tlen {
+        n = tlen - i;
+
+    } else if n > tlen {
+        n = tlen
+    }
+
+    enc := json.NewEncoder(w)
+    enc.Encode(ts[i:(i + n)])
 }
 
 // HTTP handler - get tournament status
