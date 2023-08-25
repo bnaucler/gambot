@@ -515,7 +515,12 @@ function verchangeadmin(xhr) {
 
     var obj = JSON.parse(xhr.responseText);
 
-    console.log(obj);
+    if(obj.Status == S_ERR) {
+        logout();
+
+    } else {
+        log("Admin settings successfully updated")
+    }
 }
 
 // Updates fields of current values for pwin, pdraw & ploss
@@ -538,8 +543,6 @@ function getpcur() {
 
 // Submits change of admin settings
 function changeadmin(elem) {
-
-    console.log(elem);
 
     var pwin = elem.elements["pwin"].value;
     var pdraw = elem.elements["pdraw"].value;
