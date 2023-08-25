@@ -12,9 +12,11 @@ html, body {
 }
 
 h1 {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
     font-family: courier, monospace;
-    display: block;
     font-size: 65px;
     font-weight: 400;
     float: left;
