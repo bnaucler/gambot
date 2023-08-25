@@ -51,10 +51,10 @@
 
         <button id="tstart" class="msb" type="button" onclick="newtournament(); return false;">Start new tournament</button>
         <button id="tend" class="msb" type="button" onclick="endtournament(); return false;">End tournament</button>
-        <button id="showpmgmt" class="msb" onclick="playermgmt(SHOW); return false;">Player management</button>
-        <button id="showtmgmt" class="msb" onclick="tmgmt(SHOW); return false;">Tournament history</button>
-        <button type="button" class="msb" onclick="adminwin(SHOW); return false;">Admin settings</button>
-        <button type="button" class="msb" onclick="logwin(SHOW); return false;">Show log</button>
+        <button id="showpmgmt" class="msb" onclick="showpopup('pmgmt'); return false;">Player management</button>
+        <button id="showtmgmt" class="msb" onclick="showpopup('tmgmt'); return false;">Tournament history</button>
+        <button type="button" class="msb" onclick="showpopup('admin'); return false;">Admin settings</button>
+        <button type="button" class="msb" onclick="showpopup('log'); return false;">Show log</button>
         <button type="button" class="msb" onclick="logout(); return false;">Logout</button>
 
         <div class="clear"></div>
@@ -79,7 +79,7 @@
 
         <div id="playerdata"></div>
         <div class="smallgap"></div>
-        <button id="closepmgmt" onclick="playermgmt(HIDE); return false;">Close</button>
+        <button id="closepmgmt" onclick="showpopup('none'); return false;">Close</button>
         <div class="smallgap"></div>
     </div>
 
@@ -91,7 +91,7 @@
         </form>
 
         <div id="thist"></div>
-        <button id="closetmgmt" onclick="tmgmt(HIDE); return false;">Close</button>
+        <button id="closetmgmt" onclick="showpopup('none'); return false;">Close</button>
     </div>
 
     <div id="admin" class="popup">
@@ -107,8 +107,8 @@
             <div class="clear"></div>
             <input type="submit" value="Submit">
         </form>
-        <button onclick="apasswin(SHOW); return false;">Change admin password</button>
-        <button id="closeadmin" onclick="adminwin(HIDE); return false;">Close</button>
+        <button onclick="showpopup('apass'); return false;">Change admin password</button>
+        <button id="closeadmin" onclick="showpopup('none'); return false;">Close</button>
     </div>
 
     <div id="apass" class="popup">
@@ -118,11 +118,11 @@
             <input type="submit" value="Change password">
         </form>
 
-        <button id="closeapass" onclick="apasswin(HIDE); return false;">Cancel</button>
+        <button id="closeapass" onclick="showpopup('none'); return false;">Cancel</button>
     </div>
 
     <div id="logwin" class="popup">
-        <button id="closelog" onclick="logwin(HIDE); return false;">Close</button>
+        <button id="closelog" onclick="showpopup('none'); return false;">Close</button>
         <div class="smallgap"></div>
     </div>
 

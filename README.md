@@ -27,10 +27,13 @@ Pull requests welcome!
 * Mobile friendly interface
 * Logic to determine 2nd game with reversed colors
 * UI to activate/deactivate players
+* Checkbox to show/hide inactive players in list
 * Better (and consistent) error handling
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
 * Adjust display of tournament history for currently ongoing
+* Player statistics
+* Better looking popups
 
 ## License
 MIT (do whatever you want)

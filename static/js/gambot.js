@@ -4,8 +4,6 @@ var gss = sessionStorage.getItem.bind(sessionStorage);
 
 const S_OK = 0;
 const S_ERR = 1;
-const SHOW = 0;
-const HIDE = 1;
 
 // HTTP request wrapper
 function mkxhr(dest, params, rfunc) {
@@ -424,7 +422,6 @@ function tournamentstarted() {
 
     gid("tstart").style.display = "none";
     gid("tend").style.display = "block";
-
 }
 
 // Shows & hides appropriate divs for no-tournament-mode
@@ -550,7 +547,7 @@ function changeadmin(elem) {
     var params = "pwin=" + pwin + "&pdraw=" + pdraw + "&ploss=" + ploss + "&skey=" + gss("gambotkey");
 
     gid("adminform").reset();
-    adminwin(HIDE);
+    showpopup("none");
 
     mkxhr("/admin", params, verchangeadmin);
 }
@@ -559,78 +556,6 @@ function changeadmin(elem) {
 function gettopplayers(n, t) {
 
     mkxhr("/gtp", "n=" + n + "&t=" + t, updatetopplayers);
-}
-
-// Shows / hides log window
-function logwin(state) {
-
-    var logwin = gid("logwin");
-
-    if(state === SHOW) {
-        logwin.style.display = "block";
-    } else if (state === HIDE) {
-        logwin.style.display = "none";
-    }
-}
-
-// Shows / hides player management window
-function playermgmt(state) {
-
-    var pwin = gid("playermgmt");
-
-    if(state === SHOW) {
-        pwin.style.display = "block";
-        gid("playerdata").style.display = "none";
-        gid("pidtxt").value = "";
-        gid("pntxt").value = "";
-        gid("pnatxt").value = "";
-
-    } else if (state == HIDE) {
-        pwin.style.display = "none";
-    }
-}
-
-// Shows / hides tournament management window
-function tmgmt(state) {
-
-    var twin = gid("tmgmt");
-
-    if(state === SHOW) {
-        twin.style.display = "block";
-        gid("thist").innerHTML = "";
-        gid("tidtxt").value = "";
-        gid("tntxt").value = "";
-
-    } else if (state == HIDE) {
-        twin.style.display = "none";
-    }
-}
-
-// Shows / hides admin window
-function adminwin(state) {
-
-    var awin = gid("admin");
-
-    if(state == SHOW) {
-        awin.style.display = "block";
-        getpcur();
-
-    } else if(state == HIDE) {
-        awin.style.display = "none";
-    }
-}
-
-// Shows / hides admin password change window
-function apasswin(state) {
-
-    var awin = gid("apass");
-
-    if(state == SHOW) {
-        awin.style.display = "block";
-
-    } else if(state == HIDE) {
-        awin.style.display = "none";
-    }
 }
 
 // Checks for session key
@@ -666,7 +591,63 @@ function chpass(elem) {
     gid("apassform").reset();
 
     mkxhr("/reg", params, trylogin); // TODO: Update with proper logging / user feedback
-    apasswin(HIDE);
+    showpopup("none");
+}
+
+// Iterates through elem list and selected popups to show / hide
+function setdisp(elem, popup) {
+
+    for(var pg in elem) {
+        elem[pg].style.display = popup.indexOf(pg) < 0 ? "none" : "block";
+    }
+}
+
+// Shows & hides popup windows
+function showpopup(popup) {
+
+    var elems = { pmgmt: gid("playermgmt"),
+                  tmgmt: gid("tmgmt"),
+                  admin: gid("admin"),
+                  apass: gid("apass"),
+                  log: gid("logwin")
+                }
+
+    switch(popup) {
+        case "none":
+            setdisp(elems, []);
+            break;
+
+        case "pmgmt":
+            setdisp(elems, ["pmgmt"]);
+            gid("addplayer").reset();
+            gid("getplayers").reset();
+            break;
+
+        case "tmgmt":
+            setdisp(elems, ["tmgmt"]);
+            gid("thist").innerHTML = "";
+            gid("getthist").reset();
+            break;
+
+        case "admin":
+            setdisp(elems, ["admin"]);
+            gid("adminform").reset();
+            getpcur();
+            break;
+
+        case "apass":
+            setdisp(elems, ["apass"]);
+            gid("apassform").reset();
+            break;
+
+        case "log":
+            setdisp(elems, ["log"]);
+            break;
+
+        default:
+            console.log("Trying to open nonexisting page: " + popup);
+            break;
+    }
 }
 
 // Resets skey and shows login screen
