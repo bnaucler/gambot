@@ -243,8 +243,6 @@ function updatethist(xhr) {
         return;
     }
 
-    console.log(ts);
-
     for(var i = 0; i < tlen; i++) {
         if(!timezero(ts[i].End)) createtlistitem(ts[i]);
     }
@@ -517,9 +515,9 @@ function updatepcur(xhr) {
 
     var obj = JSON.parse(xhr.responseText);
 
-    gid("pwincur").innerHTML = "Cur: " + obj.Pwin;
-    gid("pdrawcur").innerHTML = "Cur: " + obj.Pdraw;
-    gid("plosscur").innerHTML = "Cur: " + obj.Ploss;
+    gid("pwinnum").value = obj.Pwin;
+    gid("pdrawnum").value = obj.Pdraw;
+    gid("plossnum").value = obj.Ploss;
 }
 
 // Gets current values for pwin, pdraw and ploss

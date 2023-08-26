@@ -96,14 +96,14 @@
 
     <div id="admin" class="popup">
         <form id="adminform" onsubmit="changeadmin(this); return false;" method="post">
-            <input type="text" class="hsz" name="pwin" Placeholder="Points per win"></input>
-            <div id="pwincur" class="cval"></div><br>
+            <input type="number" id="pwinnum" class="hsz" name="pwin" min="0" max="10"></input>
+            <div id="pwincur" class="cval">Points per win (0-10)</div><br>
             <div class="clear"></div>
-            <input type="text" class="hsz" name="pdraw" Placeholder="Points per draw"></input>
-            <div id="pdrawcur" class="cval"></div><br>
+            <input type="number" id="pdrawnum" class="hsz" name="pdraw" min="0" max="10"></input>
+            <div id="pdrawcur" class="cval">Points per draw (0-10)</div><br>
             <div class="clear"></div>
-            <input type="text" class="hsz" name="ploss" Placeholder="Points per loss"></input>
-            <div id="plosscur" class="cval"></div><br>
+            <input type="number" id="plossnum" class="hsz" name="ploss" min="0" max="10"></input>
+            <div id="plosscur" class="cval">Points per loss (0-10)</div><br>
             <div class="clear"></div>
             <input type="submit" value="Submit">
         </form>

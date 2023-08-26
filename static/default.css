@@ -40,7 +40,7 @@ a:hover {
     transition: .3s;
 }
 
-input[type=text], input[type=password] {
+input[type=text], input[type=password], input[type=number] {
     border: none;
     border-radius: 4px;
     outline: none;
@@ -252,14 +252,15 @@ input[type=checkbox] {
 .cval {
     display: flex;
     height: 46px;
-    width: 40% !important;
+    width: 60% !important;
     float: left;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
+    padding-left: 20px;
 }
 
 .hsz {
-    width: 60% !important;
+    width: 30% !important;
     float: left;
 }
 
