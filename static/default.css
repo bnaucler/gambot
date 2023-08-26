@@ -252,15 +252,15 @@ input[type=checkbox] {
 .cval {
     display: flex;
     height: 46px;
-    width: 60% !important;
+    width: 63% !important;
     float: left;
     align-items: center;
     justify-content: left;
-    padding-left: 20px;
+    padding-left: 15px;
 }
 
 .hsz {
-    width: 30% !important;
+    width: 25% !important;
     float: left;
 }
 
