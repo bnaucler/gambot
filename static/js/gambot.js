@@ -25,10 +25,8 @@ function mkxhr(dest, params, rfunc) {
 // Returns player name from ID in tournament struct
 function getplayername(id, t) {
 
-    var plen = t.P.length;
-
-    for(var i = 0; i < plen; i++) {
-        if(t.P[i].ID === id) return t.P[i].Name;
+    for(const p of t.P) {
+        if(p.ID === id) return p.Name;
     }
 
     return null;
@@ -48,10 +46,8 @@ function declareresult(gid, pid, wname) {
 // Returns true if player with name ID is currently in a game
 function ingame(id, t) {
 
-    var glen = t.G.length;
-
-    for(var i = 0; i < glen; i++) {
-        if((t.G[i].W === id || t.G[i].B === id) && timezero(t.G[i].End)) return true;
+    for(const g of t.G) {
+        if((g.W === id || g.B === id) && timezero(g.End)) return true;
     }
 
     return false;
@@ -73,18 +69,16 @@ function addbench(id, t) {
 // Populates the bench (waiting players)
 function popbench(t) {
 
-    var plen = t.P.length;
     var bp = [];
 
-    for(var i = 0; i < plen; i++) {
-        if(!ingame(t.P[i].ID, t)) bp.push(t.P[i].ID)
+    for(const p of t.P) {
+        if(!ingame(p.ID, t)) bp.push(p.ID)
     }
 
-    var blen = bp.length;
-    if(blen === 0) gid("bench").style.display = "none";
+    if(bp.length === 0) gid("bench").style.display = "none";
     else gid("bench").style.display = "block";
 
-    for(var i = 0; i < blen; i++) addbench(bp[i], t)
+    for(const p of bp) addbench(p, t)
 }
 
 // Adds a game to the display window
@@ -149,10 +143,8 @@ function updatewindow(t) {
     if(t.ID != 0) gettopplayers(5, "c");
     else gettopplayers(5, "a");
 
-    var glen = t.G.length;
-
-    for(var i = 0; i < glen; i++) {
-        if(timezero(t.G[i].End)) addgame(t.G[i], t);
+    for(const g of t.G) {
+        if(timezero(g.End)) addgame(g, t);
     }
 
     makebench(pdiv);
@@ -189,12 +181,11 @@ function ttop(n, t) {
 function createtlistplayer(t, td) {
 
     var tpl = ttop(3, t);
-    var tplen = tpl.length;
 
-    for(var i = 0; i < tplen; i++) {
+    for(const p of tpl) {
         var tp = document.createElement("p");
         tp.className = "ttp";
-        tp.appendChild(document.createTextNode(tpl[i]));
+        tp.appendChild(document.createTextNode(p));
         td.appendChild(tp);
     }
 }
@@ -235,16 +226,16 @@ function createtlistitem(t) {
 function updatethist(xhr) {
 
     var ts = JSON.parse(xhr.responseText);
-    var tlen = ts.length;
+
     gid("thist").innerHTML = "";
 
-    if(tlen == 0) {
+    if(ts.length === 0) {
         log("No data received!");
         return;
     }
 
-    for(var i = 0; i < tlen; i++) {
-        if(!timezero(ts[i].End)) createtlistitem(ts[i]);
+    for(const t of ts) {
+        if(!timezero(t.End)) createtlistitem(t);
     }
 }
 
@@ -277,21 +268,20 @@ function playertotournament(elem) {
 function showplayers(xhr) {
 
     var obj = JSON.parse(xhr.responseText);
-    var olen = obj.length;
     var pdiv = gid("playerdata");
 
     pdiv.innerHTML = "";
     pdiv.style.display = "block";
 
-    for(var i = 0; i < olen; i++) {
+    for(const p of obj) {
         var post = document.createElement("div");
         var name = document.createElement("h4");
 
         post.className = "post";
-        name.appendChild(document.createTextNode(obj[i].Name));
+        name.appendChild(document.createTextNode(p.Name));
         post.appendChild(name);
 
-        if(obj[i].Active === false) {
+        if(p.Active === false) {
             post.style.backgroundColor = "#772222";
 
         } else {
@@ -299,7 +289,7 @@ function showplayers(xhr) {
 
             cb.type = "checkbox";
             cb.name = "selected";
-            cb.value = obj[i].ID;
+            cb.value = p.ID;
             name.appendChild(cb);
         }
 
@@ -445,16 +435,13 @@ function updatetopplayers(xhr) {
         gid("topfive").style.display = "none";
     }
 
-    var olen = obj.P.length;
-
-    for(var i = 0; i < olen; i++) {
-
+    for(const p of obj.P) {
         var item = document.createElement("div");
         var name = document.createElement("p");
         var text;
 
-        if(obj.S == "a") text = obj.P[i].Name + " " + obj.P[i].TPoints;
-        if(obj.S == "c") text = obj.P[i].Name + " " + obj.P[i].Points;
+        if(obj.S == "a") text = p.Name + " " + p.TPoints;
+        if(obj.S == "c") text = p.Name + " " + p.Points;
 
         item.className = "topplayer";
 
