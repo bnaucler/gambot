@@ -472,6 +472,7 @@ function updatestatus(xhr) {
     if(obj.ID === 0 || !timezero(obj.End)) {
         tournamentended();
         gettopplayers(5, "a");
+        gid("games").innerHTML = "";
 
     } else {
         tournamentstarted();
