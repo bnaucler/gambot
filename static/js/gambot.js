@@ -22,6 +22,21 @@ function mkxhr(dest, params, rfunc) {
     xhr.send(params);
 }
 
+// Returns DOM object of requested type, and with class & text defined if requested
+function mkobj(type, cl, txt) {
+
+    var ret = document.createElement(type);
+
+    if(cl !== undefined && cl != "") ret.classList.add(cl);
+
+    if(txt !== undefined) {
+        var tc = document.createTextNode(txt);
+        ret.appendChild(tc);
+    }
+
+    return ret;
+}
+
 // Returns player name from ID in tournament struct
 function getplayername(id, t) {
 
@@ -53,15 +68,11 @@ function ingame(id, t) {
     return false;
 }
 
-
 // Adds player to bench by id
 function addbench(id, t) {
 
     var pdiv = gid("bench");
-    var player = document.createElement("div");
-
-    player.appendChild(document.createTextNode(getplayername(id, t)));
-    player.className = "benchp";
+    var player = mkobj("div", "benchp", getplayername(id, t));
 
     pdiv.appendChild(player);
 }
@@ -85,22 +96,13 @@ function popbench(t) {
 function addgame(g, t) {
 
     var pdiv = gid("games");
-    var game = document.createElement("div");
-    var bw = document.createElement("div");
-    var W = document.createElement("div");
-    var B = document.createElement("div");
-    var draw = document.createElement("div");
-    var dtext = document.createElement("span");
 
-    game.className = "game";
-    draw.className = "draw";
-    bw.className = "bw";
-    W.className = "wp";
-    B.className = "bp";
-
-    W.appendChild(document.createTextNode(getplayername(g.W, t)));
-    B.appendChild(document.createTextNode(getplayername(g.B, t)));
-    dtext.appendChild(document.createTextNode("draw"));
+    var game = mkobj("div", "game");
+    var bw = mkobj("div", "bw");
+    var W = mkobj("div", "wp", getplayername(g.W, t));
+    var B = mkobj("div", "bp", getplayername(g.B, t));
+    var draw = mkobj("div", "draw");
+    var dtext = mkobj("span", "", "draw");
 
     W.addEventListener("click", () => {
         declareresult(g.ID, g.W, getplayername(g.W, t));
@@ -183,9 +185,7 @@ function createtlistplayer(t, td) {
     var tpl = ttop(3, t);
 
     for(const p of tpl) {
-        var tp = document.createElement("p");
-        tp.className = "ttp";
-        tp.appendChild(document.createTextNode(p));
+        var tp = mkobj("p", "ttp", p);
         td.appendChild(tp);
     }
 }
@@ -194,17 +194,10 @@ function createtlistplayer(t, td) {
 function createtlistitem(t) {
 
     var pdiv = gid("thist");
-    var td = document.createElement("div");
-    var id = document.createElement("p");
-    var stime = document.createElement("p");
-
-    td.className = "tlitm";
-    id.className = "tid";
-    stime.className = "ttime";
-
-    id.appendChild(document.createTextNode(t.ID));
-    stime.appendChild(document.createTextNode(
-        formatdate(t.Start) + " - " + formatdate(t.End)));
+    var td = mkobj("div", "tlitm");
+    var id = mkobj("p", "tid", t.ID);
+    var stext = formatdate(t.Start) + " - " + formatdate(t.End);
+    var stime = mkobj("p", "ttime", stext);
 
     td.appendChild(id);
     td.appendChild(stime);
@@ -213,9 +206,7 @@ function createtlistitem(t) {
         createtlistplayer(t, td);
 
     } else {
-        var tp = document.createElement("p");
-        tp.className = "ttp";
-        tp.appendChild(document.createTextNode("No players in tournament!"));
+        var tp = mkobj("p", "ttp", "No players in tournament");
         td.appendChild(tp);
     }
 
@@ -274,15 +265,13 @@ function showplayers(xhr) {
     pdiv.style.display = "block";
 
     for(const p of obj) {
-        var post = document.createElement("div");
-        var name = document.createElement("h4");
+        var pl = mkobj("div", "pln");
+        var name = mkobj("h4", "", p.Name);
 
-        post.className = "post";
-        name.appendChild(document.createTextNode(p.Name));
-        post.appendChild(name);
+        pl.appendChild(name);
 
         if(p.Active === false) {
-            post.style.backgroundColor = "#772222";
+            pl.style.backgroundColor = "#772222";
 
         } else {
             var cb = document.createElement("input");
@@ -292,12 +281,10 @@ function showplayers(xhr) {
             cb.value = p.ID;
             name.appendChild(cb);
         }
-
-        pdiv.appendChild(post);
+        pdiv.appendChild(pl);
     }
 
-    var btn = document.createElement("button");
-    btn.appendChild(document.createTextNode("Add selected players to tournament"));
+    var btn = mkobj("button", "", "Add selected playerss to tournament");
 
     btn.addEventListener("click", () => {
         playertotournament(pdiv);
@@ -317,12 +304,9 @@ function timezero(ttime) {
 function log(data) {
 
     var pdiv = gid("logwin");
-    var item = document.createElement("div");
-    var msg = document.createElement("p");
+    var item = mkobj("div", "log");
+    var msg = mkobj("p", "", data);
 
-    item.className = "log";
-
-    msg.appendChild(document.createTextNode(data));
     item.appendChild(msg);
     pdiv.appendChild(item);
 }
@@ -436,16 +420,14 @@ function updatetopplayers(xhr) {
     }
 
     for(const p of obj.P) {
-        var item = document.createElement("div");
-        var name = document.createElement("p");
         var text;
 
         if(obj.S == "a") text = p.Name + " " + p.TPoints;
         if(obj.S == "c") text = p.Name + " " + p.Points;
 
-        item.className = "topplayer";
+        var item = mkobj("div", "topplayer");
+        var name = mkobj("p", "", text);
 
-        name.appendChild(document.createTextNode(text));
         item.appendChild(name);
         pdiv.appendChild(item);
     }
@@ -692,8 +674,6 @@ function register() {
 
 // Checks if admin is logged in
 function checklogin() {
-
-    var skey = gss("gambotkey");
 
     adminindb();
     chkskey();
