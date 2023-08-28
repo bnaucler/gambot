@@ -331,7 +331,7 @@ function showplayers(xhr) {
     for(const p of obj) showplayer(p, pdiv, intourn);
 
     if(intourn == 1) {
-        var btn = mkobj("button", "", "Add selected playerss to tournament");
+        var btn = mkobj("button", "", "Add selected players to tournament");
 
         btn.addEventListener("click", () => {
             playertotournament(pdiv);
