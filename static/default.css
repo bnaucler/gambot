@@ -167,6 +167,7 @@ input[type=checkbox] {
 
 #tmgmt {
     display: none;
+    min-width: 260px;
 }
 
 .popup {
@@ -261,6 +262,7 @@ input[type=checkbox] {
 
 .hsz {
     width: 25% !important;
+    min-width: 65px;
     float: left;
 }
 

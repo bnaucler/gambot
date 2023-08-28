@@ -83,8 +83,12 @@
 
     <div id="tmgmt" class="popup">
         <form id="getthist" onsubmit="getthist(this); return false;" method="post">
-            <input id="tidtxt" type="text" name="ID" Placeholder="steps back in time"></input><br>
-            <input id="tntxt" type="text" name="n" Placeholder="# to fetch"></input><br>
+            <input id="tidtxt" class="hsz" type="number" name="ID" min=1 value=1></input>
+            <div class="cval">Rev. index</div><br>
+            <div class="clear"></div>
+            <input id="tnxt" class="hsz" type="number" name="n" min=1 value=1></input>
+            <div class="cval">Depth</div><br>
+            <div class="clear"></div>
             <input type="submit" value="Get tournament history">
         </form>
 
@@ -95,13 +99,13 @@
     <div id="admin" class="popup">
         <form id="adminform" onsubmit="changeadmin(this); return false;" method="post">
             <input type="number" id="pwinnum" class="hsz" name="pwin" min="0" max="10"></input>
-            <div id="pwincur" class="cval">Points per win (0-10)</div><br>
+            <div class="cval">Points per win (0-10)</div><br>
             <div class="clear"></div>
             <input type="number" id="pdrawnum" class="hsz" name="pdraw" min="0" max="10"></input>
-            <div id="pdrawcur" class="cval">Points per draw (0-10)</div><br>
+            <div class="cval">Points per draw (0-10)</div><br>
             <div class="clear"></div>
             <input type="number" id="plossnum" class="hsz" name="ploss" min="0" max="10"></input>
-            <div id="plosscur" class="cval">Points per loss (0-10)</div><br>
+            <div class="cval">Points per loss (0-10)</div><br>
             <div class="clear"></div>
             <input type="submit" value="Submit">
         </form>

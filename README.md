@@ -34,7 +34,6 @@ Pull requests welcome!
 * Refactor (go & js) and divide in multiple source files
 * Player statistics
 * Better looking popups
-* Number input fields to tournament history req
 
 ## License
 MIT (do whatever you want)
