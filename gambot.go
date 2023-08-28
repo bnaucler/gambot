@@ -830,9 +830,7 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     tlen := len(ts)
 
-    if ts[0].End.IsZero() {
-        i++
-    }
+    if ts[0].End.IsZero() { i++ }
 
     if i > tlen || i < 0 {
         i = 0

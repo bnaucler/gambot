@@ -255,42 +255,90 @@ function playertotournament(elem) {
     gid("playerdata").style.display = "none";
 }
 
+// Shows data on individual player
+function showplayerdata(xhr) {
+
+    var obj = JSON.parse(xhr.responseText);
+    var pname = gid("indplayername");
+    var editbtn = gid("editplayer");
+
+    pname.innerHTML = obj[0].Name;
+    pname.setAttribute("name", obj[0].ID);
+
+    if(obj[0].Active == true) {
+        editbtn.innerHTML = "Deactivate";
+        editbtn.setAttribute("name", "deac");
+
+    } else {
+        editbtn.innerHTML = "Activate";
+        editbtn.setAttribute("name", "activate");
+    }
+
+    showpopup("indplayer");
+}
+
+// Requests player data
+function getplayerdata(p) {
+
+    var params = "id=" + p.getAttribute("name");
+
+    mkxhr("/gp", params, showplayerdata);
+}
+
+// Adds player to list
+function showplayer(p, pdiv, intourn) {
+
+    var pl = mkobj("div", "pln");
+    var name = mkobj("p", "pntxt", p.Name);
+
+    pl.appendChild(name);
+
+    if(p.Active == false && gss("gambotshowdeac") == "true") {
+        pl.style.backgroundColor = "#772222";
+
+    } else if(p.Active == true && intourn == 1) {
+        var cb = mkobj("input", "", "");
+
+        cb.type = "checkbox";
+        cb.name = "selected";
+        cb.value = p.ID;
+        pl.appendChild(cb);
+
+    } else if(p.Active == false) {
+        return;
+    }
+
+    name.addEventListener("click", () => {
+        getplayerdata(pl);
+    });
+
+    pl.setAttribute("name", p.ID);
+    pdiv.appendChild(pl);
+}
+
 // Displays list of players
 function showplayers(xhr) {
 
     var obj = JSON.parse(xhr.responseText);
     var pdiv = gid("playerdata");
+    var intourn = gss("gambotintournament");
+    var br = mkobj("br", "", "");
 
     pdiv.innerHTML = "";
     pdiv.style.display = "block";
+    pdiv.appendChild(br);
 
-    for(const p of obj) {
-        var pl = mkobj("div", "pln");
-        var name = mkobj("h4", "", p.Name);
+    for(const p of obj) showplayer(p, pdiv, intourn);
 
-        pl.appendChild(name);
+    if(intourn == 1) {
+        var btn = mkobj("button", "", "Add selected playerss to tournament");
 
-        if(p.Active === false) {
-            pl.style.backgroundColor = "#772222";
+        btn.addEventListener("click", () => {
+            playertotournament(pdiv);
+        });
 
-        } else {
-            var cb = document.createElement("input");
-
-            cb.type = "checkbox";
-            cb.name = "selected";
-            cb.value = p.ID;
-            name.appendChild(cb);
-        }
-        pdiv.appendChild(pl);
+        pdiv.appendChild(btn);
     }
-
-    var btn = mkobj("button", "", "Add selected playerss to tournament");
-
-    btn.addEventListener("click", () => {
-        playertotournament(pdiv);
-    });
-
-    pdiv.appendChild(btn);
 }
 
 // Returns true if time object is zero / null
@@ -376,7 +424,10 @@ function getplayers(elem) {
 
     var id = elem.elements["ID"].value;
     var name = elem.elements["name"].value;
+    var cb = gid("showdeac").checked;
     var params = "id=" + id + "&name=" + name;
+
+    sessionStorage.gambotshowdeac = cb;
 
     mkxhr("/gp", params, showplayers);
 }
@@ -386,6 +437,7 @@ function tournamentstarted() {
 
     gid("tstart").style.display = "none";
     gid("tend").style.display = "block";
+    sessionStorage.gambotintournament = 1;
 }
 
 // Shows & hides appropriate divs for no-tournament-mode
@@ -393,6 +445,7 @@ function tournamentended() {
 
     gid("tstart").style.display = "inline-block";
     gid("tend").style.display = "none";
+    sessionStorage.gambotintournament = 0;
 }
 
 // Updates top list
@@ -567,6 +620,7 @@ function showpopup(popup) {
 
     var elems = { pmgmt: gid("playermgmt"),
                   tmgmt: gid("tmgmt"),
+                  indplayer: gid("indplayer"),
                   admin: gid("admin"),
                   apass: gid("apass"),
                   log: gid("logwin")
@@ -582,6 +636,10 @@ function showpopup(popup) {
             gid("playerdata").innerHTML = "";
             gid("addplayer").reset();
             gid("getplayers").reset();
+            break;
+
+        case "indplayer":
+            setdisp(elems, ["indplayer"]);
             break;
 
         case "tmgmt":
@@ -655,6 +713,30 @@ function chkskey() {
     var params = "skey=" + gss("gambotkey");
 
     mkxhr("/verskey", params, verskey);
+}
+
+// Verifies player edit response
+function verplayeredit(xhr) {
+
+    var obj = JSON.parse(xhr.responseText);
+
+    if(obj.ID != undefined) {
+        log("Successfully updated player data");
+    } else {
+        log("Error updating player data");
+    }
+}
+
+// Requests edit of player properties
+function editplayer() {
+
+    var pid = gid("indplayername").getAttribute("name");
+    var action = gid("editplayer").getAttribute("name");
+    var params = "id=" + pid + "&action=" + action + "&skey=" + gss("gambotkey");
+
+    mkxhr("/ep", params, verplayeredit);
+
+    showpopup("pmgmt");
 }
 
 // Checks if admin account exists in db

@@ -26,14 +26,13 @@ Pull requests welcome!
 * Replace local log with API call for server log
 * Mobile friendly interface
 * Logic to determine 2nd game with reversed colors
-* UI to activate/deactivate players
 * Checkbox to show/hide inactive players in list
-* Only display 'add players to tournament' when applicable
 * Better (and consistent) error handling
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
 * Player statistics
 * Better looking popups
+* Implement skey on gphandler
 
 ## License
 MIT (do whatever you want)
