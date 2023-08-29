@@ -951,6 +951,9 @@ func getplayername(db *bolt.DB, id int) string  {
 func gloser(winner int, t Tournament) int {
 
     for _, g := range t.G {
+        if !g.End.IsZero() {
+            continue;
+
         if g.W == winner {
             return g.B
 
