@@ -344,8 +344,6 @@ function showplayerdata(xhr) {
         editbtn.setAttribute("name", "activate");
     }
 
-    console.log(obj);
-
     fillbar(TOTAL, obj[0].Stat[WWIN] + obj[0].Stat[BWIN],
                    obj[0].Stat[WDRAW] + obj[0].Stat[BDRAW],
                    obj[0].Stat[WLOSS] + obj[0].Stat[BLOSS]);
