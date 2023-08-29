@@ -319,7 +319,6 @@ func getallplayers(db *bolt.DB) []Player {
    return players
 }
 
-
 // Returns slice with top n players from tournament t
 func currenttop(db *bolt.DB, n int, t Tournament) []Player {
 
@@ -1042,10 +1041,10 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
         wcol := getcol(iid, t)
         t = addpoints(iid, a.Pwin, t)
         t = addstat(iid, wcol, WIN, t)
-        if a.Ploss != 0 {
-            t = addpoints(gloser(iid, t), a.Ploss, t)
-            t = addstat(gloser(iid, t), oppcol(wcol), WIN, t)
-        }
+        t = addstat(gloser(iid, t), oppcol(wcol), LOSS, t)
+
+        if a.Ploss != 0 { t = addpoints(gloser(iid, t), a.Ploss, t) }
+
         fmt.Printf("Game %s won by %s\n", gid, getplayername(db, iid))
     }
 

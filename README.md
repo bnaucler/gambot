@@ -28,9 +28,9 @@ Pull requests welcome!
 * Logic to determine 2nd game with reversed colors
 * Checkbox to show/hide inactive players in list
 * Better (and consistent) error handling
+* Player stats accessible from top 5
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
-* Include % of win / draw / loss in player stats
 * Better looking popups
 * Implement skey on gphandler
 

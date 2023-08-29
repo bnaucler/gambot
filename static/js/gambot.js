@@ -2,8 +2,24 @@
 var gid = document.getElementById.bind(document);
 var gss = sessionStorage.getItem.bind(sessionStorage);
 
+// Macro definitions for readability
 const S_OK = 0;
 const S_ERR = 1;
+
+const WWIN = 0;
+const WDRAW = 1;
+const WLOSS = 2;
+const BWIN = 3;
+const BDRAW = 4;
+const BLOSS = 5;
+
+const WHITE = 0;
+const BLACK = 1;
+const TOTAL = 2;
+
+const WIN = 0;
+const DRAW = 1;
+const LOSS = 2;
 
 // HTTP request wrapper
 function mkxhr(dest, params, rfunc) {
@@ -265,6 +281,39 @@ function calcppg(points, games) {
     return ret.toFixed(2);
 }
 
+// Fills the horizontal bar for win / draw / loss
+function fillbar(col, win, draw, loss) {
+
+    var sum = win + draw + loss;
+    var wbar;
+    var dbar;
+    var lbar;
+
+    if(col == TOTAL) {
+        wbar = gid("indtwin");
+        dbar = gid("indtdraw");
+        lbar = gid("indtloss");
+
+    } else if(col == WHITE) {
+        wbar = gid("indwwin");
+        dbar = gid("indwdraw");
+        lbar = gid("indwloss");
+
+    } else if(col == BLACK) {
+        wbar = gid("indbwin");
+        dbar = gid("indbdraw");
+        lbar = gid("indbloss");
+    }
+
+    var wwidth = Math.floor(win / sum * 100);
+    var dwidth = Math.floor(draw / sum * 100);
+    var lwidth = Math.floor(loss / sum * 100);
+
+    wbar.style.width = wwidth + "%";
+    dbar.style.width = dwidth + "%";
+    lbar.style.width = lwidth + "%";
+}
+
 // Shows data on individual player
 function showplayerdata(xhr) {
 
@@ -291,6 +340,11 @@ function showplayerdata(xhr) {
         editbtn.setAttribute("name", "activate");
     }
 
+    fillbar(TOTAL, obj[0].Stat[WWIN] + obj[0].Stat[BWIN],
+                   obj[0].Stat[WDRAW] + obj[0].Stat[BDRAW],
+                   obj[0].Stat[WLOSS] + obj[0].Stat[BLOSS]);
+    fillbar(WHITE, obj[0].Stat[WWIN], obj[0].Stat[WDRAW], obj[0].Stat[WLOSS]);
+    fillbar(BLACK, obj[0].Stat[BWIN], obj[0].Stat[BDRAW], obj[0].Stat[BLOSS]);
     showpopup("indplayer");
 }
 

@@ -300,6 +300,10 @@ input[type=checkbox] {
     padding-top: 30px;
 }
 
+.minigap {
+    padding-top: 10px;
+}
+
 .game {
     display: table;
     width: 80%;
@@ -404,5 +408,51 @@ input[type=checkbox] {
 
 .inddataval {
     margin-left: 5px;
+    float: left;
+}
+
+.hbar {
+    height: 15px;
+    float: left;
+}
+
+.bwin {
+    background-color: #272;
+}
+
+.bdraw {
+    background-color: #777;
+}
+
+.bloss {
+    background-color: #722;
+}
+
+.indstathdr {
+    padding-bottom: 3px;
+    padding-top: 5px;
+}
+
+#gbox {
+    background-color: #272;
+}
+
+#wbox {
+    background-color: #777;
+}
+
+#rbox {
+    background-color: #722;
+}
+
+.smallbox {
+    width: 15px;
+    height: 15px;
+    margin: 5px;
+    float: left;
+}
+
+.blabel {
+    margin-top: 3px;
     float: left;
 }
