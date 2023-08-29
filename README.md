@@ -30,7 +30,7 @@ Pull requests welcome!
 * Better (and consistent) error handling
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
-* Player statistics
+* Include % of win / draw / loss in player stats
 * Better looking popups
 * Implement skey on gphandler
 

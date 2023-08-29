@@ -51,6 +51,12 @@ type Player struct {
     TPoints int
     Active bool
     Status int
+    Wwin int
+    Wdraw int
+    Wloss int
+    Bwin int
+    Bdraw int
+    Bloss int
 }
 
 type Game struct {

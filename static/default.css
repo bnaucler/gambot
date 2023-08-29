@@ -162,6 +162,11 @@ input[type=checkbox] {
     margin: 10px;
 }
 
+#indplayername {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
 .header {
     width: 310px;
     overflow: hidden;
@@ -390,4 +395,14 @@ input[type=checkbox] {
     float: left;
     font-weight: 700;
     cursor: pointer;
+}
+
+.inddatalbl {
+    width: 190px;
+    float: left;
+}
+
+.inddataval {
+    margin-left: 5px;
+    float: left;
 }

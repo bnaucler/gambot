@@ -255,15 +255,34 @@ function playertotournament(elem) {
     gid("playerdata").style.display = "none";
 }
 
+// Calculates points per game value
+function calcppg(points, games) {
+
+    var ret = points / games;
+
+    if(ret !== ret) ret = 0;
+
+    console.log(ret);
+
+    return ret.toFixed(2);
+}
+
 // Shows data on individual player
 function showplayerdata(xhr) {
 
     var obj = JSON.parse(xhr.responseText);
     var pname = gid("indplayername");
+    var indgames = gid("indgamesval");
+    var indpoints = gid("indpointsval");
+    var indppg = gid("indppgval");
     var editbtn = gid("editplayer");
 
     pname.innerHTML = obj[0].Name;
     pname.setAttribute("name", obj[0].ID);
+
+    indgames.innerHTML = obj[0].TNgames;
+    indpoints.innerHTML = obj[0].TPoints;
+    indppg.innerHTML = calcppg(obj[0].TPoints, obj[0].TNgames)
 
     if(obj[0].Active == true) {
         editbtn.innerHTML = "Deactivate";
