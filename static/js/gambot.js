@@ -262,8 +262,6 @@ function calcppg(points, games) {
 
     if(ret !== ret) ret = 0;
 
-    console.log(ret);
-
     return ret.toFixed(2);
 }
 

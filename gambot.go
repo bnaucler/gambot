@@ -17,10 +17,23 @@ import (
     bcrypt "golang.org/x/crypto/bcrypt"
 )
 
-
 const S_OK = 0                      // Status code: OK
 const S_ERR = 1                     // Status code: error
 const A_ID = 0                      // Administrator ID
+
+// Macro definitions for readability
+const WHITE = 0
+const BLACK = 1
+const WIN = 0
+const DRAW = 1
+const LOSS = 2
+
+const WWIN = 0
+const WDRAW = 1
+const WLOSS = 2
+const BWIN = 3
+const BDRAW = 4
+const BLOSS = 5
 
 const DEF_PWIN = 2                  // Default point value for win
 const DEF_PDRAW = 1                 // Default point value for draw
@@ -51,12 +64,7 @@ type Player struct {
     TPoints int
     Active bool
     Status int
-    Wwin int
-    Wdraw int
-    Wloss int
-    Bwin int
-    Bdraw int
-    Bloss int
+    Stat []int
 }
 
 type Game struct {
@@ -457,7 +465,6 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(cplayer)
 }
 
-
 // HTTP handler - add new player
 func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
@@ -476,7 +483,9 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
     }
 
-    p := Player{Name: r.FormValue("name"), Active: true}
+    p := Player{Name: r.FormValue("name"),
+                Active: true,
+                Stat: make([]int, 6)}
 
     if p.Name == "" {
         p.Status = S_ERR
@@ -906,7 +915,10 @@ func declaredraw(gid string, p int, t Tournament) Tournament {
     for i := 0; i < len(t.G) ; i++ {
         if t.G[i].ID == gid {
             t = addpoints(t.G[i].W, p, t)
+            t = addstat(t.G[i].W, WHITE, DRAW, t)
+
             t = addpoints(t.G[i].B, p, t)
+            t = addstat(t.G[i].B, BLACK, DRAW, t)
         }
     }
 
@@ -940,6 +952,65 @@ func gloser(winner int, t Tournament) int {
     return 0
 }
 
+// Returns color (WHITE / BLACK) in ongoing game or -1 at error
+func getcol(pid int, t Tournament) int {
+
+    for _, g := range t.G {
+        if !g.End.IsZero() {
+            continue;
+
+        } else if pid == g.W {
+            return WHITE
+
+        } else if pid == g.B {
+            return BLACK
+        }
+    }
+
+    return -1
+}
+
+// Returns opposite color
+func oppcol(col int) int {
+
+    if col == WHITE { return BLACK }
+
+    return WHITE
+}
+
+// Adds appropriate statistics to player object
+func addstat(pid int, col int, res int, t Tournament) Tournament {
+
+    index := 0
+
+    for i := 0; i < len(t.P); i++ {
+        if t.P[i].ID != pid { continue }
+
+        if col == WHITE && res == WIN {
+            index = WWIN
+
+        } else if col == WHITE && res == DRAW {
+            index = WDRAW
+
+        } else if col == WHITE && res == LOSS {
+            index = WLOSS
+
+        } else if col == BLACK && res == WIN {
+            index = BWIN
+
+        } else if col == BLACK && res == DRAW {
+            index = BDRAW
+
+        } else if col == BLACK && res == LOSS {
+            index = BLOSS
+        }
+
+        t.P[i].Stat[index]++
+    }
+
+    return t
+}
+
 // HTTP handler - declare game result
 func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) Tournament {
 
@@ -968,8 +1039,13 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
         fmt.Printf("Game %s is a draw!\n", gid)
 
     } else {
+        wcol := getcol(iid, t)
         t = addpoints(iid, a.Pwin, t)
-        if a.Ploss != 0 { t = addpoints(gloser(iid, t), a.Ploss, t) }
+        t = addstat(iid, wcol, WIN, t)
+        if a.Ploss != 0 {
+            t = addpoints(gloser(iid, t), a.Ploss, t)
+            t = addstat(gloser(iid, t), oppcol(wcol), WIN, t)
+        }
         fmt.Printf("Game %s won by %s\n", gid, getplayername(db, iid))
     }
 
@@ -980,6 +1056,30 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
     enc.Encode(t)
 
     return t
+}
+
+// Sums all indexes of two int slices
+func sumslice(s1 []int, s2 []int) []int {
+
+    ret := []int{}
+
+    slen := 0
+    s1len := len(s1)
+    s2len := len(s2)
+
+    if s1len > s2len {
+        slen = s2len
+
+    } else {
+        slen = s1len
+    }
+
+    for i := 0; i < slen; i++ {
+        val := s1[i] + s2[i]
+        ret = append(ret, val)
+    }
+
+    return ret
 }
 
 // HTTP handler - end current tournament
@@ -1011,6 +1111,7 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
 
         dbp.TPoints += p.Points
         dbp.TNgames += p.Ngames
+        dbp.Stat = sumslice(dbp.Stat, p.Stat)
 
         wp, e := json.Marshal(dbp)
 
