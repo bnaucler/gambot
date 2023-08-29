@@ -717,6 +717,16 @@ func isintournament(t Tournament, p int) bool {
     return false
 }
 
+// Sets all values in int slice to 0
+func slicesetall(sl []int, val int) []int {
+
+    slen := len(sl)
+
+    for i := 0; i < slen; i ++ { sl[i] = val }
+
+    return sl
+}
+
 // Add player to tournament
 func apt(db *bolt.DB, t Tournament, p int) Tournament {
 
@@ -729,6 +739,8 @@ func apt(db *bolt.DB, t Tournament, p int) Tournament {
 
     e = json.Unmarshal(cpb, &cp)
     cherr(e)
+
+    cp.Stat = slicesetall(cp.Stat, 0)
 
     t.P = append(t.P, cp)
 
@@ -876,8 +888,7 @@ func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
 func incrngame(g Game, t Tournament) Tournament {
 
     for i := 0; i < len(t.P); i++ {
-        if g.W == t.P[i].ID { t.P[i].Ngames++ }
-        if g.B == t.P[i].ID { t.P[i].Ngames++ }
+        if g.W == t.P[i].ID || g.B == t.P[i].ID { t.P[i].Ngames++ }
     }
 
     return t
@@ -1060,8 +1071,6 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
 // Sums all indexes of two int slices
 func sumslice(s1 []int, s2 []int) []int {
 
-    ret := []int{}
-
     slen := 0
     s1len := len(s1)
     s2len := len(s2)
@@ -1073,9 +1082,10 @@ func sumslice(s1 []int, s2 []int) []int {
         slen = s1len
     }
 
+    ret := make([]int, slen)
+
     for i := 0; i < slen; i++ {
-        val := s1[i] + s2[i]
-        ret = append(ret, val)
+        ret[i] = s1[i] + s2[i]
     }
 
     return ret
