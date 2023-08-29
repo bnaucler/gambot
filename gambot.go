@@ -954,7 +954,7 @@ func gloser(winner int, t Tournament) int {
         if !g.End.IsZero() {
             continue;
 
-        if g.W == winner {
+        } else if g.W == winner {
             return g.B
 
         } else if g.B == winner {
