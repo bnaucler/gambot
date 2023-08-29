@@ -285,9 +285,8 @@ function calcppg(points, games) {
 function fillbar(col, win, draw, loss) {
 
     var sum = win + draw + loss;
-    var wbar;
-    var dbar;
-    var lbar;
+    var wbar, dbar, lbar;
+    var wwidth, dwidth, lwidth;
 
     if(col == TOTAL) {
         wbar = gid("indtwin");
@@ -305,9 +304,14 @@ function fillbar(col, win, draw, loss) {
         lbar = gid("indbloss");
     }
 
-    var wwidth = Math.floor(win / sum * 100);
-    var dwidth = Math.floor(draw / sum * 100);
-    var lwidth = Math.floor(loss / sum * 100);
+    if(sum == 0) {
+        wwidth = dwidth = lwidth = 0;
+
+    } else {
+        wwidth = Math.floor(win / sum * 100);
+        dwidth = Math.floor(draw / sum * 100);
+        lwidth = Math.floor(loss / sum * 100);
+    }
 
     wbar.style.width = wwidth + "%";
     dbar.style.width = dwidth + "%";
@@ -339,6 +343,8 @@ function showplayerdata(xhr) {
         editbtn.innerHTML = "Activate";
         editbtn.setAttribute("name", "activate");
     }
+
+    console.log(obj);
 
     fillbar(TOTAL, obj[0].Stat[WWIN] + obj[0].Stat[BWIN],
                    obj[0].Stat[WDRAW] + obj[0].Stat[BDRAW],

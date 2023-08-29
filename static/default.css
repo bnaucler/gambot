@@ -448,11 +448,12 @@ input[type=checkbox] {
 .smallbox {
     width: 15px;
     height: 15px;
-    margin: 5px;
+    margin: 5px 5px 5px 0;
     float: left;
 }
 
 .blabel {
     margin-top: 3px;
+    margin-right: 10px;
     float: left;
 }

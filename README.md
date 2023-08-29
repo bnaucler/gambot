@@ -33,6 +33,7 @@ Pull requests welcome!
 * Refactor (go & js) and divide in multiple source files
 * Better looking popups
 * Implement skey on gphandler
+* Max player name length
 
 ## License
 MIT (do whatever you want)
