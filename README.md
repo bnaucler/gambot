@@ -31,8 +31,8 @@ Pull requests welcome!
 * Refactor (go & js) and divide in multiple source files
 * Better looking popups
 * Implement skey on gphandler
-* Max player name length
 * Alternate top 5 with APPG instead of total points
+* Improved player name validation
 
 ## License
 MIT (do whatever you want)

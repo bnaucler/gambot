@@ -469,9 +469,6 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 // HTTP handler - add new player
 func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
-    e := r.ParseForm()
-    cherr(e)
-
     var players []Player
 
     rskey := r.FormValue("skey")
@@ -484,7 +481,10 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
     }
 
+    var nregex = regexp.MustCompile(`[^a-zA-ZåäöÅÄÖ\ \- ]+`)
+
     pname := strings.TrimSpace(r.FormValue("name"))
+    pname = nregex.ReplaceAllString(pname, "")
 
     if len(pname) > NMAXLEN { pname = pname[:NMAXLEN] }
 
