@@ -26,9 +26,7 @@ Pull requests welcome!
 * Replace local log with API call for server log
 * Mobile friendly interface
 * Logic to determine 2nd game with reversed colors
-* Checkbox to show/hide inactive players in list
 * Better (and consistent) error handling
-* Player stats accessible from top 5
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
 * Better looking popups

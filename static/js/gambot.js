@@ -523,6 +523,26 @@ function tournamentended() {
     sessionStorage.gambotintournament = 0;
 }
 
+// Adds top player to list
+function addtopplayer(p, s, pdiv) {
+    var text;
+
+    if(s == "a") text = p.Name + " " + p.TPoints;
+    else if(s == "c") text = p.Name + " " + p.Points;
+
+    var item = mkobj("div", "topplayer");
+    var name = mkobj("p", "tpname", text);
+
+    name.addEventListener("click", () => {
+        getplayerdata(item);
+    });
+
+    item.setAttribute("name", p.ID);
+
+    item.appendChild(name);
+    pdiv.appendChild(item);
+}
+
 // Updates top list
 function updatetopplayers(xhr) {
 
@@ -547,18 +567,7 @@ function updatetopplayers(xhr) {
         gid("topfive").style.display = "none";
     }
 
-    for(const p of obj.P) {
-        var text;
-
-        if(obj.S == "a") text = p.Name + " " + p.TPoints;
-        if(obj.S == "c") text = p.Name + " " + p.Points;
-
-        var item = mkobj("div", "topplayer");
-        var name = mkobj("p", "", text);
-
-        item.appendChild(name);
-        pdiv.appendChild(item);
-    }
+    for(const p of obj.P) addtopplayer(p, obj.S, pdiv);
 }
 
 // Process tournament status request and sets appropriate mode
