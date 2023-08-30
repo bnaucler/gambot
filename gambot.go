@@ -41,6 +41,8 @@ const DEF_PLOSS = 0                 // Default point value for loss
 const DEF_DBNAME = ".gambot.db"     // Default database filename
 const DEF_PORT = 9001               // Default server port
 
+const NMAXLEN = 30                  // Player name max length
+
 var abuc = []byte("abuc")           // admin bucket
 var pbuc = []byte("pbuc")           // player bucket
 var gbuc = []byte("gbuc")           // game bucket
@@ -482,7 +484,11 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
     }
 
-    p := Player{Name: r.FormValue("name"),
+    pname := strings.TrimSpace(r.FormValue("name"))
+
+    if len(pname) > NMAXLEN { pname = pname[:NMAXLEN] }
+
+    p := Player{Name: pname,
                 Active: true,
                 Stat: make([]int, 6)}
 

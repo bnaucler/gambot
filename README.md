@@ -32,6 +32,7 @@ Pull requests welcome!
 * Better looking popups
 * Implement skey on gphandler
 * Max player name length
+* Alternate top 5 with APPG instead of total points
 
 ## License
 MIT (do whatever you want)
