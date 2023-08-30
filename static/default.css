@@ -254,8 +254,10 @@ input[type=checkbox] {
     background-color: #333;
     display: block;
     font-size: 12px;
-    padding: 4px;
+    padding: 6px;
     color: #999;
+    margin: 5px;
+    border-radius: 4px;
 }
 
 .pname {
