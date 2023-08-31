@@ -59,6 +59,7 @@ type Game struct {
     ID string
     W int
     B int
+    Winner int
     Start time.Time
     End time.Time
 }

@@ -74,7 +74,6 @@ Pull requests welcome!
     - phone number
     - chess club
 * Participant attendance & results report per tournament
-* Store winner in game object at game end
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download

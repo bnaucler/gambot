@@ -787,11 +787,12 @@ func incrngame(g gcore.Game, t gcore.Tournament) gcore.Tournament {
 }
 
 // Ends game by ID
-func endgame(gid string, t gcore.Tournament) gcore.Tournament {
+func endgame(gid string, wid int, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.G); i++ {
         if t.G[i].ID == gid {
             t.G[i].End = time.Now();
+            t.G[i].Winner = wid
             t = incrngame(t.G[i], t)
             break
         }
@@ -955,7 +956,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
         fmt.Printf("Game %s won by %s\n", gid, getplayername(db, iid))
     }
 
-    t = endgame(gid, t)
+    t = endgame(gid, iid, t)
     t = seed(t)
 
     enc := json.NewEncoder(w)
