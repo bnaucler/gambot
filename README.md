@@ -8,6 +8,16 @@ Björn W Nauclér (mail@bnaucler.se)
 ## Building
 `bin/build.sh all` - Builds server and tools
 
+## Usage
+Output of `bin/gambot -h`:  
+```
+Usage of bin/gambot:
+  -d string
+    	specify database to open (default ".gambot.db")
+  -p int
+    	port number to listen (default 9001)
+```
+
 ## Tool - dbdump
 Dumps the database contents to stdout  
 Output of `bin/dbdump -h`:  
@@ -18,16 +28,6 @@ Usage of bin/dbdump:
   -j	JSON format
   -p	players
   -t	tournaments
-```
-
-## Usage
-Output of `bin/gambot -h`:  
-```
-Usage of bin/gambot:
-  -d string
-    	specify database to open (default ".gambot.db")
-  -p int
-    	port number to listen (default 9001)
 ```
 
 ## Contributing
