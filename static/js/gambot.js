@@ -543,25 +543,44 @@ function addtopplayer(p, s, pdiv) {
     pdiv.appendChild(item);
 }
 
+// Retrieves number of top players to show from session storage
+function gettpcount() {
+
+    return Number(gss("gambottopplayers"));
+}
+
+// Stores number of top players to show in session storage
+function addtpcount(n) {
+
+    var cur = gettpcount();
+
+    cur += n;
+
+    if(Number.isInteger(cur)) sessionStorage.gambottopplayers = cur;
+}
+
 // Adds 'more' button to top player list
-function addtopmorebtn(len, s, pdiv) {
+function addtopmorebtn(s, pdiv) {
 
     var morebtn = mkobj("p", "morebtn", "more");
 
     morebtn.addEventListener("click", () => {
-        gettopplayers(len + 5, s);
+        addtpcount(5);
+        gettopplayers(gettpcount(), s);
     });
 
     pdiv.appendChild(morebtn);
 }
 
 // Adds 'less' button to top player list
-function addtoplessbtn(len, s, pdiv) {
+function addtoplessbtn(s, pdiv) {
 
     var lessbtn = mkobj("p", "lessbtn", "less");
-    var nop = len - 5;
+    var nop = addtpcount(-5)
 
-    if(nop < 5) nop = 5;
+    if(nop < 5 || nop === undefined || nop == NaN) nop = 5;
+
+    if(Number.isInteger(nop)) sessionStorage.gambottopplayers = nop;
 
     lessbtn.addEventListener("click", () => {
         gettopplayers(nop, s);
@@ -597,10 +616,9 @@ function updatetopplayers(xhr) {
 
     for(const p of obj.P) addtopplayer(p, obj.S, pdiv);
 
-    addtopmorebtn(oplen, obj.S, pdiv);
+    addtopmorebtn(obj.S, pdiv);
 
-    if(oplen > 5) addtoplessbtn(oplen, obj.S, pdiv);
-
+    if(oplen > 5) addtoplessbtn(obj.S, pdiv);
 }
 
 // Process tournament status request and sets appropriate mode
@@ -610,13 +628,13 @@ function updatestatus(xhr) {
 
     if(obj.ID === 0 || !timezero(obj.End)) {
         tournamentended();
-        gettopplayers(5, "a");
+        gettopplayers(gettpcount(), "a");
         gid("games").innerHTML = "";
 
     } else {
         tournamentstarted();
         updatewindow(obj);
-        gettopplayers(5, "c");
+        gettopplayers(gettpcount(), "c");
     }
 }
 
@@ -886,4 +904,5 @@ window.onbeforeunload = function() {
 // Request necessary data after load
 window.onload = function() {
     checklogin();
+    sessionStorage.gambottopplayers = 5;
 }
