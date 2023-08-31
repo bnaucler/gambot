@@ -543,6 +543,33 @@ function addtopplayer(p, s, pdiv) {
     pdiv.appendChild(item);
 }
 
+// Adds 'more' button to top player list
+function addtopmorebtn(len, s, pdiv) {
+
+    var morebtn = mkobj("p", "morebtn", "more");
+
+    morebtn.addEventListener("click", () => {
+        gettopplayers(len + 5, s);
+    });
+
+    pdiv.appendChild(morebtn);
+}
+
+// Adds 'less' button to top player list
+function addtoplessbtn(len, s, pdiv) {
+
+    var lessbtn = mkobj("p", "lessbtn", "less");
+    var nop = len - 5;
+
+    if(nop < 5) nop = 5;
+
+    lessbtn.addEventListener("click", () => {
+        gettopplayers(nop, s);
+    });
+
+    pdiv.appendChild(lessbtn);
+}
+
 // Updates top list
 function updatetopplayers(xhr) {
 
@@ -570,12 +597,10 @@ function updatetopplayers(xhr) {
 
     for(const p of obj.P) addtopplayer(p, obj.S, pdiv);
 
-    var morebtn = mkobj("p", "morebtn", "more");
-    morebtn.addEventListener("click", () => {
-        gettopplayers(oplen + 5, obj.S);
-    });
+    addtopmorebtn(oplen, obj.S, pdiv);
 
-    pdiv.appendChild(morebtn);
+    if(oplen > 5) addtoplessbtn(oplen, obj.S, pdiv);
+
 }
 
 // Process tournament status request and sets appropriate mode

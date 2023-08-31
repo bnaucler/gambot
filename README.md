@@ -59,7 +59,6 @@ Pull requests welcome!
     - Handler launch wrapper
 * Alternate top 5 with APPG instead of total points
 * Remove 'more' button for top players when reaching max
-* Button to reset displayed top players to 5
 * Sustain # of top players on reload
 * Logic to determine top players when points are equal
 * Edit player function to change name, email etc
