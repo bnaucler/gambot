@@ -13,6 +13,8 @@ import (
     "time"
     "encoding/json"
 
+    "github.com/bnaucler/gambot/lib/gcore"
+
     bolt "go.etcd.io/bbolt"
     bcrypt "golang.org/x/crypto/bcrypt"
 )
@@ -35,57 +37,6 @@ const BWIN = 3
 const BDRAW = 4
 const BLOSS = 5
 
-const DEF_PWIN = 2                  // Default point value for win
-const DEF_PDRAW = 1                 // Default point value for draw
-const DEF_PLOSS = 0                 // Default point value for loss
-const DEF_DBNAME = ".gambot.db"     // Default database filename
-const DEF_PORT = 9001               // Default server port
-
-const NMAXLEN = 30                  // Player name max length
-
-var abuc = []byte("abuc")           // admin bucket
-var pbuc = []byte("pbuc")           // player bucket
-var gbuc = []byte("gbuc")           // game bucket
-var tbuc = []byte("tbuc")           // tournament bucket
-
-type Admin struct {
-    Skey string
-    Pass []byte
-    Pwin int
-    Pdraw int
-    Ploss int
-    Status int
-}
-
-type Player struct {
-    ID int
-    Name string
-    Ngames int
-    TNgames int
-    Points int
-    TPoints int
-    Active bool
-    Status int
-    Stat []int
-}
-
-type Game struct {
-    ID string
-    W int
-    B int
-    Start time.Time
-    End time.Time
-}
-
-type Tournament struct {
-    ID int
-    P []Player
-    G []Game
-    Start time.Time
-    End time.Time
-    Status int
-}
-
 type Req struct {
     ID string
     Name string
@@ -93,7 +44,7 @@ type Req struct {
 }
 
 type Tpresp struct {
-    P []Player
+    P []gcore.Player
     S string
 }
 
@@ -142,7 +93,7 @@ func rdb(db *bolt.DB, k int, cbuc []byte) (v []byte, e error) {
 }
 
 // Validates password to stored hash
-func validateuser(a Admin, pass string) (bool) {
+func validateuser(a gcore.Admin, pass string) (bool) {
 
     e := bcrypt.CompareHashAndPassword(a.Pass, []byte(pass))
 
@@ -151,11 +102,11 @@ func validateuser(a Admin, pass string) (bool) {
 }
 
 // Retrieves admin object from database
-func getadmin(db *bolt.DB) (Admin, error) {
+func getadmin(db *bolt.DB) (gcore.Admin, error) {
 
-    a := Admin{}
+    a := gcore.Admin{}
 
-    ab, e := rdb(db, A_ID, abuc)
+    ab, e := rdb(db, A_ID, gcore.Abuc)
 
     json.Unmarshal(ab, &a)
 
@@ -163,21 +114,21 @@ func getadmin(db *bolt.DB) (Admin, error) {
 }
 
 // Stores admin object to database
-func writeadmin(a Admin, db *bolt.DB) {
+func writeadmin(a gcore.Admin, db *bolt.DB) {
 
     buf, e := json.Marshal(a)
     cherr(e)
 
-    e = wrdb(db, A_ID, buf, abuc)
+    e = wrdb(db, A_ID, buf, gcore.Abuc)
     cherr(e)
 }
 
 // Initializes points for win/draw/loss to default values
-func setdefaultpoints(a Admin) Admin {
+func setdefaultpoints(a gcore.Admin) gcore.Admin {
 
-    a.Pwin = DEF_PWIN
-    a.Pdraw = DEF_PDRAW
-    a.Ploss = DEF_PLOSS
+    a.Pwin = gcore.DEF_PWIN
+    a.Pdraw = gcore.DEF_PDRAW
+    a.Ploss = gcore.DEF_PLOSS
 
     return a
 }
@@ -190,7 +141,7 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     a, e := getadmin(db)
     if e != nil {
-        a = Admin{}
+        a = gcore.Admin{}
         a = setdefaultpoints(a)
     }
 
@@ -203,7 +154,7 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     } else if len(a.Pass) > 1 && !validateuser(a, r.FormValue("pass")) {
         fmt.Printf("Illegal admin registration attempt\n")
-        a = Admin{}
+        a = gcore.Admin{}
     }
 
     enc := json.NewEncoder(w)
@@ -217,7 +168,7 @@ func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     cherr(e)
 
     a, e := getadmin(db)
-    if e != nil { a = Admin{} }
+    if e != nil { a = gcore.Admin{} }
 
     if validateuser(a, r.FormValue("pass")) {
         fmt.Printf("Admin login successful\n")
@@ -227,7 +178,7 @@ func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     } else {
         fmt.Printf("Admin login failed\n")
-        a = Admin{}
+        a = gcore.Admin{}
     }
 
     enc := json.NewEncoder(w)
@@ -246,7 +197,7 @@ func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     cherr(e)
 
     if !valskey(db, rskey) {
-        ea := Admin{}
+        ea := gcore.Admin{}
         ea.Status = S_ERR
         enc := json.NewEncoder(w)
         enc.Encode(ea)
@@ -275,18 +226,18 @@ func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 }
 
 // Returns slice containing all tournament objects in db
-func getalltournaments(db *bolt.DB) []Tournament {
+func getalltournaments(db *bolt.DB) []gcore.Tournament {
 
-    var ts []Tournament
-    var t Tournament
+    var ts []gcore.Tournament
+    var t gcore.Tournament
 
     db.View(func(tx *bolt.Tx) error {
 
-        b := tx.Bucket(tbuc)
+        b := tx.Bucket(gcore.Tbuc)
         c := b.Cursor()
 
         for k, v := c.First(); k != nil; k, v = c.Next() {
-            t = Tournament{}
+            t = gcore.Tournament{}
             json.Unmarshal(v, &t)
             ts = append(ts, t)
         }
@@ -299,18 +250,18 @@ func getalltournaments(db *bolt.DB) []Tournament {
 }
 
 // Returns slice containing all player objects in db
-func getallplayers(db *bolt.DB) []Player {
+func getallplayers(db *bolt.DB) []gcore.Player {
 
-    var players []Player
-    var cp Player
+    var players []gcore.Player
+    var cp gcore.Player
 
     db.View(func(tx *bolt.Tx) error {
 
-        b := tx.Bucket(pbuc)
+        b := tx.Bucket(gcore.Pbuc)
         c := b.Cursor()
 
         for k, v := c.First(); k != nil; k, v = c.Next() {
-            cp = Player{}
+            cp = gcore.Player{}
             json.Unmarshal(v, &cp)
             players = append(players, cp)
         }
@@ -322,9 +273,9 @@ func getallplayers(db *bolt.DB) []Player {
 }
 
 // Returns slice with top n players from tournament t
-func currenttop(db *bolt.DB, n int, t Tournament) []Player {
+func currenttop(db *bolt.DB, n int, t gcore.Tournament) []gcore.Player {
 
-    players := make([]Player, len(t.P))
+    players := make([]gcore.Player, len(t.P))
     copy(players, t.P)
 
     sort.Slice(players, func(i, j int) bool {
@@ -337,7 +288,7 @@ func currenttop(db *bolt.DB, n int, t Tournament) []Player {
 }
 
 // Returns slice with all time top n players
-func alltimetop(db *bolt.DB, n int) []Player {
+func alltimetop(db *bolt.DB, n int) []gcore.Player {
 
     players := getallplayers(db)
 
@@ -351,7 +302,7 @@ func alltimetop(db *bolt.DB, n int) []Player {
 }
 
 // HTTP handler - get top player(s)
-func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) {
+func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tournament) {
 
     resp := Tpresp{}
 
@@ -364,7 +315,7 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournamen
     n, e := strconv.Atoi(req)
     cherr(e)
 
-    resp.P = make([]Player, n)
+    resp.P = make([]gcore.Player, n)
 
     if rt == "a" {
         resp.P = alltimetop(db, n)
@@ -385,8 +336,8 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournamen
 // HTTP handler - get player(s)
 func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
-    var players []Player
-    var cp Player
+    var players []gcore.Player
+    var cp gcore.Player
 
     e := r.ParseForm()
     cherr(e)
@@ -399,7 +350,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         id, e := strconv.Atoi(req.ID)
         cherr(e)
 
-        p, e := rdb(db, id, pbuc)
+        p, e := rdb(db, id, gcore.Pbuc)
         cherr(e)
 
         json.Unmarshal(p, &cp)
@@ -431,7 +382,7 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     rskey := r.FormValue("skey")
 
     if !valskey(db, rskey) {
-        ep := Player{}
+        ep := gcore.Player{}
         enc := json.NewEncoder(w)
         enc.Encode(ep)
         return
@@ -441,10 +392,10 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     id, e := strconv.Atoi(req.ID)
     cherr(e)
 
-    p, e := rdb(db, id, pbuc)
+    p, e := rdb(db, id, gcore.Pbuc)
     cherr(e)
 
-    cplayer := Player{}
+    cplayer := gcore.Player{}
     json.Unmarshal(p, &cplayer)
 
     if req.Action == "deac" { // deactivate
@@ -459,7 +410,7 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     buf, e := json.Marshal(cplayer)
     cherr(e)
 
-    e = wrdb(db, id, buf,  pbuc)
+    e = wrdb(db, id, buf,  gcore.Pbuc)
     cherr(e)
 
     enc := json.NewEncoder(w)
@@ -469,12 +420,12 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 // HTTP handler - add new player
 func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
-    var players []Player
+    var players []gcore.Player
 
     rskey := r.FormValue("skey")
 
     if !valskey(db, rskey) {
-        ep := Player{}
+        ep := gcore.Player{}
         enc := json.NewEncoder(w)
         players := append(players, ep)
         enc.Encode(players)
@@ -486,9 +437,9 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     pname := strings.TrimSpace(r.FormValue("name"))
     pname = nregex.ReplaceAllString(pname, "")
 
-    if len(pname) > NMAXLEN { pname = pname[:NMAXLEN] }
+    if len(pname) > gcore.NMAXLEN { pname = pname[:gcore.NMAXLEN] }
 
-    p := Player{Name: pname,
+    p := gcore.Player{Name: pname,
                 Active: true,
                 Stat: make([]int, 6)}
 
@@ -497,7 +448,7 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     } else {
         db.Update(func(tx *bolt.Tx) error {
-            b, _ := tx.CreateBucketIfNotExists([]byte("pbuc"))
+            b, _ := tx.CreateBucketIfNotExists(gcore.Pbuc)
 
             id, _ := b.NextSequence()
             p.ID = int(id)
@@ -517,9 +468,9 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 }
 
 // Creates new game with appropriate game ID
-func mkgame(t Tournament) Game {
+func mkgame(t gcore.Tournament) gcore.Game {
 
-    game := Game{}
+    game := gcore.Game{}
 
     game.Start = time.Now()
     game.ID = fmt.Sprintf("%d/%d", t.ID, len(t.G) + 1)
@@ -528,7 +479,7 @@ func mkgame(t Tournament) Game {
 }
 
 // Returns true if players have met during selected tournament
-func haveplayed(p1 int, p2 int, t Tournament) bool {
+func haveplayed(p1 int, p2 int, t gcore.Tournament) bool {
 
     for _, g := range t.G {
         if g.W == p1 && g.B == p2 { return true }
@@ -539,7 +490,7 @@ func haveplayed(p1 int, p2 int, t Tournament) bool {
 }
 
 // Returns true if player is currently in an active game
-func ingame(id int, t Tournament) bool {
+func ingame(id int, t gcore.Tournament) bool {
 
     for _, g := range t.G {
         if !g.End.IsZero() {
@@ -553,7 +504,7 @@ func ingame(id int, t Tournament) bool {
 }
 
 // Finds appropriate opponent based on tournament history
-func findopp(id int, t Tournament) int {
+func findopp(id int, t gcore.Tournament) int {
 
     var opps []int
 
@@ -577,7 +528,7 @@ func findopp(id int, t Tournament) int {
 }
 
 // returns slice with player IDs, currently not in a game
-func availableplayers(t Tournament) []int {
+func availableplayers(t gcore.Tournament) []int {
 
     var ret []int;
 
@@ -599,7 +550,7 @@ func rndflip(p1 int, p2 int) (int, int) {
 }
 
 // Returns total number of games where id played white
-func whitepp(id int, t Tournament) int {
+func whitepp(id int, t gcore.Tournament) int {
 
     ret := 0
 
@@ -611,7 +562,7 @@ func whitepp(id int, t Tournament) int {
 }
 
 // Returns total number of games where id played black
-func blackpp(id int, t Tournament) int {
+func blackpp(id int, t gcore.Tournament) int {
 
     ret := 0
 
@@ -623,7 +574,7 @@ func blackpp(id int, t Tournament) int {
 }
 
 // Locic to determine colors per player
-func blackwhite(p1 int, p2 int, t Tournament) (int, int) {
+func blackwhite(p1 int, p2 int, t gcore.Tournament) (int, int) {
 
     w1 := whitepp(p1, t)
     w2 := whitepp(p2, t)
@@ -638,7 +589,7 @@ func blackwhite(p1 int, p2 int, t Tournament) (int, int) {
 }
 
 // Creates matchups within tournament
-func seed(t Tournament) Tournament {
+func seed(t gcore.Tournament) gcore.Tournament {
 
     ap := availableplayers(t)
 
@@ -666,7 +617,8 @@ func valskey(db *bolt.DB, skey string) bool {
 }
 
 // HTTP handler - create new tournament
-func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) Tournament {
+func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
+               t gcore.Tournament) gcore.Tournament {
 
     rskey := r.FormValue("skey")
 
@@ -684,12 +636,12 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
         return t
     }
 
-    t = Tournament{}
+    t = gcore.Tournament{}
     t.Start = time.Now()
     t.Status = S_OK;
 
     db.Update(func(tx *bolt.Tx) error {
-        b, _ := tx.CreateBucketIfNotExists([]byte("tbuc"))
+        b, _ := tx.CreateBucketIfNotExists(gcore.Tbuc)
 
         id, _ := b.NextSequence()
         t.ID = int(id)
@@ -712,7 +664,7 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
 }
 
 // Returns true if player enrolled in tournament
-func isintournament(t Tournament, p int) bool {
+func isintournament(t gcore.Tournament, p int) bool {
 
     for _, elem := range t.P {
         if elem.ID == p {
@@ -734,14 +686,14 @@ func slicesetall(sl []int, val int) []int {
 }
 
 // Add player to tournament
-func apt(db *bolt.DB, t Tournament, p int) Tournament {
+func apt(db *bolt.DB, t gcore.Tournament, p int) gcore.Tournament {
 
     if t.ID == 0 || isintournament(t, p) { return t }
 
-    cpb, e := rdb(db, p, pbuc)
+    cpb, e := rdb(db, p, gcore.Pbuc)
     cherr(e)
 
-    cp := Player{}
+    cp := gcore.Player{}
 
     e = json.Unmarshal(cpb, &cp)
     cherr(e)
@@ -754,7 +706,8 @@ func apt(db *bolt.DB, t Tournament, p int) Tournament {
 }
 
 // HTTP handler - Add player to tournament
-func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) Tournament {
+func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
+                t gcore.Tournament) gcore.Tournament {
 
     var regexnum = regexp.MustCompile(`[^\p{N} ]+`)
 
@@ -786,7 +739,7 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournamen
 }
 
 // Sorts tournament slice by ID and returns
-func revtslice(ts []Tournament) []Tournament {
+func revtslice(ts []gcore.Tournament) []gcore.Tournament {
 
     sort.Slice(ts, func(i, j int) bool {
         return ts[i].ID > ts[j].ID
@@ -845,7 +798,7 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     rskey := r.FormValue("skey")
 
     if !valskey(db, rskey) {
-        ts := []Tournament{}
+        ts := []gcore.Tournament{}
         enc := json.NewEncoder(w)
         enc.Encode(ts)
         return
@@ -880,18 +833,18 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 }
 
 // HTTP handler - get tournament status
-func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) {
+func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tournament) {
 
     rskey := r.FormValue("skey")
     enc := json.NewEncoder(w)
 
-    if !valskey(db, rskey) { t = Tournament{} }
+    if !valskey(db, rskey) { t = gcore.Tournament{} }
 
     enc.Encode(t)
 }
 
 // Increments the Ngames parameter per user
-func incrngame(g Game, t Tournament) Tournament {
+func incrngame(g gcore.Game, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.P); i++ {
         if g.W == t.P[i].ID || g.B == t.P[i].ID { t.P[i].Ngames++ }
@@ -901,7 +854,7 @@ func incrngame(g Game, t Tournament) Tournament {
 }
 
 // Ends game by ID
-func endgame(gid string, t Tournament) Tournament {
+func endgame(gid string, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.G); i++ {
         if t.G[i].ID == gid {
@@ -915,7 +868,7 @@ func endgame(gid string, t Tournament) Tournament {
 }
 
 // Adds p points to player, ID as key
-func addpoints(id int, p int, t Tournament) Tournament {
+func addpoints(id int, p int, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.P) ; i++ {
         if t.P[i].ID == id {
@@ -926,7 +879,7 @@ func addpoints(id int, p int, t Tournament) Tournament {
 }
 
 // Awards points to both players in a draw
-func declaredraw(gid string, p int, t Tournament) Tournament {
+func declaredraw(gid string, p int, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.G) ; i++ {
         if t.G[i].ID == gid {
@@ -944,8 +897,8 @@ func declaredraw(gid string, p int, t Tournament) Tournament {
 // Retrieves name from ID in database
 func getplayername(db *bolt.DB, id int) string  {
 
-    wp, e := rdb(db, id, pbuc)
-    p := Player{}
+    wp, e := rdb(db, id, gcore.Pbuc)
+    p := gcore.Player{}
 
     e = json.Unmarshal(wp, &p)
     cherr(e)
@@ -954,7 +907,7 @@ func getplayername(db *bolt.DB, id int) string  {
 }
 
 // Returns losing player id based on winner id
-func gloser(winner int, t Tournament) int {
+func gloser(winner int, t gcore.Tournament) int {
 
     for _, g := range t.G {
         if !g.End.IsZero() {
@@ -972,7 +925,7 @@ func gloser(winner int, t Tournament) int {
 }
 
 // Returns color (WHITE / BLACK) in ongoing game or -1 at error
-func getcol(pid int, t Tournament) int {
+func getcol(pid int, t gcore.Tournament) int {
 
     for _, g := range t.G {
         if !g.End.IsZero() {
@@ -998,7 +951,7 @@ func oppcol(col int) int {
 }
 
 // Adds appropriate statistics to player object
-func addstat(pid int, col int, res int, t Tournament) Tournament {
+func addstat(pid int, col int, res int, t gcore.Tournament) gcore.Tournament {
 
     index := 0
 
@@ -1031,7 +984,8 @@ func addstat(pid int, col int, res int, t Tournament) Tournament {
 }
 
 // HTTP handler - declare game result
-func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) Tournament {
+func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
+               t gcore.Tournament) gcore.Tournament {
 
     e := r.ParseForm()
     cherr(e)
@@ -1041,7 +995,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
     rskey := r.FormValue("skey")
 
     if !valskey(db, rskey) {
-        et := Tournament{}
+        et := gcore.Tournament{}
         enc := json.NewEncoder(w)
         enc.Encode(et)
         return t
@@ -1101,12 +1055,13 @@ func sumslice(s1 []int, s2 []int) []int {
 }
 
 // HTTP handler - end current tournament
-func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament) Tournament {
+func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
+               t gcore.Tournament) gcore.Tournament {
 
     rskey := r.FormValue("skey")
 
     if !valskey(db, rskey) {
-        et := Tournament{}
+        et := gcore.Tournament{}
         enc := json.NewEncoder(w)
         enc.Encode(et)
         return t
@@ -1117,12 +1072,12 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
     wt, e := json.Marshal(t)
     cherr(e)
 
-    e = wrdb(db, t.ID, []byte(wt), tbuc)
+    e = wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
     cherr(e)
 
     for _, p := range t.P {
-        wdbp, e := rdb(db, p.ID, pbuc)
-        dbp := Player{}
+        wdbp, e := rdb(db, p.ID, gcore.Pbuc)
+        dbp := gcore.Player{}
 
         e = json.Unmarshal(wdbp, &dbp)
         cherr(e)
@@ -1133,7 +1088,7 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
 
         wp, e := json.Marshal(dbp)
 
-        e = wrdb(db, p.ID, []byte(wp), pbuc)
+        e = wrdb(db, p.ID, []byte(wp), gcore.Pbuc)
         cherr(e)
     }
 
@@ -1151,13 +1106,13 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t Tournament
     enc := json.NewEncoder(w)
     enc.Encode(t)
 
-    return Tournament{}
+    return gcore.Tournament{}
 }
 
 func main() {
 
-    pptr := flag.Int("p", DEF_PORT, "port number to listen")
-    dbptr := flag.String("d", DEF_DBNAME, "specify database to open")
+    pptr := flag.Int("p", gcore.DEF_PORT, "port number to listen")
+    dbptr := flag.String("d", gcore.DEF_DBNAME, "specify database to open")
     flag.Parse()
 
     rand.Seed(time.Now().UnixNano())
@@ -1166,7 +1121,7 @@ func main() {
     cherr(e)
     defer db.Close()
 
-    t := Tournament{}
+    t := gcore.Tournament{}
 
     // static
     http.Handle("/", http.FileServer(http.Dir("static")))
