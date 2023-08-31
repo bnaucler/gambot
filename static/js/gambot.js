@@ -355,7 +355,7 @@ function showplayerdata(xhr) {
 // Requests player data
 function getplayerdata(p) {
 
-    var params = "id=" + p.getAttribute("name") + "&skey" + gss("gambotkey");
+    var params = "id=" + p.getAttribute("name") + "&skey=" + gss("gambotkey");
 
     mkxhr("/gp", params, showplayerdata);
 }
