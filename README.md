@@ -22,25 +22,28 @@ Usage of bin/gambot:
 Pull requests welcome!
 
 ## TODO
+* API reference
+* CONTRIBUTING doc
+* Database dump script
 * Server side logging
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
 * Seeding algorithm selector
-* Logic to determine 2nd game with reversed colors for rando algorithm
-* Winner meets winner seeding algo (w. color reversal)
-* Monrad seeding algo
+    - Logic to determine 2nd game with reversed colors for rando algorithm
+    - Winner meets winner seeding algo (w. color reversal)
+    - Monrad seeding algo
+* Possibility to 'force' games for players on bench
 * Better (and consistent) error handling
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
+* Reorganize CSS and comment for readability
 * Better looking popups
 * Implement skey on gphandler
 * Store player objects in db after each finished game
 * Move current tournament object to db instead of passing around to handlers
 * Move macro definitions to JSON file - import in both back- & frontend
 * Same function call structure for all handlers
-* API reference
-* CONTRIBUTING doc
-* Handler launch wrapper
+    - Handler launch wrapper
 * Alternate top 5 with APPG instead of total points
 * Expand top 5 to show more players
 * Logic to determine top players when points are equal
@@ -54,9 +57,8 @@ Pull requests welcome!
     - gender
     - phone
     - club
-* Participant report per tournament
+* Participant attendance & results report per tournament
 * Store winner in game object at game end
-* Database dump script
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
