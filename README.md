@@ -9,7 +9,8 @@ Björn W Nauclér (mail@bnaucler.se)
 `bin/build.sh all` - Builds server and tools
 
 ## Tool - dbdump
-Dumps the database contents to stdout
+Dumps the database contents to stdout  
+Output of `bin/dbdump -h`:  
 ```
 Usage of bin/dbdump:
   -d string
@@ -35,7 +36,6 @@ Pull requests welcome!
 ## TODO
 * API reference
 * CONTRIBUTING doc
-* Database dump tool
 * Server side logging
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
