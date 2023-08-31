@@ -20,7 +20,6 @@ import (
 
 const S_OK = 0                      // Status code: OK
 const S_ERR = 1                     // Status code: error
-const A_ID = 0                      // Administrator ID
 
 // Macro definitions for readability
 const WHITE = 0
@@ -68,25 +67,13 @@ func validateuser(a gcore.Admin, pass string) (bool) {
     } else { return false }
 }
 
-// Retrieves admin object from database
-func getadmin(db *bolt.DB) (gcore.Admin, error) {
-
-    a := gcore.Admin{}
-
-    ab, e := gcore.Rdb(db, A_ID, gcore.Abuc)
-
-    json.Unmarshal(ab, &a)
-
-    return a, e
-}
-
 // Stores admin object to database
 func writeadmin(a gcore.Admin, db *bolt.DB) {
 
     buf, e := json.Marshal(a)
     gcore.Cherr(e)
 
-    e = gcore.Wrdb(db, A_ID, buf, gcore.Abuc)
+    e = gcore.Wrdb(db, gcore.A_ID, buf, gcore.Abuc)
     gcore.Cherr(e)
 }
 
@@ -106,7 +93,7 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     e := r.ParseForm()
     gcore.Cherr(e)
 
-    a, e := getadmin(db)
+    a, e := gcore.Getadmin(db)
     if e != nil {
         a = gcore.Admin{}
         a = setdefaultpoints(a)
@@ -134,7 +121,7 @@ func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     e := r.ParseForm()
     gcore.Cherr(e)
 
-    a, e := getadmin(db)
+    a, e := gcore.Getadmin(db)
     if e != nil { a = gcore.Admin{} }
 
     if validateuser(a, r.FormValue("pass")) {
@@ -160,7 +147,7 @@ func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     rskey := r.FormValue("skey")
 
-    a, e := getadmin(db)
+    a, e := gcore.Getadmin(db)
     gcore.Cherr(e)
 
     if !valskey(db, rskey) {
@@ -528,7 +515,7 @@ func seed(t gcore.Tournament) gcore.Tournament {
 // Returns true if skey matches current admin skey
 func valskey(db *bolt.DB, skey string) bool {
 
-    a, e := getadmin(db)
+    a, e := gcore.Getadmin(db)
     gcore.Cherr(e)
 
     if skey == a.Skey { return true }
@@ -678,7 +665,7 @@ func verskeyhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     rskey := r.FormValue("skey")
 
-    a, e := getadmin(db)
+    a, e := gcore.Getadmin(db)
     if e != nil || rskey != a.Skey {
         ret = false
 
@@ -695,7 +682,7 @@ func chkadmhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     var ret bool
 
-    a, e := getadmin(db)
+    a, e := gcore.Getadmin(db)
     if e != nil || len(a.Pass) < 1 {
         ret = false
 
@@ -924,7 +911,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
     iid, e := strconv.Atoi(wid)
     gcore.Cherr(e)
 
-    a, e := getadmin(db)
+    a, e := gcore.Getadmin(db)
     gcore.Cherr(e)
 
     if iid == 0 {

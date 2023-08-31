@@ -23,6 +23,8 @@ const DEF_PORT = 9001               // Default server port
 
 const NMAXLEN = 30                  // Player name max length
 
+const A_ID = 0                      // Administrator ID
+
 type Admin struct {
     Skey string
     Pass []byte
@@ -92,6 +94,18 @@ func Rdb(db *bolt.DB, k int, cbuc []byte) (v []byte, e error) {
         return nil
     })
     return
+}
+
+// Retrieves admin object from database
+func Getadmin(db *bolt.DB) (Admin, error) {
+
+    a := Admin{}
+
+    ab, e := Rdb(db, A_ID, Abuc)
+
+    json.Unmarshal(ab, &a)
+
+    return a, e
 }
 
 // Returns slice containing all player objects in db

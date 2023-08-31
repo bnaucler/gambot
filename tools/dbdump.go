@@ -12,6 +12,20 @@ import (
     bolt "go.etcd.io/bbolt"
 )
 
+func dumpadmin(db *bolt.DB, j bool) {
+    a, e := gcore.Getadmin(db)
+    gcore.Cherr(e)
+
+    if j {
+        wa, e := json.Marshal(a)
+        gcore.Cherr(e)
+        fmt.Printf("%s\n", wa)
+
+    } else {
+        fmt.Printf("%+v\n", a)
+    }
+}
+
 func dumpplayers(db *bolt.DB, j bool) {
     p := gcore.Getallplayers(db)
 
@@ -41,8 +55,9 @@ func dumptournaments(db *bolt.DB, j bool) {
 func main() {
 
     dbptr := flag.String("d", gcore.DEF_DBNAME, "specify database to open")
-    tptr := flag.Bool("t", false, "tournaments")
-    pptr := flag.Bool("p", false, "players")
+    aptr := flag.Bool("a", false, "dump admin data")
+    tptr := flag.Bool("t", false, "dump tournament data")
+    pptr := flag.Bool("p", false, "dump player data")
     jptr := flag.Bool("j", false, "JSON format")
     flag.Parse()
 
@@ -54,6 +69,7 @@ func main() {
 
     defer db.Close()
 
+    if *aptr { dumpadmin(db, *jptr) }
     if *tptr { dumptournaments(db, *jptr) }
     if *pptr { dumpplayers(db, *jptr) }
 }

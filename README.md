@@ -23,11 +23,12 @@ Dumps the database contents to stdout
 Output of `bin/dbdump -h`:  
 ```
 Usage of bin/dbdump:
+  -a	dump admin data
   -d string
     	specify database to open (default ".gambot.db")
   -j	JSON format
-  -p	players
-  -t	tournaments
+  -p	dump player data
+  -t	dump tournament data
 ```
 
 ## Contributing
