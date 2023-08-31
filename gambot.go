@@ -192,53 +192,6 @@ func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(a)
 }
 
-// Returns slice containing all tournament objects in db
-func getalltournaments(db *bolt.DB) []gcore.Tournament {
-
-    var ts []gcore.Tournament
-    var t gcore.Tournament
-
-    db.View(func(tx *bolt.Tx) error {
-
-        b := tx.Bucket(gcore.Tbuc)
-        c := b.Cursor()
-
-        for k, v := c.First(); k != nil; k, v = c.Next() {
-            t = gcore.Tournament{}
-            json.Unmarshal(v, &t)
-            ts = append(ts, t)
-        }
-
-        return nil
-   })
-
-    return ts
-
-}
-
-// Returns slice containing all player objects in db
-func getallplayers(db *bolt.DB) []gcore.Player {
-
-    var players []gcore.Player
-    var cp gcore.Player
-
-    db.View(func(tx *bolt.Tx) error {
-
-        b := tx.Bucket(gcore.Pbuc)
-        c := b.Cursor()
-
-        for k, v := c.First(); k != nil; k, v = c.Next() {
-            cp = gcore.Player{}
-            json.Unmarshal(v, &cp)
-            players = append(players, cp)
-        }
-
-        return nil
-   })
-
-   return players
-}
-
 // Returns slice with top n players from tournament t
 func currenttop(db *bolt.DB, n int, t gcore.Tournament) []gcore.Player {
 
@@ -257,7 +210,7 @@ func currenttop(db *bolt.DB, n int, t gcore.Tournament) []gcore.Player {
 // Returns slice with all time top n players
 func alltimetop(db *bolt.DB, n int) []gcore.Player {
 
-    players := getallplayers(db)
+    players := gcore.Getallplayers(db)
 
     sort.Slice(players, func(i, j int) bool {
         return players[i].TPoints > players[j].TPoints
@@ -311,7 +264,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     req := Req{ID: r.FormValue("id"), Name: r.FormValue("name")}
 
     if req.ID == "" && req.Name == "" { // TODO REFACTOR
-        players = getallplayers(db)
+        players = gcore.Getallplayers(db)
 
     } else if req.ID != "" {
         id, e := strconv.Atoi(req.ID)
@@ -324,7 +277,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         players = append(players, cp)
 
     } else {
-        allplayers := getallplayers(db)
+        allplayers := gcore.Getallplayers(db)
 
         for _, p := range allplayers {
             reqlow := strings.ToLower(req.Name)
@@ -778,7 +731,7 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     if e != nil { i = 1 }
     i--
 
-    ts := revtslice(getalltournaments(db))
+    ts := revtslice(gcore.Getalltournaments(db))
 
     tlen := len(ts)
 

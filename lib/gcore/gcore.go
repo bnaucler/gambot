@@ -5,6 +5,7 @@ import (
     "log"
     "time"
     "strconv"
+    "encoding/json"
 
     bolt "go.etcd.io/bbolt"
 )
@@ -93,3 +94,48 @@ func Rdb(db *bolt.DB, k int, cbuc []byte) (v []byte, e error) {
     return
 }
 
+// Returns slice containing all player objects in db
+func Getallplayers(db *bolt.DB) []Player {
+
+    var players []Player
+    var cp Player
+
+    db.View(func(tx *bolt.Tx) error {
+
+        b := tx.Bucket(Pbuc)
+        c := b.Cursor()
+
+        for k, v := c.First(); k != nil; k, v = c.Next() {
+            cp = Player{}
+            json.Unmarshal(v, &cp)
+            players = append(players, cp)
+        }
+
+        return nil
+   })
+
+   return players
+}
+
+// Returns slice containing all tournament objects in db
+func Getalltournaments(db *bolt.DB) []Tournament {
+
+    var ts []Tournament
+    var t Tournament
+
+    db.View(func(tx *bolt.Tx) error {
+
+        b := tx.Bucket(Tbuc)
+        c := b.Cursor()
+
+        for k, v := c.First(); k != nil; k, v = c.Next() {
+            t = Tournament{}
+            json.Unmarshal(v, &t)
+            ts = append(ts, t)
+        }
+
+        return nil
+   })
+
+    return ts
+}
