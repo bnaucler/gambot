@@ -548,6 +548,7 @@ function updatetopplayers(xhr) {
 
     var obj = JSON.parse(xhr.responseText);
     var pdiv = gid("topfivecontents");
+    var oplen = obj.P.length;
 
     pdiv.innerHTML = "";
 
@@ -555,19 +556,26 @@ function updatetopplayers(xhr) {
         gid("games").style.width = "0";
         gid("topfive").style.width = "100%";
         gid("topfive").style.display = "block";
-        gid("topfiveheader").innerHTML = "ALL TIME TOP 5";
+        gid("topfiveheader").innerHTML = "ALL TIME TOP " + oplen;
 
     } else if (obj.S == "c" && obj.P.length > 0) {
         gid("games").style.width = "75%";
         gid("topfive").style.width = "25%";
         gid("topfive").style.display = "block";
-        gid("topfiveheader").innerHTML = "TOP 5";
+        gid("topfiveheader").innerHTML = "TOP " + oplen;
 
     } else {
         gid("topfive").style.display = "none";
     }
 
     for(const p of obj.P) addtopplayer(p, obj.S, pdiv);
+
+    var morebtn = mkobj("p", "morebtn", "more");
+    morebtn.addEventListener("click", () => {
+        gettopplayers(oplen + 5, obj.S);
+    });
+
+    pdiv.appendChild(morebtn);
 }
 
 // Process tournament status request and sets appropriate mode

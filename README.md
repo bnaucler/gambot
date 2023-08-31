@@ -49,6 +49,7 @@ Pull requests welcome!
 * Tournament history search by date
 * Refactor (go & js) and divide in multiple source files
 * Reorganize CSS and comment for readability
+* Tool to import player & tournament JSON data to db
 * Better looking popups
 * Implement skey on gphandler
 * Store player objects in db after each finished game
@@ -57,7 +58,9 @@ Pull requests welcome!
 * Same function call structure for all handlers
     - Handler launch wrapper
 * Alternate top 5 with APPG instead of total points
-* Expand top 5 to show more players
+* Remove 'more' button for top players when reaching max
+* Button to reset displayed top players to 5
+* Sustain # of top players on reload
 * Logic to determine top players when points are equal
 * Edit player function to change name, email etc
 * Allow accented letters (i.e. é, à) in player names
