@@ -352,7 +352,7 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
     }
 
-    var nregex = regexp.MustCompile(`[^a-zA-ZåäöÅÄÖ\ \- ]+`)
+    var nregex = regexp.MustCompile(`[^a-zA-ZÀ-ÿ\ \- ]+`)
 
     pname := strings.TrimSpace(r.FormValue("name"))
     pname = nregex.ReplaceAllString(pname, "")

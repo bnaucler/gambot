@@ -60,8 +60,9 @@ Pull requests welcome!
     - Store APPG in player object and calculate in backend
 * Remove 'more' button for top players when reaching max
 * Logic to determine top players when points are equal
+    - APPG based
+    - If still equal: APPG as black
 * Edit player function to change name, email etc
-* Allow accented letters (i.e. é, à) in player names
 * Store following player data:
     - first name
     - last name
