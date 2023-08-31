@@ -1,6 +1,7 @@
 package gcore
 
 import (
+    "log"
     "time"
 )
 
@@ -53,5 +54,8 @@ type Game struct {
     B int
     Start time.Time
     End time.Time
+}
+func Cherr(e error) {
+    if e != nil { log.Fatal(e) }
 }
 

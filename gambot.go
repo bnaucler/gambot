@@ -2,7 +2,6 @@ package main
 
 import (
     "fmt"
-    "log"
     "sort"
     "flag"
     "strings"
@@ -46,10 +45,6 @@ type Req struct {
 type Tpresp struct {
     P []gcore.Player
     S string
-}
-
-func cherr(e error) {
-    if e != nil { log.Fatal(e) }
 }
 
 // Create random string of length ln
@@ -117,10 +112,10 @@ func getadmin(db *bolt.DB) (gcore.Admin, error) {
 func writeadmin(a gcore.Admin, db *bolt.DB) {
 
     buf, e := json.Marshal(a)
-    cherr(e)
+    gcore.Cherr(e)
 
     e = wrdb(db, A_ID, buf, gcore.Abuc)
-    cherr(e)
+    gcore.Cherr(e)
 }
 
 // Initializes points for win/draw/loss to default values
@@ -137,7 +132,7 @@ func setdefaultpoints(a gcore.Admin) gcore.Admin {
 func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
 
     a, e := getadmin(db)
     if e != nil {
@@ -147,7 +142,7 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     if len(a.Pass) < 1 || validateuser(a, r.FormValue("opass")) {
         a.Pass, e = bcrypt.GenerateFromPassword([]byte(r.FormValue("pass")), bcrypt.DefaultCost)
-        cherr(e)
+        gcore.Cherr(e)
         a.Skey = randstr(30)
         writeadmin(a, db)
         a.Pass = []byte("")
@@ -165,7 +160,7 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
 
     a, e := getadmin(db)
     if e != nil { a = gcore.Admin{} }
@@ -189,12 +184,12 @@ func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
 
     rskey := r.FormValue("skey")
 
     a, e := getadmin(db)
-    cherr(e)
+    gcore.Cherr(e)
 
     if !valskey(db, rskey) {
         ea := gcore.Admin{}
@@ -307,13 +302,13 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tou
     resp := Tpresp{}
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
 
     req := r.FormValue("n")
     rt := r.FormValue("t")
 
     n, e := strconv.Atoi(req)
-    cherr(e)
+    gcore.Cherr(e)
 
     resp.P = make([]gcore.Player, n)
 
@@ -340,7 +335,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     var cp gcore.Player
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
     req := Req{ID: r.FormValue("id"), Name: r.FormValue("name")}
 
     if req.ID == "" && req.Name == "" { // TODO REFACTOR
@@ -348,10 +343,10 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     } else if req.ID != "" {
         id, e := strconv.Atoi(req.ID)
-        cherr(e)
+        gcore.Cherr(e)
 
         p, e := rdb(db, id, gcore.Pbuc)
-        cherr(e)
+        gcore.Cherr(e)
 
         json.Unmarshal(p, &cp)
         players = append(players, cp)
@@ -377,7 +372,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
 
     rskey := r.FormValue("skey")
 
@@ -390,10 +385,10 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     req := Req{ID: r.FormValue("id"), Action: r.FormValue("action")}
     id, e := strconv.Atoi(req.ID)
-    cherr(e)
+    gcore.Cherr(e)
 
     p, e := rdb(db, id, gcore.Pbuc)
-    cherr(e)
+    gcore.Cherr(e)
 
     cplayer := gcore.Player{}
     json.Unmarshal(p, &cplayer)
@@ -408,10 +403,10 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     }
 
     buf, e := json.Marshal(cplayer)
-    cherr(e)
+    gcore.Cherr(e)
 
     e = wrdb(db, id, buf,  gcore.Pbuc)
-    cherr(e)
+    gcore.Cherr(e)
 
     enc := json.NewEncoder(w)
     enc.Encode(cplayer)
@@ -609,7 +604,7 @@ func seed(t gcore.Tournament) gcore.Tournament {
 func valskey(db *bolt.DB, skey string) bool {
 
     a, e := getadmin(db)
-    cherr(e)
+    gcore.Cherr(e)
 
     if skey == a.Skey { return true }
 
@@ -691,12 +686,12 @@ func apt(db *bolt.DB, t gcore.Tournament, p int) gcore.Tournament {
     if t.ID == 0 || isintournament(t, p) { return t }
 
     cpb, e := rdb(db, p, gcore.Pbuc)
-    cherr(e)
+    gcore.Cherr(e)
 
     cp := gcore.Player{}
 
     e = json.Unmarshal(cpb, &cp)
-    cherr(e)
+    gcore.Cherr(e)
 
     cp.Stat = slicesetall(cp.Stat, 0)
 
@@ -712,7 +707,7 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
     var regexnum = regexp.MustCompile(`[^\p{N} ]+`)
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
 
     rskey := r.FormValue("skey")
     qmap := r.Form["?id"]
@@ -726,7 +721,7 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
                 break
             }
             ie, e := strconv.Atoi(clean)
-            cherr(e)
+            gcore.Cherr(e)
             t = apt(db, t, ie)
         }
         t = seed(t)
@@ -754,7 +749,7 @@ func verskeyhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     var ret bool
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
 
     rskey := r.FormValue("skey")
 
@@ -791,7 +786,7 @@ func chkadmhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
 
     wn := r.FormValue("n")
     wi := r.FormValue("i")
@@ -901,7 +896,7 @@ func getplayername(db *bolt.DB, id int) string  {
     p := gcore.Player{}
 
     e = json.Unmarshal(wp, &p)
-    cherr(e)
+    gcore.Cherr(e)
 
     return p.Name
 }
@@ -988,7 +983,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
                t gcore.Tournament) gcore.Tournament {
 
     e := r.ParseForm()
-    cherr(e)
+    gcore.Cherr(e)
 
     wid := r.FormValue("id")
     gid := r.FormValue("game")
@@ -1002,10 +997,10 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
     }
 
     iid, e := strconv.Atoi(wid)
-    cherr(e)
+    gcore.Cherr(e)
 
     a, e := getadmin(db)
-    cherr(e)
+    gcore.Cherr(e)
 
     if iid == 0 {
         t = declaredraw(gid, a.Pdraw, t)
@@ -1070,17 +1065,17 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
     t.End = time.Now()
 
     wt, e := json.Marshal(t)
-    cherr(e)
+    gcore.Cherr(e)
 
     e = wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
-    cherr(e)
+    gcore.Cherr(e)
 
     for _, p := range t.P {
         wdbp, e := rdb(db, p.ID, gcore.Pbuc)
         dbp := gcore.Player{}
 
         e = json.Unmarshal(wdbp, &dbp)
-        cherr(e)
+        gcore.Cherr(e)
 
         dbp.TPoints += p.Points
         dbp.TNgames += p.Ngames
@@ -1089,7 +1084,7 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
         wp, e := json.Marshal(dbp)
 
         e = wrdb(db, p.ID, []byte(wp), gcore.Pbuc)
-        cherr(e)
+        gcore.Cherr(e)
     }
 
     if t.ID == 0 {
@@ -1118,7 +1113,7 @@ func main() {
     rand.Seed(time.Now().UnixNano())
 
     db, e := bolt.Open(*dbptr, 0640, nil)
-    cherr(e)
+    gcore.Cherr(e)
     defer db.Close()
 
     t := gcore.Tournament{}
@@ -1203,5 +1198,5 @@ func main() {
 
     lport := fmt.Sprintf(":%d", *pptr)
     e = http.ListenAndServe(lport, nil)
-    cherr(e)
+    gcore.Cherr(e)
 }
