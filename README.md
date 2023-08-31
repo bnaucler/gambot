@@ -24,7 +24,7 @@ Pull requests welcome!
 ## TODO
 * API reference
 * CONTRIBUTING doc
-* Database dump script
+* Database dump tool
 * Server side logging
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
