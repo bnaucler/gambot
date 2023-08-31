@@ -1,4 +1,5 @@
-gambot
+bin/*
+!bin/build.sh
 .gambot.db
 *.swp
 *.DS_Store

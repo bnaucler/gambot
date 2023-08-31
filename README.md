@@ -6,7 +6,18 @@ Arena tournament manager cobbled together for use at the local chess club.
 Björn W Nauclér (mail@bnaucler.se)
 
 ## Building
-`bin/build.sh`
+`bin/build.sh all` - Builds server and tools
+
+## Tool - dbdump
+Dumps the database contents to stdout
+```
+Usage of bin/dbdump:
+  -d string
+    	specify database to open (default ".gambot.db")
+  -j	JSON format
+  -p	players
+  -t	tournaments
+```
 
 ## Usage
 Output of `bin/gambot -h`:  
