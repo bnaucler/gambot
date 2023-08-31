@@ -35,12 +35,6 @@ const BWIN = 3
 const BDRAW = 4
 const BLOSS = 5
 
-type Req struct {
-    ID string
-    Name string
-    Action string
-}
-
 type Tpresp struct {
     P []gcore.Player
     S string
@@ -216,6 +210,14 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tou
     e := r.ParseForm()
     gcore.Cherr(e)
 
+    rskey := r.FormValue("skey")
+
+    if !valskey(db, rskey) {
+        enc := json.NewEncoder(w)
+        enc.Encode(resp)
+        return
+    }
+
     req := r.FormValue("n")
     rt := r.FormValue("t")
 
@@ -243,19 +245,29 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tou
 // HTTP handler - get player(s)
 func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
-    var players []gcore.Player
+    players := []gcore.Player{}
     var cp gcore.Player
 
     e := r.ParseForm()
     gcore.Cherr(e)
-    req := Req{ID: r.FormValue("id"), Name: r.FormValue("name")}
 
-    if req.ID == "" && req.Name == "" { // TODO REFACTOR
+    rskey := r.FormValue("skey")
+
+    if !valskey(db, rskey) {
+        enc := json.NewEncoder(w)
+        enc.Encode(players)
+        return
+    }
+
+    rid := r.FormValue("id")
+    rname := r.FormValue("name")
+
+    if rid == "" && rname == "" { // TODO REFACTOR
         players = gcore.Getallplayers(db)
 
-    } else if req.ID != "" {
-        id, e := strconv.Atoi(req.ID)
-        gcore.Cherr(e)
+    } else if rid != "" {
+        id, e := strconv.Atoi(rid)
+        gcore.Cherr(e) // TODO better handling needed
 
         p, e := gcore.Rdb(db, id, gcore.Pbuc)
         gcore.Cherr(e)
@@ -267,7 +279,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         allplayers := gcore.Getallplayers(db)
 
         for _, p := range allplayers {
-            reqlow := strings.ToLower(req.Name)
+            reqlow := strings.ToLower(rname)
             nlow := strings.ToLower(p.Name)
 
             if strings.Contains(nlow, reqlow) {
@@ -295,8 +307,9 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
     }
 
-    req := Req{ID: r.FormValue("id"), Action: r.FormValue("action")}
-    id, e := strconv.Atoi(req.ID)
+    rid := r.FormValue("id")
+    raction := r.FormValue("action")
+    id, e := strconv.Atoi(rid)
     gcore.Cherr(e)
 
     p, e := gcore.Rdb(db, id, gcore.Pbuc)
@@ -305,11 +318,11 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     cplayer := gcore.Player{}
     json.Unmarshal(p, &cplayer)
 
-    if req.Action == "deac" { // deactivate
+    if raction == "deac" { // deactivate
         cplayer.Active = false
         fmt.Printf("Deactivating player %d: %s\n", cplayer.ID, cplayer.Name)
 
-    } else if req.Action == "activate" {
+    } else if raction == "activate" {
         cplayer.Active = true
         fmt.Printf("Activating player %d: %s\n", cplayer.ID, cplayer.Name)
     }

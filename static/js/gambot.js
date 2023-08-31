@@ -355,7 +355,7 @@ function showplayerdata(xhr) {
 // Requests player data
 function getplayerdata(p) {
 
-    var params = "id=" + p.getAttribute("name");
+    var params = "id=" + p.getAttribute("name") + "&skey" + gss("gambotkey");
 
     mkxhr("/gp", params, showplayerdata);
 }
@@ -500,7 +500,7 @@ function getplayers(elem) {
     var id = elem.elements["ID"].value;
     var name = elem.elements["name"].value;
     var cb = gid("showdeac").checked;
-    var params = "id=" + id + "&name=" + name;
+    var params = "id=" + id + "&name=" + name + "&skey=" + gss("gambotkey");
 
     sessionStorage.gambotshowdeac = cb;
 
@@ -703,7 +703,9 @@ function changeadmin(elem) {
 // Requests top players (n players of type t: (a)ll or (c)urrent)
 function gettopplayers(n, t) {
 
-    mkxhr("/gtp", "n=" + n + "&t=" + t, updatetopplayers);
+    var params = "n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
+
+    mkxhr("/gtp", params, updatetopplayers);
 }
 
 // Checks for session key

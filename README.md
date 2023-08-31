@@ -51,25 +51,27 @@ Pull requests welcome!
 * Reorganize CSS and comment for readability
 * Tool to import player & tournament JSON data to db
 * Better looking popups
-* Implement skey on gphandler
 * Store player objects in db after each finished game
 * Move current tournament object to db instead of passing around to handlers
 * Move macro definitions to JSON file - import in both back- & frontend
 * Same function call structure for all handlers
     - Handler launch wrapper
 * Alternate top 5 with APPG instead of total points
+    - Store APPG in player object and calculate in backend
 * Remove 'more' button for top players when reaching max
 * Logic to determine top players when points are equal
 * Edit player function to change name, email etc
 * Allow accented letters (i.e. é, à) in player names
 * Store following player data:
+    - first name
+    - last name
     - email
     - password
     - lichess username
     - address (incl postal address & zip)
     - gender
-    - phone
-    - club
+    - phone number
+    - chess club
 * Participant attendance & results report per tournament
 * Store winner in game object at game end
 * See all games in tournament history
