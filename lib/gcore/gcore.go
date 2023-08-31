@@ -1,8 +1,12 @@
 package gcore
 
 import (
+    "fmt"
     "log"
     "time"
+    "strconv"
+
+    bolt "go.etcd.io/bbolt"
 )
 
 var Abuc = []byte("abuc")           // admin bucket
@@ -55,7 +59,37 @@ type Game struct {
     Start time.Time
     End time.Time
 }
+
+// Check error and panic
 func Cherr(e error) {
     if e != nil { log.Fatal(e) }
+}
+
+// Write byte slice to DB
+func Wrdb(db *bolt.DB, k int, v []byte, cbuc []byte) (e error) {
+
+    e = db.Update(func(tx *bolt.Tx) error {
+        b, e := tx.CreateBucketIfNotExists(cbuc)
+        if e != nil { return e }
+
+        e = b.Put([]byte(strconv.Itoa(k)), v)
+        if e != nil { return e }
+
+        return nil
+    })
+    return
+}
+
+// Return JSON encoded byte slice from DB
+func Rdb(db *bolt.DB, k int, cbuc []byte) (v []byte, e error) {
+
+    e = db.View(func(tx *bolt.Tx) error {
+        b := tx.Bucket(cbuc)
+        if b == nil { return fmt.Errorf("No bucket!") }
+
+        v = b.Get([]byte(strconv.Itoa(k)))
+        return nil
+    })
+    return
 }
 

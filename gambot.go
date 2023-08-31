@@ -59,34 +59,6 @@ func randstr(ln int) (string){
     return string(b)
 }
 
-// Write byte slice to DB
-func wrdb(db *bolt.DB, k int, v []byte, cbuc []byte) (e error) {
-
-    e = db.Update(func(tx *bolt.Tx) error {
-        b, e := tx.CreateBucketIfNotExists(cbuc)
-        if e != nil { return e }
-
-        e = b.Put([]byte(strconv.Itoa(k)), v)
-        if e != nil { return e }
-
-        return nil
-    })
-    return
-}
-
-// Return JSON encoded byte slice from DB
-func rdb(db *bolt.DB, k int, cbuc []byte) (v []byte, e error) {
-
-    e = db.View(func(tx *bolt.Tx) error {
-        b := tx.Bucket(cbuc)
-        if b == nil { return fmt.Errorf("No bucket!") }
-
-        v = b.Get([]byte(strconv.Itoa(k)))
-        return nil
-    })
-    return
-}
-
 // Validates password to stored hash
 func validateuser(a gcore.Admin, pass string) (bool) {
 
@@ -101,7 +73,7 @@ func getadmin(db *bolt.DB) (gcore.Admin, error) {
 
     a := gcore.Admin{}
 
-    ab, e := rdb(db, A_ID, gcore.Abuc)
+    ab, e := gcore.Rdb(db, A_ID, gcore.Abuc)
 
     json.Unmarshal(ab, &a)
 
@@ -114,7 +86,7 @@ func writeadmin(a gcore.Admin, db *bolt.DB) {
     buf, e := json.Marshal(a)
     gcore.Cherr(e)
 
-    e = wrdb(db, A_ID, buf, gcore.Abuc)
+    e = gcore.Wrdb(db, A_ID, buf, gcore.Abuc)
     gcore.Cherr(e)
 }
 
@@ -345,7 +317,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         id, e := strconv.Atoi(req.ID)
         gcore.Cherr(e)
 
-        p, e := rdb(db, id, gcore.Pbuc)
+        p, e := gcore.Rdb(db, id, gcore.Pbuc)
         gcore.Cherr(e)
 
         json.Unmarshal(p, &cp)
@@ -387,7 +359,7 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     id, e := strconv.Atoi(req.ID)
     gcore.Cherr(e)
 
-    p, e := rdb(db, id, gcore.Pbuc)
+    p, e := gcore.Rdb(db, id, gcore.Pbuc)
     gcore.Cherr(e)
 
     cplayer := gcore.Player{}
@@ -405,7 +377,7 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     buf, e := json.Marshal(cplayer)
     gcore.Cherr(e)
 
-    e = wrdb(db, id, buf,  gcore.Pbuc)
+    e = gcore.Wrdb(db, id, buf,  gcore.Pbuc)
     gcore.Cherr(e)
 
     enc := json.NewEncoder(w)
@@ -685,7 +657,7 @@ func apt(db *bolt.DB, t gcore.Tournament, p int) gcore.Tournament {
 
     if t.ID == 0 || isintournament(t, p) { return t }
 
-    cpb, e := rdb(db, p, gcore.Pbuc)
+    cpb, e := gcore.Rdb(db, p, gcore.Pbuc)
     gcore.Cherr(e)
 
     cp := gcore.Player{}
@@ -892,7 +864,7 @@ func declaredraw(gid string, p int, t gcore.Tournament) gcore.Tournament {
 // Retrieves name from ID in database
 func getplayername(db *bolt.DB, id int) string  {
 
-    wp, e := rdb(db, id, gcore.Pbuc)
+    wp, e := gcore.Rdb(db, id, gcore.Pbuc)
     p := gcore.Player{}
 
     e = json.Unmarshal(wp, &p)
@@ -1067,11 +1039,11 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
     wt, e := json.Marshal(t)
     gcore.Cherr(e)
 
-    e = wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
+    e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
     gcore.Cherr(e)
 
     for _, p := range t.P {
-        wdbp, e := rdb(db, p.ID, gcore.Pbuc)
+        wdbp, e := gcore.Rdb(db, p.ID, gcore.Pbuc)
         dbp := gcore.Player{}
 
         e = json.Unmarshal(wdbp, &dbp)
@@ -1083,7 +1055,7 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
 
         wp, e := json.Marshal(dbp)
 
-        e = wrdb(db, p.ID, []byte(wp), gcore.Pbuc)
+        e = gcore.Wrdb(db, p.ID, []byte(wp), gcore.Pbuc)
         gcore.Cherr(e)
     }
 
