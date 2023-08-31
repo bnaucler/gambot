@@ -173,6 +173,18 @@ func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(a)
 }
 
+// Removes all deactivated players from slice
+func rmdeacplayers(pl []gcore.Player) []gcore.Player {
+
+    ret := []gcore.Player{}
+
+    for _, p := range pl {
+        if p.Active { ret = append(ret, p)}
+    }
+
+    return ret
+}
+
 // Returns slice with top n players from tournament t
 func currenttop(db *bolt.DB, n int, t gcore.Tournament) []gcore.Player {
 
@@ -192,6 +204,7 @@ func currenttop(db *bolt.DB, n int, t gcore.Tournament) []gcore.Player {
 func alltimetop(db *bolt.DB, n int) []gcore.Player {
 
     players := gcore.Getallplayers(db)
+    players = rmdeacplayers(players)
 
     sort.Slice(players, func(i, j int) bool {
         return players[i].TPoints > players[j].TPoints
