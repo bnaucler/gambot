@@ -57,11 +57,11 @@ type Player struct {
     Points int
     TPoints int
     Active bool
-    Status int
     Stat []int
     APPG float32
     WAPPG float32
     BAPPG float32
+    Status int
 }
 
 type Tournament struct {

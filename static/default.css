@@ -40,7 +40,7 @@ a:hover {
     transition: .3s;
 }
 
-input[type=text], input[type=password], input[type=number] {
+input[type=text], input[type=password], input[type=number], select {
     border: none;
     border-radius: 4px;
     outline: none;

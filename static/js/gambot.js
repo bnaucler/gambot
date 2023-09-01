@@ -488,7 +488,22 @@ function addplayer(elem) {
 
     var fname = elem.elements["fname"].value;
     var lname = elem.elements["lname"].value;
-    var params = "fname=" + fname + "&lname=" + lname + "&skey=" + gss("gambotkey");
+    var gender = elem.elements["gender"].value;
+    var email = elem.elements["email"].value;
+    var postal = elem.elements["postal"].value;
+    var zip = elem.elements["zip"].value;
+    var phone = elem.elements["phone"].value;
+    var club = elem.elements["club"].value;
+
+    var params = "fname=" + fname +
+                 "&lname=" + lname +
+                 "&gender=" + gender +
+                 "&email=" + email +
+                 "&postal=" + postal +
+                 "&zip=" + zip +
+                 "&phone=" + phone +
+                 "&club=" + club +
+                 "&skey=" + gss("gambotkey");
 
     gid("addplayerform").reset();
 

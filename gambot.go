@@ -361,10 +361,10 @@ func procname(raw string) string {
 }
 
 // Processes player name request and populates object properties
-func mkplayername(p gcore.Player, fname string, lname string) gcore.Player {
+func valplayername(p gcore.Player) gcore.Player {
 
-    pfname := procname(fname)
-    plname := procname(lname)
+    pfname := procname(p.Pi.FName)
+    plname := procname(p.Pi.LName)
 
     pname := fmt.Sprintf("%s %s", pfname, plname)
 
@@ -385,17 +385,23 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     rskey := r.FormValue("skey")
 
     if !valskey(db, rskey) {
-        ep := gcore.Player{}
         enc := json.NewEncoder(w)
-        players := append(players, ep)
         enc.Encode(players)
         return
     }
 
-    p := gcore.Player{Active: true,
-                      Stat: make([]int, 6)}
+    p := gcore.Player{Active: true, Stat: make([]int, 6)}
 
-    p = mkplayername(p, r.FormValue("fname"), r.FormValue("lname"))
+    p.Pi = gcore.Pdata{FName: r.FormValue("fname"),
+                       LName: r.FormValue("lname"),
+                       Gender: r.FormValue("gender"),
+                       Email: r.FormValue("email"),
+                       PostalAddr: r.FormValue("postal"),
+                       Zip: r.FormValue("zip"),
+                       Phone: r.FormValue("phone"),
+                       Club: r.FormValue("club")}
+
+    p = valplayername(p)
 
     if p.Pi.Name == "" {
         p.Status = S_ERR

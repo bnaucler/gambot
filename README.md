@@ -64,8 +64,8 @@ Pull requests welcome!
 * Logic to determine top players when points are equal
     - APPG based
     - If still equal: APPG as black
-* Update aphandler and UI to store all information in player object
 * Edit player function to change name, email etc
+* Better player data validation
 * Participant attendance & results report per tournament
 * See all games in tournament history
 * See all players and respective scores in tournament history
