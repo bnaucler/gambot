@@ -488,6 +488,7 @@ function addplayer(elem) {
 
     var fname = elem.elements["fname"].value;
     var lname = elem.elements["lname"].value;
+    var dbirth = elem.elements["dbirth"].value;
     var gender = elem.elements["gender"].value;
     var email = elem.elements["email"].value;
     var postal = elem.elements["postal"].value;
@@ -497,6 +498,7 @@ function addplayer(elem) {
 
     var params = "fname=" + fname +
                  "&lname=" + lname +
+                 "&dbirth=" + dbirth +
                  "&gender=" + gender +
                  "&email=" + email +
                  "&postal=" + postal +
@@ -504,6 +506,8 @@ function addplayer(elem) {
                  "&phone=" + phone +
                  "&club=" + club +
                  "&skey=" + gss("gambotkey");
+
+    console.log(params);
 
     gid("addplayerform").reset();
 

@@ -403,6 +403,9 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     p = valplayername(p)
 
+    tm, e := time.Parse("2006-01-02", r.FormValue("dbirth"))
+    if e == nil { p.Pi.Dbirth = tm }
+
     if p.Pi.Name == "" {
         p.Status = S_ERR
 

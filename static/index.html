@@ -64,8 +64,6 @@
     </div>
 
     <div id="playermgmt" class="popup">
-        <button id="addplayerbtn" onclick="showpopup('addplayer'); return false;">Add players</button>
-        <div class="minigap"></div>
         <form id="getplayers" onsubmit="getplayers(this); return false;" method="post">
             <input id="pidtxt" type="text" name="ID" Placeholder="User ID"></input><br>
             <input id="pntxt" type="text" name="name" Placeholder="Name contains"></input><br>
@@ -76,6 +74,7 @@
         </form>
 
         <div id="playerdata"></div>
+        <button id="addplayerbtn" onclick="showpopup('addplayer'); return false;">Add new player</button>
         <button id="closepmgmt" onclick="showpopup('none'); return false;">Close</button>
     </div>
 
@@ -83,6 +82,7 @@
         <form id="addplayerform" onsubmit="addplayer(this); return false;" method="post">
             <input type="text" name="fname" Placeholder="First Name"></input><br>
             <input type="text" name="lname" Placeholder="Last Name"></input><br>
+            <input type="text" name="dbirth" Placeholder="Date of birth (YYYY-MM-DD)"></input><br>
             <select name="gender">
                 <option value="male">Male</option>
                 <option value="female">Female</option>

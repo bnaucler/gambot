@@ -29,6 +29,7 @@ type Pdata struct {
     Name string
     FName string
     LName string
+    Dbirth time.Time
     Email string
     LicessUser string
     PostalAddr string
