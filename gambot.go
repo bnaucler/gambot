@@ -38,6 +38,7 @@ const BLOSS = 5
 type Tpresp struct {
     P []gcore.Player
     S string
+    Ismax bool
 }
 
 // Create random string of length ln
@@ -186,7 +187,9 @@ func rmdeacplayers(pl []gcore.Player) []gcore.Player {
 }
 
 // Returns slice with top n players from tournament t
-func currenttop(db *bolt.DB, n int, t gcore.Tournament) []gcore.Player {
+func currenttop(db *bolt.DB, n int, t gcore.Tournament) ([]gcore.Player, bool) {
+
+    var ismax bool = false
 
     players := make([]gcore.Player, len(t.P))
     copy(players, t.P)
@@ -195,13 +198,18 @@ func currenttop(db *bolt.DB, n int, t gcore.Tournament) []gcore.Player {
         return players[i].Points > players[j].Points
     })
 
-    if n > len(players) { n = len(players) }
+    if n >= len(players) {
+        n = len(players)
+        ismax = true
+    }
 
-    return players[0:n]
+    return players[0:n], ismax
 }
 
 // Returns slice with all time top n players
-func alltimetop(db *bolt.DB, n int) []gcore.Player {
+func alltimetop(db *bolt.DB, n int) ([]gcore.Player, bool) {
+
+    var ismax bool = false
 
     players := gcore.Getallplayers(db)
     players = rmdeacplayers(players)
@@ -210,9 +218,12 @@ func alltimetop(db *bolt.DB, n int) []gcore.Player {
         return players[i].TPoints > players[j].TPoints
     })
 
-    if n > len(players) { n = len(players) }
+    if n >= len(players) {
+        n = len(players)
+        ismax = true
+    }
 
-    return players[0:n]
+    return players[0:n], ismax
 }
 
 // HTTP handler - get top player(s)
@@ -240,11 +251,11 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tou
     resp.P = make([]gcore.Player, n)
 
     if rt == "a" {
-        resp.P = alltimetop(db, n)
+        resp.P, resp.Ismax = alltimetop(db, n)
         resp.S = "a"
 
     } else if rt == "c" {
-        resp.P = currenttop(db, n, t)
+        resp.P, resp.Ismax = currenttop(db, n, t)
         resp.S = "c"
 
     } else {

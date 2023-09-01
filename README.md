@@ -60,12 +60,14 @@ Pull requests welcome!
     - Handler launch wrapper
 * Alternate top 5 with APPG instead of total points
     - Store APPG in player object and calculate in backend
-* Remove 'more' button for top players when reaching max
 * Logic to determine top players when points are equal
     - APPG based
     - If still equal: APPG as black
 * Edit player function to change name, email etc
 * Better player data validation
+    - frontend
+    - backend
+* Send player added status report to frontend
 * Participant attendance & results report per tournament
 * See all games in tournament history
 * See all players and respective scores in tournament history

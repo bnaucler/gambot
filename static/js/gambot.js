@@ -507,8 +507,6 @@ function addplayer(elem) {
                  "&club=" + club +
                  "&skey=" + gss("gambotkey");
 
-    console.log(params);
-
     gid("addplayerform").reset();
 
     mkxhr("/ap", params, showplayers);
@@ -596,14 +594,13 @@ function addtopmorebtn(s, pdiv) {
 function addtoplessbtn(s, pdiv) {
 
     var lessbtn = mkobj("p", "lessbtn", "less");
-    var nop = addtpcount(-5)
+    var nop = gettpcount() - 5;
 
     if(nop < 5 || nop === undefined || nop == NaN) nop = 5;
 
-    if(Number.isInteger(nop)) sessionStorage.gambottopplayers = nop;
-
     lessbtn.addEventListener("click", () => {
         gettopplayers(nop, s);
+        sessionStorage.gambottopplayers = nop;
     });
 
     pdiv.appendChild(lessbtn);
@@ -636,7 +633,7 @@ function updatetopplayers(xhr) {
 
     for(const p of obj.P) addtopplayer(p, obj.S, pdiv);
 
-    addtopmorebtn(obj.S, pdiv);
+    if(!obj.Ismax) addtopmorebtn(obj.S, pdiv);
 
     if(oplen > 5) addtoplessbtn(obj.S, pdiv);
 }
