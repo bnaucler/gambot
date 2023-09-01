@@ -357,8 +357,10 @@ input[type=checkbox] {
 }
 
 .benchp {
+    width: fit-content;
     color: #bbb;
     padding: 5px;
+    cursor: pointer;
 }
 
 .tlitm {
@@ -486,4 +488,24 @@ input[type=checkbox] {
 
 #addplayer {
     display: none;
+}
+
+.minipop {
+    border-radius: 5px;
+    padding: 5px;
+    position: fixed;
+    background-color: #ccc;
+}
+
+.minipopitem {
+    border-radius: 3px;
+    padding: 2px;
+    color: #222;
+    transition: .3s;
+    cursor: pointer;
+}
+
+.minipopitem:hover {
+    color: #eee;
+    background-color: #222;
 }

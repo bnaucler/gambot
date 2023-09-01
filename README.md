@@ -42,7 +42,7 @@ Pull requests welcome!
 * Track process pid
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
-* Seeding algorithm selector
+* Seeding algorithm selector (minipop when 'start new tournament' is pressed
     - Logic to determine 2nd game with reversed colors for rando algorithm
     - Winner meets winner seeding algo (w. color reversal)
     - Monrad seeding algo
@@ -72,7 +72,7 @@ Pull requests welcome!
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
-* Possibility to remove players from ongoing tournament
+* Possibility to remove in-game players from ongoing tournament
 * Possibility to pause players during ongoing tournament
 * 'soft end' to stop seeding
 * Licess API bindings

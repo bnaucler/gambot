@@ -84,11 +84,40 @@ function ingame(id, t) {
     return false;
 }
 
+// 'Forces' a game when none are found by seeding algo
+function benchpopup(id, t) {
+
+    var bpop = mkobj("div", "minipop");
+    var rembtn = mkobj("div", "minipopitem", "Remove");
+    var forcebtn = mkobj("div", "minipopitem", "Force");
+    var pdiv = gid("tnmt");
+
+    bpop.style.left = event.clientX + "px";
+    bpop.style.top = event.clientY + "px";
+
+    bpop.addEventListener("mouseleave", function(event) {
+        bpop.remove();
+    });
+
+    rembtn.addEventListener("click", () => {
+        edittournament("rem", id);
+        bpop.remove();
+    });
+
+    bpop.appendChild(rembtn)
+    bpop.appendChild(forcebtn)
+    pdiv.appendChild(bpop);
+}
+
 // Adds player to bench by id
 function addbench(id, t) {
 
     var pdiv = gid("bench");
     var player = mkobj("div", "benchp", getplayername(id, t));
+
+    player.addEventListener("click", () => {
+        benchpopup(id, t);
+    });
 
     pdiv.appendChild(player);
 }
@@ -476,11 +505,11 @@ function newtournament() {
 }
 
 // Requests ending current tournament
-function endtournament() {
+function edittournament(action, id) {
 
-    var params = "skey=" + gss("gambotkey");
+    var params = "action=" + action + "&id=" + id + "&skey=" + gss("gambotkey");
 
-    mkxhr("/et", params, tournamentend);
+    mkxhr("/et", params, tournamentend); // TODO
 }
 
 // Requests adding new player to database

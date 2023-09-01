@@ -1029,7 +1029,7 @@ func sumslice(s1 []int, s2 []int) []int {
     return ret
 }
 
-// Ends tournament t
+// Ends tournament t TODO: refactor
 func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
     t.End = time.Now()
@@ -1071,6 +1071,21 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
     return gcore.Tournament{}
 }
 
+// Removes player with id pid from ongoing tournament
+func rtplayer(db *bolt.DB, pid int, t gcore.Tournament) gcore.Tournament {
+
+    npl := []gcore.Player{}
+
+    for _, p := range t.P {
+        if p.ID != pid { npl = append(npl, p) }
+    }
+
+    t.P = npl
+    fmt.Printf("Removing player with ID %d from tournament %d\n", pid, t.ID)
+
+    return t
+}
+
 // HTTP handler - edit tournament
 func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
                t gcore.Tournament) gcore.Tournament {
@@ -1084,7 +1099,17 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
         return t
     }
 
-    if(r.FormValue("action") == "end") { t = endtournament(db, t) }
+    act := r.FormValue("action")
+
+    if act == "end" {
+        t = endtournament(db, t)
+
+    } else if act == "rem" {
+        rid := r.FormValue("id")
+        id, e := strconv.Atoi(rid)
+        gcore.Cherr(e)
+        t = rtplayer(db, id, t)
+    }
 
     enc := json.NewEncoder(w)
     enc.Encode(t)
