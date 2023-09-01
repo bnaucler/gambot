@@ -84,20 +84,30 @@ function ingame(id, t) {
     return false;
 }
 
-// 'Forces' a game when none are found by seeding algo
+// Creates a minipop element
+function mkminipop() {
+
+    var elem = mkobj("div", "minipop");
+
+    elem.style.left = event.clientX + "px";
+    elem.style.top = event.clientY + "px";
+
+    elem.addEventListener("mouseleave", function(event) {
+        elem.remove();
+    });
+
+    return elem
+}
+
+// Creates a popup menu for bench players
 function benchpopup(id, t) {
 
-    var bpop = mkobj("div", "minipop");
+    var bpop = mkminipop();
     var rembtn = mkobj("div", "minipopitem", "Remove");
     var forcebtn = mkobj("div", "minipopitem", "Force");
     var pdiv = gid("tnmt");
 
-    bpop.style.left = event.clientX + "px";
-    bpop.style.top = event.clientY + "px";
-
-    bpop.addEventListener("mouseleave", function(event) {
-        bpop.remove();
-    });
+    mkminipop(bpop);
 
     rembtn.addEventListener("click", () => {
         edittournament("rem", id);
