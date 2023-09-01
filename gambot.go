@@ -350,6 +350,33 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(cplayer)
 }
 
+// Processes string with regex to produce a valid name
+func procname(raw string) string {
+
+    var nregex = regexp.MustCompile(`[^a-zA-ZÀ-ÿ\ \- ]+`)
+
+    ret := nregex.ReplaceAllString(raw, "")
+
+    return strings.TrimSpace(ret)
+}
+
+// Processes player name request and populates object properties
+func mkplayername(p gcore.Player, fname string, lname string) gcore.Player {
+
+    pfname := procname(fname)
+    plname := procname(lname)
+
+    pname := fmt.Sprintf("%s %s", pfname, plname)
+
+    if len(pname) > gcore.NMAXLEN { pname = pname[:gcore.NMAXLEN] }
+
+    p.Pi.FName = pfname
+    p.Pi.LName = plname
+    p.Pi.Name = pname
+
+    return p
+}
+
 // HTTP handler - add new player
 func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
@@ -365,17 +392,10 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
     }
 
-    var nregex = regexp.MustCompile(`[^a-zA-ZÀ-ÿ\ \- ]+`)
-
-    pname := strings.TrimSpace(r.FormValue("name"))
-    pname = nregex.ReplaceAllString(pname, "")
-
-    if len(pname) > gcore.NMAXLEN { pname = pname[:gcore.NMAXLEN] }
-
     p := gcore.Player{Active: true,
                       Stat: make([]int, 6)}
 
-    p.Pi.Name = pname
+    p = mkplayername(p, r.FormValue("fname"), r.FormValue("lname"))
 
     if p.Pi.Name == "" {
         p.Status = S_ERR

@@ -486,10 +486,11 @@ function endtournament() {
 // Requests adding new player to database
 function addplayer(elem) {
 
-    var id = elem.elements["name"].value;
-    var params = "name=" + id + "&skey=" + gss("gambotkey");
+    var fname = elem.elements["fname"].value;
+    var lname = elem.elements["lname"].value;
+    var params = "fname=" + fname + "&lname=" + lname + "&skey=" + gss("gambotkey");
 
-    gid("addplayer").reset();
+    gid("addplayerform").reset();
 
     mkxhr("/ap", params, showplayers);
 }
@@ -756,6 +757,7 @@ function setdisp(elem, popup) {
 function showpopup(popup) {
 
     var elems = { pmgmt: gid("playermgmt"),
+                  addplayer: gid("addplayer"),
                   tmgmt: gid("tmgmt"),
                   indplayer: gid("indplayer"),
                   admin: gid("admin"),
@@ -771,8 +773,12 @@ function showpopup(popup) {
         case "pmgmt":
             setdisp(elems, ["pmgmt"]);
             gid("playerdata").innerHTML = "";
-            gid("addplayer").reset();
+            gid("addplayerform").reset();
             gid("getplayers").reset();
+            break;
+
+        case "addplayer":
+            setdisp(elems, ["addplayer"]);
             break;
 
         case "indplayer":

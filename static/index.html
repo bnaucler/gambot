@@ -64,13 +64,8 @@
     </div>
 
     <div id="playermgmt" class="popup">
-        <form id="addplayer" onsubmit="addplayer(this); return false;" method="post">
-            <input id="pnatxt" type="text" name="name" Placeholder="Player name"></input><br>
-            <input type="submit" value="Add new player">
-        </form>
-
-        <div class="smallgap"></div>
-
+        <button id="addplayerbtn" onclick="showpopup('addplayer'); return false;">Add players</button>
+        <div class="minigap"></div>
         <form id="getplayers" onsubmit="getplayers(this); return false;" method="post">
             <input id="pidtxt" type="text" name="ID" Placeholder="User ID"></input><br>
             <input id="pntxt" type="text" name="name" Placeholder="Name contains"></input><br>
@@ -82,6 +77,15 @@
 
         <div id="playerdata"></div>
         <button id="closepmgmt" onclick="showpopup('none'); return false;">Close</button>
+    </div>
+
+    <div id="addplayer" class="popup">
+        <form id="addplayerform" onsubmit="addplayer(this); return false;" method="post">
+            <input type="text" name="fname" Placeholder="First Name"></input><br>
+            <input type="text" name="lname" Placeholder="Last Name"></input><br>
+            <input type="submit" value="Add new player">
+        </form>
+        <button id="closeaddplayer" onclick="showpopup('none'); return false;">Cancel</button>
     </div>
 
     <div id="indplayer" class="popup">
