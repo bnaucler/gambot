@@ -293,7 +293,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
         for _, p := range allplayers {
             reqlow := strings.ToLower(rname)
-            nlow := strings.ToLower(p.Name)
+            nlow := strings.ToLower(p.Pi.Name)
 
             if strings.Contains(nlow, reqlow) {
                 players = append(players, p)
@@ -333,11 +333,11 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     if raction == "deac" { // deactivate
         cplayer.Active = false
-        fmt.Printf("Deactivating player %d: %s\n", cplayer.ID, cplayer.Name)
+        fmt.Printf("Deactivating player %d: %s\n", cplayer.ID, cplayer.Pi.Name)
 
     } else if raction == "activate" {
         cplayer.Active = true
-        fmt.Printf("Activating player %d: %s\n", cplayer.ID, cplayer.Name)
+        fmt.Printf("Activating player %d: %s\n", cplayer.ID, cplayer.Pi.Name)
     }
 
     buf, e := json.Marshal(cplayer)
@@ -372,15 +372,16 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     if len(pname) > gcore.NMAXLEN { pname = pname[:gcore.NMAXLEN] }
 
-    p := gcore.Player{Name: pname,
-                Active: true,
-                Stat: make([]int, 6)}
+    p := gcore.Player{Active: true,
+                      Stat: make([]int, 6)}
 
-    if p.Name == "" {
+    p.Pi.Name = pname
+
+    if p.Pi.Name == "" {
         p.Status = S_ERR
 
     } else {
-        db.Update(func(tx *bolt.Tx) error {
+        db.Update(func(tx *bolt.Tx) error { // TODO refactor to separate func
             b, _ := tx.CreateBucketIfNotExists(gcore.Pbuc)
 
             id, _ := b.NextSequence()
@@ -837,7 +838,7 @@ func getplayername(db *bolt.DB, id int) string  {
     e = json.Unmarshal(wp, &p)
     gcore.Cherr(e)
 
-    return p.Name
+    return p.Pi.Name
 }
 
 // Returns losing player id based on winner id

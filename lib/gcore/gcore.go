@@ -25,6 +25,19 @@ const NMAXLEN = 30                  // Player name max length
 
 const A_ID = 0                      // Administrator ID
 
+type Pdata struct {
+    Name string
+    FName string
+    LName string
+    Email string
+    LicessUser string
+    PostalAddr string
+    Zip string
+    Gender string
+    Phone string
+    Club string
+}
+
 type Admin struct {
     Skey string
     Pass []byte
@@ -36,7 +49,9 @@ type Admin struct {
 
 type Player struct {
     ID int
-    Name string
+    Uname string
+    Pass []byte
+    Pi Pdata
     Ngames int
     TNgames int
     Points int
@@ -44,6 +59,9 @@ type Player struct {
     Active bool
     Status int
     Stat []int
+    APPG float32
+    WAPPG float32
+    BAPPG float32
 }
 
 type Tournament struct {

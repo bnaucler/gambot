@@ -57,7 +57,7 @@ function mkobj(type, cl, txt) {
 function getplayername(id, t) {
 
     for(const p of t.P) {
-        if(p.ID === id) return p.Name;
+        if(p.ID === id) return p.Pi.Name;
     }
 
     return null;
@@ -190,7 +190,7 @@ function ttop(n, t) {
 
     if(n > plen) n = plen;
 
-    for(var i = 0; i < n; i++) ret.push(tc[i].Name + " " + tc[i].Points)
+    for(var i = 0; i < n; i++) ret.push(tc[i].Pi.Name + " " + tc[i].Points)
 
     return ret;
 }
@@ -328,7 +328,7 @@ function showplayerdata(xhr) {
     var indppg = gid("indppgval");
     var editbtn = gid("editplayer");
 
-    pname.innerHTML = obj[0].Name;
+    pname.innerHTML = obj[0].Pi.Name;
     pname.setAttribute("name", obj[0].ID);
 
     indgames.innerHTML = obj[0].TNgames;
@@ -364,7 +364,7 @@ function getplayerdata(p) {
 function showplayer(p, pdiv, intourn) {
 
     var pl = mkobj("div", "pln");
-    var name = mkobj("p", "pntxt", p.Name);
+    var name = mkobj("p", "pntxt", p.Pi.Name);
 
     pl.appendChild(name);
 
@@ -527,8 +527,8 @@ function tournamentended() {
 function addtopplayer(p, s, pdiv) {
     var text;
 
-    if(s == "a") text = p.Name + " " + p.TPoints;
-    else if(s == "c") text = p.Name + " " + p.Points;
+    if(s == "a") text = p.Pi.Name + " " + p.TPoints;
+    else if(s == "c") text = p.Pi.Name + " " + p.Points;
 
     var item = mkobj("div", "topplayer");
     var name = mkobj("p", "tpname", text);
