@@ -1029,18 +1029,8 @@ func sumslice(s1 []int, s2 []int) []int {
     return ret
 }
 
-// HTTP handler - end current tournament
-func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
-               t gcore.Tournament) gcore.Tournament {
-
-    rskey := r.FormValue("skey")
-
-    if !valskey(db, rskey) {
-        et := gcore.Tournament{}
-        enc := json.NewEncoder(w)
-        enc.Encode(et)
-        return t
-    }
+// Ends tournament t
+func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
     t.End = time.Now()
 
@@ -1067,7 +1057,7 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
         gcore.Cherr(e)
     }
 
-    if t.ID == 0 {
+    if t.ID == 0 { // TODO check before write
         t.Status = S_ERR
         fmt.Printf("No tournament running - cannot end\n")
 
@@ -1078,10 +1068,28 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
                 t.End.Hour(), t.End.Minute())
     }
 
+    return gcore.Tournament{}
+}
+
+// HTTP handler - edit tournament
+func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
+               t gcore.Tournament) gcore.Tournament {
+
+    rskey := r.FormValue("skey")
+
+    if !valskey(db, rskey) {
+        et := gcore.Tournament{}
+        enc := json.NewEncoder(w)
+        enc.Encode(et)
+        return t
+    }
+
+    if(r.FormValue("action") == "end") { t = endtournament(db, t) }
+
     enc := json.NewEncoder(w)
     enc.Encode(t)
 
-    return gcore.Tournament{}
+    return t
 }
 
 func main() {
