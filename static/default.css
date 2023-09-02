@@ -12,6 +12,7 @@ html, body {
 }
 
 h1 {
+    user-select: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -498,8 +499,9 @@ input[type=checkbox] {
 }
 
 .minipopitem {
+    user-select: none;
     border-radius: 3px;
-    padding: 2px;
+    padding: 3px;
     color: #222;
     transition: .3s;
     cursor: pointer;
