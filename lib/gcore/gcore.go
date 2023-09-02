@@ -5,6 +5,7 @@ import (
     "log"
     "time"
     "strconv"
+    "net/http"
     "encoding/json"
 
     bolt "go.etcd.io/bbolt"
@@ -25,6 +26,9 @@ const NMAXLEN = 30                  // Player name max length
 
 const A_ID = 0                      // Administrator ID
 const CTINDEX = 0                   // Database key for current tournament
+
+// Handler function definition
+type Hfn func(http.ResponseWriter, *http.Request, *bolt.DB)
 
 type Pdata struct {
     Name string

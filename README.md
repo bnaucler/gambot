@@ -56,7 +56,6 @@ Pull requests welcome!
 * Move minipop so that cursor starts inside the div
 * Move macro definitions to JSON file - import in both back- & frontend
 * New player object with stat for ongoing tournament
-* Handler launch wrapper
 * Alternate top 5 with APPG instead of total points
     - Store APPG in player object and calculate in backend
 * Logic to determine top players when points are equal

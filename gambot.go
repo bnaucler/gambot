@@ -1177,6 +1177,14 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(t)
 }
 
+// Launches mapped handler functions
+func starthlr(url string, fn gcore.Hfn, db *bolt.DB) {
+
+    http.HandleFunc(url, func(w http.ResponseWriter, r *http.Request) {
+        fn(w, r, db)
+    })
+}
+
 func main() {
 
     pptr := flag.Int("p", gcore.DEF_PORT, "port number to listen")
@@ -1193,83 +1201,27 @@ func main() {
     e = storect(db, et)
     gcore.Cherr(e)
 
-    // static
     http.Handle("/", http.FileServer(http.Dir("static")))
 
-    // admin registration
-    http.HandleFunc("/reg", func(w http.ResponseWriter, r *http.Request) {
-        reghandler(w, r, db)
-    })
+    var hlrs = map[string]gcore.Hfn {
+        "/reg":             reghandler,     // Admin registration
+        "/login":           loginhandler,   // Admin login
+        "/admin":           adminhandler,   // Admin settings
+        "/chkadm":          chkadmhandler,  // Check if admin exists in db
+        "/verskey":         verskeyhandler, // Verifies skey with database
+        "/ap":              aphandler,      // Add player
+        "/ep":              ephandler,      // Edit player
+        "/gp":              gphandler,      // Get player
+        "/gtp":             gtphandler,     // Get top players
+        "/ct":              cthandler,      // Create tournament
+        "/et":              ethandler,      // Edit tournament
+        "/apt":             apthandler,     // Add player to tournament
+        "/ts":              tshandler,      // Get tournament status
+        "/th":              thhandler,      // Get tournament history
+        "/dr":              drhandler,      // Declare game result
+    }
 
-    // admin login
-    http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-        loginhandler(w, r, db)
-    })
-
-    // admin settings
-    http.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
-        adminhandler(w, r, db)
-    })
-
-    // add player
-    http.HandleFunc("/ap", func(w http.ResponseWriter, r *http.Request) {
-        aphandler(w, r, db)
-    })
-
-    // edit player
-    http.HandleFunc("/ep", func(w http.ResponseWriter, r *http.Request) {
-        ephandler(w, r, db)
-    })
-
-    // get player
-    http.HandleFunc("/gp", func(w http.ResponseWriter, r *http.Request) {
-        gphandler(w, r, db)
-    })
-
-    // get top players
-    http.HandleFunc("/gtp", func(w http.ResponseWriter, r *http.Request) {
-        gtphandler(w, r, db)
-    })
-
-    // create tournament
-    http.HandleFunc("/ct", func(w http.ResponseWriter, r *http.Request) {
-        cthandler(w, r, db)
-    })
-
-    // end tournament
-    http.HandleFunc("/et", func(w http.ResponseWriter, r *http.Request) {
-        ethandler(w, r, db)
-    })
-
-    // Get tournament status
-    http.HandleFunc("/ts", func(w http.ResponseWriter, r *http.Request) {
-        tshandler(w, r, db)
-    })
-
-    // Get tournament history
-    http.HandleFunc("/th", func(w http.ResponseWriter, r *http.Request) {
-        thhandler(w, r, db)
-    })
-
-    // Checks if admin exists in database (for new instance)
-    http.HandleFunc("/chkadm", func(w http.ResponseWriter, r *http.Request) {
-        chkadmhandler(w, r, db)
-    })
-
-    // Verifies provided skey with database
-    http.HandleFunc("/verskey", func(w http.ResponseWriter, r *http.Request) {
-        verskeyhandler(w, r, db)
-    })
-
-    // add players to tournament
-    http.HandleFunc("/apt", func(w http.ResponseWriter, r *http.Request) {
-        apthandler(w, r, db)
-    })
-
-    // declare game result
-    http.HandleFunc("/dr", func(w http.ResponseWriter, r *http.Request) {
-        drhandler(w, r, db)
-    })
+    for url, fn := range hlrs { starthlr(url, fn, db) }
 
     lport := fmt.Sprintf(":%d", *pptr)
     e = http.ListenAndServe(lport, nil)
