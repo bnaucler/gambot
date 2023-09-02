@@ -1105,11 +1105,10 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
     t.End = time.Now()
 
-    // wt, e := json.Marshal(t)
-    // gcore.Cherr(e)
+    wt, e := json.Marshal(t)
+    gcore.Cherr(e)
 
-    // e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
-    e := storect(db, t)
+    e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
     gcore.Cherr(e)
 
     for _, p := range t.P { storeplayer(db, p) }

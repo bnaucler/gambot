@@ -167,7 +167,7 @@ func Getalltournaments(db *bolt.DB) []Tournament {
         b := tx.Bucket(Tbuc)
         c := b.Cursor()
 
-        for k, v := c.First(); k != nil; k, v = c.Next() {
+        for k, v := c.Seek([]byte("1")); k != nil; k, v = c.Next() {
             t = Tournament{}
             json.Unmarshal(v, &t)
             ts = append(ts, t)
