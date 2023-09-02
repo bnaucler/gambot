@@ -37,9 +37,11 @@ Pull requests welcome!
 ## TODO
 * API reference
 * CONTRIBUTING doc
-* Server side logging
 * Signal handler
+* Shutdown sequence
 * Track process pid
+    - lockfile
+* Server side logging
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
 * Seeding algorithm selector (minipop when 'start new tournament' is pressed
@@ -47,14 +49,15 @@ Pull requests welcome!
     - Winner meets winner seeding algo (w. color reversal)
     - Monrad seeding algo
 * Possibility to 'force' games for players on bench
-* Better (and consistent) error handling
+* Better (and consistent) backend error handling
 * Tournament history search by date
+    - next / prev buttons
 * Refactor (go & js) and divide in multiple source files
 * Reorganize CSS and comment for readability
 * Tool to import player & tournament JSON data to db
 * Better looking popups
 * Move macro definitions to JSON file - import in both back- & frontend
-* New player object with stat for ongoing tournament
+* Player object stat for ongoing tournament
 * Alternate top 5 with APPG instead of total points
     - Store APPG in player object and calculate in backend
 * Logic to determine top players when points are equal
@@ -70,6 +73,8 @@ Pull requests welcome!
 * See all players and respective scores in tournament history
 * Tournament history data download
 * Possibility to remove in-game players from ongoing tournament
+    - Declare result & remove
+    - Force remove (walk-over)
 * Possibility to pause players during ongoing tournament
 * 'soft end' to stop seeding
 * Licess API bindings
