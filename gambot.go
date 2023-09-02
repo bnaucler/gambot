@@ -82,6 +82,28 @@ func setdefaultpoints(a gcore.Admin) gcore.Admin {
     return a
 }
 
+// Stores current tournament object to DB
+func storect(db *bolt.DB, t gcore.Tournament) error {
+
+    wt, e := json.Marshal(t)
+    gcore.Cherr(e)
+
+    e = gcore.Wrdb(db, gcore.CTINDEX, []byte(wt), gcore.Tbuc)
+
+    return e
+}
+
+// Retrieves current tournament object from DB
+func getct(db *bolt.DB) (gcore.Tournament, error){
+
+    t := gcore.Tournament{}
+    wt, e := gcore.Rdb(db, gcore.CTINDEX, gcore.Tbuc)
+
+    e = json.Unmarshal(wt, &t)
+
+    return t, e
+}
+
 // HTTP handler - admin registration
 func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
@@ -227,7 +249,7 @@ func alltimetop(db *bolt.DB, n int) ([]gcore.Player, bool) {
 }
 
 // HTTP handler - get top player(s)
-func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tournament) {
+func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     resp := Tpresp{}
 
@@ -241,6 +263,9 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tou
         enc.Encode(resp)
         return
     }
+
+    t, e := getct(db)
+    gcore.Cherr(e)
 
     req := r.FormValue("n")
     rt := r.FormValue("t")
@@ -583,24 +608,26 @@ func valskey(db *bolt.DB, skey string) bool {
 }
 
 // HTTP handler - create new tournament
-func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
-               t gcore.Tournament) gcore.Tournament {
+func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     rskey := r.FormValue("skey")
+
+    t, e := getct(db)
+    gcore.Cherr(e)
 
     if t.ID != 0 {
         t.Status = S_ERR;
         enc := json.NewEncoder(w)
         enc.Encode(t)
         fmt.Printf("Tournament already ongoing!\n")
-        return t
+        return
 
     } else if !valskey(db, rskey) {
         enc := json.NewEncoder(w)
         enc.Encode(t)
         fmt.Printf("Admin verification failed\n")
-        return t
-    }
+        return
+    };
 
     t = gcore.Tournament{}
     t.Start = time.Now()
@@ -626,7 +653,8 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
     enc := json.NewEncoder(w)
     enc.Encode(t)
 
-    return t
+    e  = storect(db, t)
+    gcore.Cherr(e)
 }
 
 // Returns true if player enrolled in tournament
@@ -665,8 +693,7 @@ func apt(db *bolt.DB, t gcore.Tournament, p int) gcore.Tournament {
 }
 
 // HTTP handler - Add player to tournament
-func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
-                t gcore.Tournament) gcore.Tournament {
+func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     var regexnum = regexp.MustCompile(`[^\p{N} ]+`)
 
@@ -676,6 +703,9 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
     rskey := r.FormValue("skey")
     qmap := r.Form["?id"]
     qstr := strings.Split(qmap[0], ",")
+
+    t, e := getct(db)
+    gcore.Cherr(e)
 
     if valskey(db, rskey) {
         for _, elem := range qstr {
@@ -691,10 +721,11 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
         t = seed(t)
     }
 
+    e = storect(db, t)
+    gcore.Cherr(e)
+
     enc := json.NewEncoder(w)
     enc.Encode(t)
-
-    return t
 }
 
 // Sorts tournament slice by ID and returns
@@ -792,7 +823,10 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 }
 
 // HTTP handler - get tournament status
-func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tournament) {
+func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    t, e := getct(db)
+    gcore.Cherr(e)
 
     rskey := r.FormValue("skey")
     enc := json.NewEncoder(w)
@@ -992,8 +1026,7 @@ func storegameplayers(db *bolt.DB, gid string, t gcore.Tournament) {
 }
 
 // HTTP handler - declare game result
-func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
-               t gcore.Tournament) gcore.Tournament {
+func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     e := r.ParseForm()
     gcore.Cherr(e)
@@ -1006,8 +1039,11 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
         et := gcore.Tournament{}
         enc := json.NewEncoder(w)
         enc.Encode(et)
-        return t
+        return
     }
+
+    t, e := getct(db)
+    gcore.Cherr(e)
 
     iid, e := strconv.Atoi(wid)
     gcore.Cherr(e)
@@ -1037,7 +1073,8 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
     enc := json.NewEncoder(w)
     enc.Encode(t)
 
-    return t
+    e = storect(db, t)
+    gcore.Cherr(e)
 }
 
 // Sums all indexes of two int slices
@@ -1068,10 +1105,11 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
     t.End = time.Now()
 
-    wt, e := json.Marshal(t)
-    gcore.Cherr(e)
+    // wt, e := json.Marshal(t)
+    // gcore.Cherr(e)
 
-    e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
+    // e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
+    e := storect(db, t)
     gcore.Cherr(e)
 
     for _, p := range t.P { storeplayer(db, p) }
@@ -1106,8 +1144,7 @@ func rtplayer(db *bolt.DB, pid int, t gcore.Tournament) gcore.Tournament {
 }
 
 // HTTP handler - edit tournament
-func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
-               t gcore.Tournament) gcore.Tournament {
+func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     rskey := r.FormValue("skey")
 
@@ -1115,13 +1152,19 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
         et := gcore.Tournament{}
         enc := json.NewEncoder(w)
         enc.Encode(et)
-        return t
+        return
     }
+
+    t, e := getct(db)
+    gcore.Cherr(e)
 
     act := r.FormValue("action")
 
     if act == "end" {
         t = endtournament(db, t)
+        et := gcore.Tournament{}
+        e = storect(db, et)
+        gcore.Cherr(e)
 
     } else if act == "rem" {
         rid := r.FormValue("id")
@@ -1132,8 +1175,6 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
 
     enc := json.NewEncoder(w)
     enc.Encode(t)
-
-    return t
 }
 
 func main() {
@@ -1148,7 +1189,9 @@ func main() {
     gcore.Cherr(e)
     defer db.Close()
 
-    t := gcore.Tournament{}
+    et := gcore.Tournament{}
+    e = storect(db, et)
+    gcore.Cherr(e)
 
     // static
     http.Handle("/", http.FileServer(http.Dir("static")))
@@ -1185,22 +1228,22 @@ func main() {
 
     // get top players
     http.HandleFunc("/gtp", func(w http.ResponseWriter, r *http.Request) {
-        gtphandler(w, r, db, t)
+        gtphandler(w, r, db)
     })
 
     // create tournament
     http.HandleFunc("/ct", func(w http.ResponseWriter, r *http.Request) {
-        t = cthandler(w, r, db, t)
+        cthandler(w, r, db)
     })
 
     // end tournament
     http.HandleFunc("/et", func(w http.ResponseWriter, r *http.Request) {
-        t = ethandler(w, r, db, t)
+        ethandler(w, r, db)
     })
 
     // Get tournament status
     http.HandleFunc("/ts", func(w http.ResponseWriter, r *http.Request) {
-        tshandler(w, r, db, t)
+        tshandler(w, r, db)
     })
 
     // Get tournament history
@@ -1220,12 +1263,12 @@ func main() {
 
     // add players to tournament
     http.HandleFunc("/apt", func(w http.ResponseWriter, r *http.Request) {
-        t = apthandler(w, r, db, t)
+        apthandler(w, r, db)
     })
 
     // declare game result
     http.HandleFunc("/dr", func(w http.ResponseWriter, r *http.Request) {
-        t = drhandler(w, r, db, t)
+        drhandler(w, r, db)
     })
 
     lport := fmt.Sprintf(":%d", *pptr)

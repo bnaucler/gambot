@@ -24,6 +24,7 @@ const DEF_PORT = 9001               // Default server port
 const NMAXLEN = 30                  // Player name max length
 
 const A_ID = 0                      // Administrator ID
+const CTINDEX = 0                   // Database key for current tournament
 
 type Pdata struct {
     Name string
