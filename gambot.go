@@ -270,7 +270,6 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tou
 func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     players := []gcore.Player{}
-    var cp gcore.Player
 
     e := r.ParseForm()
     gcore.Cherr(e)
@@ -293,10 +292,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         id, e := strconv.Atoi(rid)
         gcore.Cherr(e) // TODO better handling needed
 
-        p, e := gcore.Rdb(db, id, gcore.Pbuc)
-        gcore.Cherr(e)
-
-        json.Unmarshal(p, &cp)
+        cp := getdbplayerbyid(db, id)
         players = append(players, cp)
 
     } else {
@@ -336,11 +332,7 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     id, e := strconv.Atoi(rid)
     gcore.Cherr(e)
 
-    p, e := gcore.Rdb(db, id, gcore.Pbuc)
-    gcore.Cherr(e)
-
-    cplayer := gcore.Player{}
-    json.Unmarshal(p, &cplayer)
+    cplayer := getdbplayerbyid(db, id)
 
     if raction == "deac" { // deactivate
         cplayer.Active = false
@@ -664,15 +656,8 @@ func apt(db *bolt.DB, t gcore.Tournament, p int) gcore.Tournament {
 
     if t.ID == 0 || isintournament(t, p) { return t }
 
-    cpb, e := gcore.Rdb(db, p, gcore.Pbuc)
-    gcore.Cherr(e)
-
-    cp := gcore.Player{}
-
-    e = json.Unmarshal(cpb, &cp)
-    gcore.Cherr(e)
-
-    cp.Stat = slicesetall(cp.Stat, 0)
+    cp := getdbplayerbyid(db, p)
+    cp.Points = 0
 
     t.P = append(t.P, cp)
 
@@ -821,7 +806,10 @@ func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, t gcore.Tour
 func incrngame(g gcore.Game, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.P); i++ {
-        if g.W == t.P[i].ID || g.B == t.P[i].ID { t.P[i].Ngames++ }
+        if g.W == t.P[i].ID || g.B == t.P[i].ID {
+            t.P[i].Ngames++
+            t.P[i].TNgames++
+        }
     }
 
     return t
@@ -848,6 +836,7 @@ func addpoints(id int, p int, t gcore.Tournament) gcore.Tournament {
     for i := 0; i < len(t.P) ; i++ {
         if t.P[i].ID == id {
             t.P[i].Points += p
+            t.P[i].TPoints += p
         }
     }
     return t
@@ -958,6 +947,50 @@ func addstat(pid int, col int, res int, t gcore.Tournament) gcore.Tournament {
     return t
 }
 
+// Returns player object with specified id
+func getdbplayerbyid(db *bolt.DB, pid int) gcore.Player {
+
+    cp := gcore.Player{}
+
+    p, e := gcore.Rdb(db, pid, gcore.Pbuc)
+    gcore.Cherr(e)
+
+    json.Unmarshal(p, &cp)
+
+    return cp
+}
+
+// Returns player with specified ID from tournament struct
+func gettplayerbyid(pid int, t gcore.Tournament) gcore.Player {
+
+    for _, p := range t.P {
+        if p.ID == pid {return p }
+    }
+
+    return gcore.Player{}
+}
+
+// Updates database record for player p TODO adjust for continuous writes
+func storeplayer(db *bolt.DB, p gcore.Player) {
+
+    wp, e := json.Marshal(p)
+
+    e = gcore.Wrdb(db, p.ID, []byte(wp), gcore.Pbuc)
+    gcore.Cherr(e)
+}
+
+// Stores both players in game to db
+func storegameplayers(db *bolt.DB, gid string, t gcore.Tournament) {
+
+    for _, g := range t.G {
+        if g.ID == gid {
+            storeplayer(db, gettplayerbyid(g.W, t))
+            storeplayer(db, gettplayerbyid(g.B, t))
+            break
+        }
+    }
+}
+
 // HTTP handler - declare game result
 func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
                t gcore.Tournament) gcore.Tournament {
@@ -998,6 +1031,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB,
     }
 
     t = endgame(gid, iid, t)
+    storegameplayers(db, gid, t)
     t = seed(t)
 
     enc := json.NewEncoder(w)
@@ -1029,7 +1063,7 @@ func sumslice(s1 []int, s2 []int) []int {
     return ret
 }
 
-// Ends tournament t TODO: refactor
+// Ends tournament t
 func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
     t.End = time.Now()
@@ -1040,22 +1074,7 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
     e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
     gcore.Cherr(e)
 
-    for _, p := range t.P {
-        wdbp, e := gcore.Rdb(db, p.ID, gcore.Pbuc)
-        dbp := gcore.Player{}
-
-        e = json.Unmarshal(wdbp, &dbp)
-        gcore.Cherr(e)
-
-        dbp.TPoints += p.Points
-        dbp.TNgames += p.Ngames
-        dbp.Stat = sumslice(dbp.Stat, p.Stat)
-
-        wp, e := json.Marshal(dbp)
-
-        e = gcore.Wrdb(db, p.ID, []byte(wp), gcore.Pbuc)
-        gcore.Cherr(e)
-    }
+    for _, p := range t.P { storeplayer(db, p) }
 
     if t.ID == 0 { // TODO check before write
         t.Status = S_ERR
@@ -1077,7 +1096,7 @@ func rtplayer(db *bolt.DB, pid int, t gcore.Tournament) gcore.Tournament {
     npl := []gcore.Player{}
 
     for _, p := range t.P {
-        if p.ID != pid { npl = append(npl, p) }
+        if p.ID != pid {npl = append(npl, p) }
     }
 
     t.P = npl

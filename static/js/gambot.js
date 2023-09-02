@@ -367,6 +367,8 @@ function showplayerdata(xhr) {
     var indppg = gid("indppgval");
     var editbtn = gid("editplayer");
 
+    console.log(obj);
+
     pname.innerHTML = obj[0].Pi.Name;
     pname.setAttribute("name", obj[0].ID);
 
