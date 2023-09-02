@@ -89,8 +89,8 @@ function mkminipop() {
 
     var elem = mkobj("div", "minipop");
 
-    elem.style.left = event.clientX + "px";
-    elem.style.top = event.clientY + "px";
+    elem.style.left = (event.clientX - 5) + "px";
+    elem.style.top = (event.clientY - 5) + "px";
 
     elem.addEventListener("mouseleave", function(event) {
         elem.remove();

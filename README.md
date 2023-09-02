@@ -53,7 +53,6 @@ Pull requests welcome!
 * Reorganize CSS and comment for readability
 * Tool to import player & tournament JSON data to db
 * Better looking popups
-* Move minipop so that cursor starts inside the div
 * Move macro definitions to JSON file - import in both back- & frontend
 * New player object with stat for ongoing tournament
 * Alternate top 5 with APPG instead of total points
