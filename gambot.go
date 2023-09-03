@@ -1,15 +1,19 @@
 package main
 
 import (
+    "os"
     "fmt"
     "sort"
     "flag"
-    "strings"
+    "time"
     "regexp"
+    "strings"
     "strconv"
     "net/http"
+    "io/ioutil"
     "math/rand"
-    "time"
+    "os/signal"
+    "path/filepath"
     "encoding/json"
 
     "github.com/bnaucler/gambot/lib/gcore"
@@ -1205,6 +1209,42 @@ func starthlr(url string, fn gcore.Hfn, db *bolt.DB) {
     })
 }
 
+// Enables clean shutdown. Needs delay for caller to send response
+func shutdown(pidfile string) {
+
+    go func() {
+        time.Sleep(1 * time.Second)
+        os.Remove(pidfile)
+        os.Exit(0)
+    }()
+}
+
+// Setting up signal handler
+func sighandler(pidfile string) {
+
+    sigc := make(chan os.Signal, 1)
+    signal.Notify(sigc, os.Interrupt)
+    go func(){
+        for sig := range sigc {
+            fmt.Printf("Caught %+v - cleaning up.\n", sig)
+            shutdown(pidfile)
+        }
+    }()
+}
+
+// Creates PID file and launches signal handler
+func ginit() {
+
+    prgname := filepath.Base(os.Args[0])
+    pid := os.Getpid()
+
+    pidfile := fmt.Sprintf("%s.pid", prgname)
+    e := ioutil.WriteFile(pidfile, []byte(strconv.Itoa(pid)), 0644)
+    gcore.Cherr(e)
+
+    sighandler(pidfile)
+}
+
 func main() {
 
     pptr := flag.Int("p", gcore.DEF_PORT, "port number to listen")
@@ -1212,6 +1252,7 @@ func main() {
     flag.Parse()
 
     rand.Seed(time.Now().UnixNano())
+    ginit()
 
     db, e := bolt.Open(*dbptr, 0640, nil)
     gcore.Cherr(e)

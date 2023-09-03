@@ -37,10 +37,7 @@ Pull requests welcome!
 ## TODO
 * API reference
 * CONTRIBUTING doc
-* Signal handler
 * Shutdown sequence
-* Track process pid
-    - lockfile
 * Server side logging
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
@@ -56,6 +53,7 @@ Pull requests welcome!
 * Reorganize CSS and comment for readability
 * Tool to import player & tournament JSON data to db
 * Better looking popups
+* Better looking minipops
 * Move macro definitions to JSON file - import in both back- & frontend
 * Player object stat for ongoing tournament
 * Alternate top 5 with APPG instead of total points
