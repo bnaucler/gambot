@@ -2,4 +2,5 @@ bin/*
 !bin/build.sh
 .gambot.db
 *.swp
+*.pid
 *.DS_Store
