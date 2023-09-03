@@ -99,6 +99,14 @@ function mkminipop() {
     return elem
 }
 
+// Requests a game when seeding algo is not automatically creating one
+function forcegame(id) {
+
+    var params = "id=" + id + "&skey=" + gss("gambotkey");
+
+    mkxhr("/mkgame", params, playersadded); // TODO
+}
+
 // Creates a popup menu for bench players
 function benchpopup(id, t) {
 
@@ -111,6 +119,11 @@ function benchpopup(id, t) {
 
     rembtn.addEventListener("click", () => {
         edittournament("rem", id);
+        bpop.remove();
+    });
+
+    forcebtn.addEventListener("click", () => {
+        forcegame(id)
         bpop.remove();
     });
 

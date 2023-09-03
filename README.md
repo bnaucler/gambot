@@ -39,13 +39,15 @@ Pull requests welcome!
 * CONTRIBUTING doc
 * Shutdown sequence
 * Server side logging
+* API call object to streamline request handling
+* Function for returning empty objects at key verification failure
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
 * Seeding algorithm selector (minipop when 'start new tournament' is pressed
     - Logic to determine 2nd game with reversed colors for rando algorithm
     - Winner meets winner seeding algo (w. color reversal)
     - Monrad seeding algo
-* Possibility to 'force' games for players on bench
+* Possibility to 'force' games with specified opponent
 * Better (and consistent) backend error handling
 * Tournament history search by date
     - next / prev buttons

@@ -1160,9 +1160,75 @@ func rtplayer(db *bolt.DB, pid int, t gcore.Tournament) gcore.Tournament {
     }
 
     t.P = npl
-    fmt.Printf("Removing player with ID %d from tournament %d\n", pid, t.ID)
+    pn := getplayername(db, pid)
+    fmt.Printf("Removing %s (id: %d) from tournament %d\n", pn, pid, t.ID)
 
     return t
+}
+
+// Returns slice of IDs for players currently not in a game
+func getbenchplayers(t gcore.Tournament) []int {
+
+    ret := []int{}
+
+    for _, p := range t.P {
+        if !ingame(p.ID, t) { ret = append(ret, p.ID) }
+    }
+
+    return ret
+}
+
+// Removes item with the value v from slice
+func rmitemfromintslice(v int, s []int) []int {
+
+    ret := []int{}
+
+    for _, sv := range s {
+        if v != sv { ret = append(ret, sv)}
+    }
+
+    return ret
+}
+
+// HTTP handler - creates game
+func mkgamehandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    e := r.ParseForm()
+    gcore.Cherr(e)
+
+    rskey := r.FormValue("skey")
+
+    if !valskey(db, rskey) {
+        et := gcore.Tournament{}
+        enc := json.NewEncoder(w)
+        enc.Encode(et)
+        return
+    }
+
+    rid := r.FormValue("id")
+    pid, e := strconv.Atoi(rid)
+    gcore.Cherr(e)
+
+    t, e := getct(db)
+
+    bp := getbenchplayers(t)
+    bp = rmitemfromintslice(pid, bp)
+    blen := len(bp)
+
+    fmt.Printf("%+v\n", bp)
+
+    if blen > 0 {
+        opp :=  bp[rand.Intn(blen)]
+        game := mkgame(t)
+        game.W, game.B = blackwhite(pid, opp, t)
+        t.G = append(t.G, game)
+    }
+
+    e = storect(db, t)
+    gcore.Cherr(e)
+
+    enc := json.NewEncoder(w)
+    enc.Encode(t)
 }
 
 // HTTP handler - edit tournament
@@ -1270,6 +1336,7 @@ func main() {
         "/admin":           adminhandler,   // Admin settings
         "/chkadm":          chkadmhandler,  // Check if admin exists in db
         "/verskey":         verskeyhandler, // Verifies skey with database
+        "/mkgame":          mkgamehandler,  // Requests creation of new game
         "/ap":              aphandler,      // Add player
         "/ep":              ephandler,      // Edit player
         "/gp":              gphandler,      // Get player
