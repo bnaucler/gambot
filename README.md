@@ -72,9 +72,6 @@ Pull requests welcome!
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
-* Possibility to remove in-game players from ongoing tournament
-    - Declare result & remove
-    - Force remove (walk-over)
 * Possibility to pause players during ongoing tournament
 * 'soft end' to stop seeding
 * Licess API bindings

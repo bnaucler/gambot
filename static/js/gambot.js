@@ -119,6 +119,31 @@ function benchpopup(id, t) {
     pdiv.appendChild(bpop);
 }
 
+// Creates popup menu for in-game players
+function igppopup(id, gameid, t) {
+
+    var bpop = mkminipop();
+    var dwbtn = mkobj("div", "minipopitem", "Declare win");
+    var rembtn = mkobj("div", "minipopitem", "Remove");
+    var pdiv = gid("tnmt");
+
+    dwbtn.addEventListener("click", () => {
+        var pname = getplayername(id, t);
+        declareresult(gameid, id, pname);
+        bpop.remove();
+    });
+
+    rembtn.addEventListener("click", () => {
+        edittournament("rem", id);
+        bpop.remove();
+    });
+
+    bpop.appendChild(dwbtn);
+    bpop.appendChild(rembtn);
+    pdiv.appendChild(bpop);
+}
+
+
 // Adds player to bench by id
 function addbench(id, t) {
 
@@ -160,11 +185,11 @@ function addgame(g, t) {
     var dtext = mkobj("span", "", "draw");
 
     W.addEventListener("click", () => {
-        declareresult(g.ID, g.W, getplayername(g.W, t));
+        igppopup(g.W, g.ID, t);
     });
 
     B.addEventListener("click", () => {
-        declareresult(g.ID, g.B, getplayername(g.W, t));
+        igppopup(g.B, g.ID, t);
     });
 
     draw.addEventListener("click", () => {

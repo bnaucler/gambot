@@ -1127,13 +1127,32 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
     return gcore.Tournament{}
 }
 
+// Cancels game containing player with ID uid - awards no points
+func cancelgamebyuid(db *bolt.DB, uid int, t gcore.Tournament) gcore.Tournament {
+
+    for i := 0; i < len(t.G); i++ {
+        if t.G[i].W == uid || t.G[i].B == uid {
+            t.G[i].End = time.Now(); // Ngames is not incremented
+            fmt.Printf("Cancelling game %s\n", t.G[i].ID)
+        }
+    }
+
+    return t
+}
+
 // Removes player with id pid from ongoing tournament
 func rtplayer(db *bolt.DB, pid int, t gcore.Tournament) gcore.Tournament {
 
     npl := []gcore.Player{}
 
     for _, p := range t.P {
-        if p.ID != pid {npl = append(npl, p) }
+        if p.ID != pid {
+            npl = append(npl, p)
+
+        } else if ingame(pid, t) {
+            t = cancelgamebyuid(db, pid, t);
+            t = seed(t)
+        }
     }
 
     t.P = npl
@@ -1170,6 +1189,8 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         id, e := strconv.Atoi(rid)
         gcore.Cherr(e)
         t = rtplayer(db, id, t)
+        e = storect(db, t)
+        gcore.Cherr(e)
     }
 
     enc := json.NewEncoder(w)
