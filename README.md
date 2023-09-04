@@ -44,7 +44,6 @@ Pull requests welcome!
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
 * Seeding algorithm selector (minipop when 'start new tournament' is pressed
-    - Logic to determine 2nd game with reversed colors for rando algorithm
     - Winner meets winner seeding algo (w. color reversal)
     - Monrad seeding algo
 * Possibility to 'force' games with specified opponent
@@ -69,11 +68,12 @@ Pull requests welcome!
     - backend
 * Send player added status report to frontend
 * Participant attendance & results report per tournament
-* Fix bench when only 1 player is in tournament
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
 * Better looking pause icon
+* Same button for admin registration and login
+* Same button for starting and ending tournament
 * 'soft end' to stop seeding
 * Licess API bindings
 

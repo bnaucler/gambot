@@ -492,6 +492,7 @@ input[type=checkbox] {
 }
 
 .minipop {
+    border: 1px #222 solid;
     border-radius: 5px;
     padding: 5px;
     position: fixed;

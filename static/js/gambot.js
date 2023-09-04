@@ -77,8 +77,10 @@ function declareresult(gid, pid, wname) {
 // Returns true if player with name ID is currently in a game
 function ingame(id, t) {
 
-    for(const g of t.G) {
-        if((g.W === id || g.B === id) && timezero(g.End)) return true;
+    if(t.G != null) {
+        for(const g of t.G) {
+            if((g.W === id || g.B === id) && timezero(g.End)) return true;
+        }
     }
 
     return false;
@@ -280,12 +282,14 @@ function updatewindow(t) {
 
     pdiv.innerHTML = "";
 
-    if(t.P == null || t.G == null) return;
+    if(t.P == null) return;
     if(t.ID != 0) gettopplayers(5, "c");
     else gettopplayers(5, "a");
 
-    for(const g of t.G) {
-        if(timezero(g.End)) addgame(g, t);
+    if(t.G != null) {
+        for(const g of t.G) {
+            if(timezero(g.End)) addgame(g, t);
+        }
     }
 
     makebench(pdiv);
