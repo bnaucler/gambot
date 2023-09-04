@@ -1,6 +1,6 @@
 // Alias to reduce typing
-var gid = document.getElementById.bind(document);
-var gss = sessionStorage.getItem.bind(sessionStorage);
+let gid = document.getElementById.bind(document);
+let gss = sessionStorage.getItem.bind(sessionStorage);
 
 // Macro definitions for readability
 const S_OK = 0;
@@ -24,7 +24,7 @@ const LOSS = 2;
 // HTTP request wrapper
 function mkxhr(dest, params, rfunc) {
 
-    var xhr = new XMLHttpRequest();
+    let xhr = new XMLHttpRequest();
 
     xhr.open("POST", dest, true);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -41,12 +41,12 @@ function mkxhr(dest, params, rfunc) {
 // Returns DOM object of requested type, and with class & text defined if requested
 function mkobj(type, cl, txt) {
 
-    var ret = document.createElement(type);
+    let ret = document.createElement(type);
 
     if(cl !== undefined && cl != "") ret.classList.add(cl);
 
     if(txt !== undefined) {
-        var tc = document.createTextNode(txt);
+        let tc = document.createTextNode(txt);
         ret.appendChild(tc);
     }
 
@@ -69,7 +69,7 @@ function declareresult(gid, pid, wname) {
     if(pid === 0) log("Game " + gid + " is a draw.")
     else log("Game " + gid + " won by " + wname)
 
-    var params = "id=" + pid + "&game=" + gid + "&skey=" + gss("gambotkey");
+    let params = "id=" + pid + "&game=" + gid + "&skey=" + gss("gambotkey");
 
     mkxhr("/dr", params, playersadded); // TOOD temp
 }
@@ -87,7 +87,7 @@ function ingame(id, t) {
 // Creates a minipop element
 function mkminipop() {
 
-    var elem = mkobj("div", "minipop");
+    let elem = mkobj("div", "minipop");
 
     elem.style.left = (event.clientX - 5) + "px";
     elem.style.top = (event.clientY - 5) + "px";
@@ -102,7 +102,7 @@ function mkminipop() {
 // Requests a game when seeding algo is not automatically creating one
 function forcegame(id) {
 
-    var params = "id=" + id + "&skey=" + gss("gambotkey");
+    let params = "id=" + id + "&skey=" + gss("gambotkey");
 
     mkxhr("/mkgame", params, playersadded); // TODO
 }
@@ -110,10 +110,10 @@ function forcegame(id) {
 // Creates a popup menu for bench players
 function benchpopup(id, t) {
 
-    var bpop = mkminipop();
-    var rembtn = mkobj("div", "minipopitem", "Remove");
-    var forcebtn = mkobj("div", "minipopitem", "Force");
-    var pdiv = gid("tnmt");
+    let bpop = mkminipop();
+    let rembtn = mkobj("div", "minipopitem", "Remove");
+    let forcebtn = mkobj("div", "minipopitem", "Force");
+    let pdiv = gid("tnmt");
 
     mkminipop(bpop);
 
@@ -135,13 +135,13 @@ function benchpopup(id, t) {
 // Creates popup menu for in-game players
 function igppopup(id, gameid, t) {
 
-    var bpop = mkminipop();
-    var dwbtn = mkobj("div", "minipopitem", "Declare win");
-    var rembtn = mkobj("div", "minipopitem", "Remove");
-    var pdiv = gid("tnmt");
+    let bpop = mkminipop();
+    let dwbtn = mkobj("div", "minipopitem", "Declare win");
+    let rembtn = mkobj("div", "minipopitem", "Remove");
+    let pdiv = gid("tnmt");
 
     dwbtn.addEventListener("click", () => {
-        var pname = getplayername(id, t);
+        let pname = getplayername(id, t);
         declareresult(gameid, id, pname);
         bpop.remove();
     });
@@ -160,8 +160,8 @@ function igppopup(id, gameid, t) {
 // Adds player to bench by id
 function addbench(id, t) {
 
-    var pdiv = gid("bench");
-    var player = mkobj("div", "benchp", getplayername(id, t));
+    let pdiv = gid("bench");
+    let player = mkobj("div", "benchp", getplayername(id, t));
 
     player.addEventListener("click", () => {
         benchpopup(id, t);
@@ -173,7 +173,7 @@ function addbench(id, t) {
 // Populates the bench (waiting players)
 function popbench(t) {
 
-    var bp = [];
+    let bp = [];
 
     for(const p of t.P) {
         if(!ingame(p.ID, t)) bp.push(p.ID)
@@ -188,14 +188,14 @@ function popbench(t) {
 // Adds a game to the display window
 function addgame(g, t) {
 
-    var pdiv = gid("games");
+    let pdiv = gid("games");
 
-    var game = mkobj("div", "game");
-    var bw = mkobj("div", "bw");
-    var W = mkobj("div", "wp", getplayername(g.W, t));
-    var B = mkobj("div", "bp", getplayername(g.B, t));
-    var draw = mkobj("div", "draw");
-    var dtext = mkobj("span", "", "draw");
+    let game = mkobj("div", "game");
+    let bw = mkobj("div", "bw");
+    let W = mkobj("div", "wp", getplayername(g.W, t));
+    let B = mkobj("div", "bp", getplayername(g.B, t));
+    let draw = mkobj("div", "draw");
+    let dtext = mkobj("span", "", "draw");
 
     W.addEventListener("click", () => {
         igppopup(g.W, g.ID, t);
@@ -220,7 +220,7 @@ function addgame(g, t) {
 // Creates bench element
 function makebench(pdiv) {
 
-    var bench = document.createElement("div");
+    let bench = document.createElement("div");
 
     bench.id = "bench";
 
@@ -230,7 +230,7 @@ function makebench(pdiv) {
 // Updates game window with tournament data
 function updatewindow(t) {
 
-    var pdiv = gid("games");
+    let pdiv = gid("games");
 
     pdiv.innerHTML = "";
 
@@ -249,8 +249,8 @@ function updatewindow(t) {
 // Formats server date codes to a more easily readable format
 function formatdate(d) {
 
-    var date = d.substring(0, 10);
-    var time = d.substring(11, 16);
+    let date = d.substring(0, 10);
+    let time = d.substring(11, 16);
 
     return date + " " + time;
 }
@@ -258,16 +258,16 @@ function formatdate(d) {
 // Returns names & score for n# of top players in tournament t
 function ttop(n, t) {
 
-    var tc = structuredClone(t.P)
-    var ret = [];
-    var plen = tc.length;
+    let tc = structuredClone(t.P)
+    let ret = [];
+    let plen = tc.length;
 
     tc.sort((i, j) => i.Points - j.Points);
     tc.reverse();
 
     if(n > plen) n = plen;
 
-    for(var i = 0; i < n; i++) ret.push(tc[i].Pi.Name + " " + tc[i].Points)
+    for(let i = 0; i < n; i++) ret.push(tc[i].Pi.Name + " " + tc[i].Points)
 
     return ret;
 }
@@ -275,10 +275,10 @@ function ttop(n, t) {
 // Adds individual player & score to tournament history list
 function createtlistplayer(t, td) {
 
-    var tpl = ttop(3, t);
+    let tpl = ttop(3, t);
 
     for(const p of tpl) {
-        var tp = mkobj("p", "ttp", p);
+        let tp = mkobj("p", "ttp", p);
         td.appendChild(tp);
     }
 }
@@ -286,11 +286,11 @@ function createtlistplayer(t, td) {
 // Creates list item for tournament history
 function createtlistitem(t) {
 
-    var pdiv = gid("thist");
-    var td = mkobj("div", "tlitm");
-    var id = mkobj("p", "tid", t.ID);
-    var stext = formatdate(t.Start) + " - " + formatdate(t.End);
-    var stime = mkobj("p", "ttime", stext);
+    let pdiv = gid("thist");
+    let td = mkobj("div", "tlitm");
+    let id = mkobj("p", "tid", t.ID);
+    let stext = formatdate(t.Start) + " - " + formatdate(t.End);
+    let stime = mkobj("p", "ttime", stext);
 
     td.appendChild(id);
     td.appendChild(stime);
@@ -299,7 +299,7 @@ function createtlistitem(t) {
         createtlistplayer(t, td);
 
     } else {
-        var tp = mkobj("p", "ttp", "No players in tournament");
+        let tp = mkobj("p", "ttp", "No players in tournament");
         td.appendChild(tp);
     }
 
@@ -309,7 +309,7 @@ function createtlistitem(t) {
 // Displays tournament history
 function updatethist(xhr) {
 
-    var ts = JSON.parse(xhr.responseText);
+    let ts = JSON.parse(xhr.responseText);
 
     gid("thist").innerHTML = "";
 
@@ -326,7 +326,7 @@ function updatethist(xhr) {
 // Call updatewindow() if request contains players
 function playersadded(xhr) {
 
-    var t = JSON.parse(xhr.responseText);
+    let t = JSON.parse(xhr.responseText);
     if(t.P != undefined) updatewindow(t);
 }
 
@@ -340,8 +340,8 @@ function playertotournament(elem) {
         ids.push(checkbox.value);
     });
 
-    var olen = ids.length;
-    var params = "?id=" + JSON.stringify(ids) + "&skey=" + gss("gambotkey");
+    let olen = ids.length;
+    let params = "?id=" + JSON.stringify(ids) + "&skey=" + gss("gambotkey");
 
     mkxhr("/apt", params, playersadded);
 
@@ -351,7 +351,7 @@ function playertotournament(elem) {
 // Calculates points per game value
 function calcppg(points, games) {
 
-    var ret = points / games;
+    let ret = points / games;
 
     if(ret !== ret) ret = 0;
 
@@ -361,9 +361,9 @@ function calcppg(points, games) {
 // Fills the horizontal bar for win / draw / loss
 function fillbar(col, win, draw, loss) {
 
-    var sum = win + draw + loss;
-    var wbar, dbar, lbar;
-    var wwidth, dwidth, lwidth;
+    let sum = win + draw + loss;
+    let wbar, dbar, lbar;
+    let wwidth, dwidth, lwidth;
 
     if(col == TOTAL) {
         wbar = gid("indtwin");
@@ -398,12 +398,12 @@ function fillbar(col, win, draw, loss) {
 // Shows data on individual player
 function showplayerdata(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
-    var pname = gid("indplayername");
-    var indgames = gid("indgamesval");
-    var indpoints = gid("indpointsval");
-    var indppg = gid("indppgval");
-    var editbtn = gid("editplayer");
+    let obj = JSON.parse(xhr.responseText);
+    let pname = gid("indplayername");
+    let indgames = gid("indgamesval");
+    let indpoints = gid("indpointsval");
+    let indppg = gid("indppgval");
+    let editbtn = gid("editplayer");
 
     pname.innerHTML = obj[0].Pi.Name;
     pname.setAttribute("name", obj[0].ID);
@@ -432,7 +432,7 @@ function showplayerdata(xhr) {
 // Requests player data
 function getplayerdata(p) {
 
-    var params = "id=" + p.getAttribute("name") + "&skey=" + gss("gambotkey");
+    let params = "id=" + p.getAttribute("name") + "&skey=" + gss("gambotkey");
 
     mkxhr("/gp", params, showplayerdata);
 }
@@ -440,8 +440,8 @@ function getplayerdata(p) {
 // Adds player to list
 function showplayer(p, pdiv, intourn) {
 
-    var pl = mkobj("div", "pln");
-    var name = mkobj("p", "pntxt", p.Pi.Name);
+    let pl = mkobj("div", "pln");
+    let name = mkobj("p", "pntxt", p.Pi.Name);
 
     pl.appendChild(name);
 
@@ -449,7 +449,7 @@ function showplayer(p, pdiv, intourn) {
         pl.style.backgroundColor = "#772222";
 
     } else if(p.Active == true && intourn == 1) {
-        var cb = mkobj("input", "", "");
+        let cb = mkobj("input", "", "");
 
         cb.type = "checkbox";
         cb.name = "selected";
@@ -471,10 +471,10 @@ function showplayer(p, pdiv, intourn) {
 // Displays list of players
 function showplayers(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
-    var pdiv = gid("playerdata");
-    var intourn = gss("gambotintournament");
-    var br = mkobj("br", "", "");
+    let obj = JSON.parse(xhr.responseText);
+    let pdiv = gid("playerdata");
+    let intourn = gss("gambotintournament");
+    let br = mkobj("br", "", "");
 
     pdiv.innerHTML = "";
     pdiv.style.display = "block";
@@ -483,7 +483,7 @@ function showplayers(xhr) {
     for(const p of obj) showplayer(p, pdiv, intourn);
 
     if(intourn == 1) {
-        var btn = mkobj("button", "", "Add selected players to tournament");
+        let btn = mkobj("button", "", "Add selected players to tournament");
 
         btn.addEventListener("click", () => {
             playertotournament(pdiv);
@@ -503,9 +503,9 @@ function timezero(ttime) {
 // Creates an entry in the local log
 function log(data) {
 
-    var pdiv = gid("logwin");
-    var item = mkobj("div", "log");
-    var msg = mkobj("p", "", data);
+    let pdiv = gid("logwin");
+    let item = mkobj("div", "log");
+    let msg = mkobj("p", "", data);
 
     item.appendChild(msg);
     pdiv.appendChild(item);
@@ -514,9 +514,9 @@ function log(data) {
 // Processes tournament start request and creates appropriate log entries
 function tournamentstart(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
-    var date = obj.Start.slice(0, 10)
-    var time = obj.Start.slice(11, 16)
+    let obj = JSON.parse(xhr.responseText);
+    let date = obj.Start.slice(0, 10)
+    let time = obj.Start.slice(11, 16)
 
     if(obj.Status === S_ERR) log("Could not start new tournament");
     else {
@@ -532,9 +532,9 @@ function tournamentstart(xhr) {
 // Processes tournament end request and creates appropriate log entries
 function tournamentend(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
-    var date = obj.End.slice(0, 10)
-    var time = obj.End.slice(11, 16)
+    let obj = JSON.parse(xhr.responseText);
+    let date = obj.End.slice(0, 10)
+    let time = obj.End.slice(11, 16)
 
     if(obj.Status === S_ERR) log("No tournament running - cannot end!");
     else log("Tournament " + obj.ID + " ended at " + date + " "+ time)
@@ -546,7 +546,7 @@ function tournamentend(xhr) {
 // Requests start of new tournament
 function newtournament() {
 
-    var params = "skey=" + gss("gambotkey");
+    let params = "skey=" + gss("gambotkey");
 
     mkxhr("/ct", params, tournamentstart);
     gettopplayers(5);
@@ -555,7 +555,7 @@ function newtournament() {
 // Requests ending current tournament
 function edittournament(action, id) {
 
-    var params = "action=" + action + "&id=" + id + "&skey=" + gss("gambotkey");
+    let params = "action=" + action + "&id=" + id + "&skey=" + gss("gambotkey");
 
     mkxhr("/et", params, tournamentend); // TODO
 }
@@ -563,17 +563,17 @@ function edittournament(action, id) {
 // Requests adding new player to database
 function addplayer(elem) {
 
-    var fname = elem.elements["fname"].value;
-    var lname = elem.elements["lname"].value;
-    var dbirth = elem.elements["dbirth"].value;
-    var gender = elem.elements["gender"].value;
-    var email = elem.elements["email"].value;
-    var postal = elem.elements["postal"].value;
-    var zip = elem.elements["zip"].value;
-    var phone = elem.elements["phone"].value;
-    var club = elem.elements["club"].value;
+    let fname = elem.elements["fname"].value;
+    let lname = elem.elements["lname"].value;
+    let dbirth = elem.elements["dbirth"].value;
+    let gender = elem.elements["gender"].value;
+    let email = elem.elements["email"].value;
+    let postal = elem.elements["postal"].value;
+    let zip = elem.elements["zip"].value;
+    let phone = elem.elements["phone"].value;
+    let club = elem.elements["club"].value;
 
-    var params = "fname=" + fname +
+    let params = "fname=" + fname +
                  "&lname=" + lname +
                  "&dbirth=" + dbirth +
                  "&gender=" + gender +
@@ -592,10 +592,10 @@ function addplayer(elem) {
 // Sends request to search database for players
 function getplayers(elem) {
 
-    var id = elem.elements["ID"].value;
-    var name = elem.elements["name"].value;
-    var cb = gid("showdeac").checked;
-    var params = "id=" + id + "&name=" + name + "&skey=" + gss("gambotkey");
+    let id = elem.elements["ID"].value;
+    let name = elem.elements["name"].value;
+    let cb = gid("showdeac").checked;
+    let params = "id=" + id + "&name=" + name + "&skey=" + gss("gambotkey");
 
     sessionStorage.gambotshowdeac = cb;
 
@@ -620,13 +620,13 @@ function tournamentended() {
 
 // Adds top player to list
 function addtopplayer(p, s, pdiv) {
-    var text;
+    let text;
 
     if(s == "a") text = p.Pi.Name + " " + p.TPoints;
     else if(s == "c") text = p.Pi.Name + " " + p.Points;
 
-    var item = mkobj("div", "topplayer");
-    var name = mkobj("p", "tpname", text);
+    let item = mkobj("div", "topplayer");
+    let name = mkobj("p", "tpname", text);
 
     name.addEventListener("click", () => {
         getplayerdata(item);
@@ -647,7 +647,7 @@ function gettpcount() {
 // Stores number of top players to show in session storage
 function addtpcount(n) {
 
-    var cur = gettpcount();
+    let cur = gettpcount();
 
     cur += n;
 
@@ -657,7 +657,7 @@ function addtpcount(n) {
 // Adds 'more' button to top player list
 function addtopmorebtn(s, pdiv) {
 
-    var morebtn = mkobj("p", "morebtn", "more");
+    let morebtn = mkobj("p", "morebtn", "more");
 
     morebtn.addEventListener("click", () => {
         addtpcount(5);
@@ -670,8 +670,8 @@ function addtopmorebtn(s, pdiv) {
 // Adds 'less' button to top player list
 function addtoplessbtn(s, pdiv) {
 
-    var lessbtn = mkobj("p", "lessbtn", "less");
-    var nop = gettpcount() - 5;
+    let lessbtn = mkobj("p", "lessbtn", "less");
+    let nop = gettpcount() - 5;
 
     if(nop < 5 || nop === undefined || nop == NaN) nop = 5;
 
@@ -686,9 +686,9 @@ function addtoplessbtn(s, pdiv) {
 // Updates top list
 function updatetopplayers(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
-    var pdiv = gid("topfivecontents");
-    var oplen = obj.P.length;
+    let obj = JSON.parse(xhr.responseText);
+    let pdiv = gid("topfivecontents");
+    let oplen = obj.P.length;
 
     pdiv.innerHTML = "";
 
@@ -718,7 +718,7 @@ function updatetopplayers(xhr) {
 // Process tournament status request and sets appropriate mode
 function updatestatus(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
+    let obj = JSON.parse(xhr.responseText);
 
     if(obj.ID === 0 || !timezero(obj.End)) {
         tournamentended();
@@ -735,16 +735,16 @@ function updatestatus(xhr) {
 // Requests tournament status
 function gettournamentstatus() {
 
-    var params = "skey=" + gss("gambotkey");
+    let params = "skey=" + gss("gambotkey");
     mkxhr("/ts", params, updatestatus);
 }
 
 // Requests tournament history (n games starting at index i)
 function getthist(elem) {
 
-    var id = elem.elements["ID"].value;
-    var n = elem.elements["n"].value;
-    var params = "i=" + id + "&n=" + n + "&skey=" + gss("gambotkey");
+    let id = elem.elements["ID"].value;
+    let n = elem.elements["n"].value;
+    let params = "i=" + id + "&n=" + n + "&skey=" + gss("gambotkey");
 
     mkxhr("/th", params, updatethist);
 }
@@ -752,7 +752,7 @@ function getthist(elem) {
 // Verifies server response after adjustment of admin settings
 function verchangeadmin(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
+    let obj = JSON.parse(xhr.responseText);
 
     if(obj.Status == S_ERR) {
         logout();
@@ -765,7 +765,7 @@ function verchangeadmin(xhr) {
 // Updates fields of current values for pwin, pdraw & ploss
 function updatepcur(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
+    let obj = JSON.parse(xhr.responseText);
 
     gid("pwinnum").value = obj.Pwin;
     gid("pdrawnum").value = obj.Pdraw;
@@ -775,7 +775,7 @@ function updatepcur(xhr) {
 // Gets current values for pwin, pdraw and ploss
 function getpcur() {
 
-    var params = "skey=" + gss("gambotkey");
+    let params = "skey=" + gss("gambotkey");
 
     mkxhr("/admin", params, updatepcur);
 }
@@ -783,10 +783,10 @@ function getpcur() {
 // Submits change of admin settings
 function changeadmin(elem) {
 
-    var pwin = elem.elements["pwin"].value;
-    var pdraw = elem.elements["pdraw"].value;
-    var ploss = elem.elements["ploss"].value;
-    var params = "pwin=" + pwin + "&pdraw=" + pdraw + "&ploss=" + ploss + "&skey=" + gss("gambotkey");
+    let pwin = elem.elements["pwin"].value;
+    let pdraw = elem.elements["pdraw"].value;
+    let ploss = elem.elements["ploss"].value;
+    let params = "pwin=" + pwin + "&pdraw=" + pdraw + "&ploss=" + ploss + "&skey=" + gss("gambotkey");
 
     gid("adminform").reset();
     showpopup("none");
@@ -797,7 +797,7 @@ function changeadmin(elem) {
 // Requests top players (n players of type t: (a)ll or (c)urrent)
 function gettopplayers(n, t) {
 
-    var params = "n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
+    let params = "n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
 
     mkxhr("/gtp", params, updatetopplayers);
 }
@@ -805,7 +805,7 @@ function gettopplayers(n, t) {
 // Checks for session key
 function trylogin(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
+    let obj = JSON.parse(xhr.responseText);
 
     if(obj.Skey) {
         sessionStorage.gambotkey = obj.Skey;
@@ -816,8 +816,8 @@ function trylogin(xhr) {
 // Initiates login procedure
 function loginuser(elem) {
 
-    var pass = elem.elements["pass"].value;
-    var params = "pass=" + pass;
+    let pass = elem.elements["pass"].value;
+    let params = "pass=" + pass;
 
     gid("loginform").reset();
 
@@ -827,10 +827,10 @@ function loginuser(elem) {
 // Changes admin password
 function chpass(elem) {
 
-    var opass = elem.elements["opass"].value;
-    var npass = elem.elements["npass"].value;
+    let opass = elem.elements["opass"].value;
+    let npass = elem.elements["npass"].value;
 
-    var params = "pass=" + npass + "&opass=" + opass;
+    let params = "pass=" + npass + "&opass=" + opass;
 
     gid("apassform").reset();
 
@@ -841,7 +841,7 @@ function chpass(elem) {
 // Iterates through elem list and selected popups to show / hide
 function setdisp(elem, popup) {
 
-    for(var pg in elem) {
+    for(let pg in elem) {
         elem[pg].style.display = popup.indexOf(pg) < 0 ? "none" : "block";
     }
 }
@@ -849,7 +849,7 @@ function setdisp(elem, popup) {
 // Shows & hides popup windows
 function showpopup(popup) {
 
-    var elems = { pmgmt: gid("playermgmt"),
+    let elems = { pmgmt: gid("playermgmt"),
                   addplayer: gid("addplayer"),
                   tmgmt: gid("tmgmt"),
                   indplayer: gid("indplayer"),
@@ -916,7 +916,7 @@ function logout() {
 // Receives data on if admin exists in db and opens appropriate window
 function veradminindb(xhr) {
 
-    var res = JSON.parse(xhr.responseText);
+    let res = JSON.parse(xhr.responseText);
 
     if(res == true) {
         gid("regbutton").style.display = "none";
@@ -931,8 +931,8 @@ function veradminindb(xhr) {
 // Verifies skey match and shows appropriate window
 function verskey(xhr) {
 
-    var res = JSON.parse(xhr.responseText);
-    var lgwin = gid("login");
+    let res = JSON.parse(xhr.responseText);
+    let lgwin = gid("login");
 
     if(res == true) {
         lgwin.style.display = "none";
@@ -946,7 +946,7 @@ function verskey(xhr) {
 // Validates local skey with backend
 function chkskey() {
 
-    var params = "skey=" + gss("gambotkey");
+    let params = "skey=" + gss("gambotkey");
 
     mkxhr("/verskey", params, verskey);
 }
@@ -954,7 +954,7 @@ function chkskey() {
 // Verifies player edit response
 function verplayeredit(xhr) {
 
-    var obj = JSON.parse(xhr.responseText);
+    let obj = JSON.parse(xhr.responseText);
 
     if(obj.ID != undefined) {
         log("Successfully updated player data");
@@ -966,9 +966,9 @@ function verplayeredit(xhr) {
 // Requests edit of player properties
 function editplayer() {
 
-    var pid = gid("indplayername").getAttribute("name");
-    var action = gid("editplayer").getAttribute("name");
-    var params = "id=" + pid + "&action=" + action + "&skey=" + gss("gambotkey");
+    let pid = gid("indplayername").getAttribute("name");
+    let action = gid("editplayer").getAttribute("name");
+    let params = "id=" + pid + "&action=" + action + "&skey=" + gss("gambotkey");
 
     mkxhr("/ep", params, verplayeredit);
 
@@ -984,7 +984,7 @@ function adminindb() {
 // Registers new admin user
 function register() {
 
-    var params = "pass=" + gid("loginpass").value;
+    let params = "pass=" + gid("loginpass").value;
 
     gid("loginform").reset();
     mkxhr("/reg", params, trylogin);
