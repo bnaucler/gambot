@@ -69,10 +69,13 @@ Pull requests welcome!
     - backend
 * Send player added status report to frontend
 * Participant attendance & results report per tournament
+* Fix bench when only 1 player is in tournament
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
-* Possibility to pause players during ongoing tournament
+* Auto-seed after unpausing players
+* Possibility to pause players currently in a game
+* Better looking pause icon
 * 'soft end' to stop seeding
 * Licess API bindings
 

@@ -63,6 +63,7 @@ type Player struct {
     Points int
     TPoints int
     Active bool
+    Pause bool
     Stat []int
     APPG float32
     WAPPG float32

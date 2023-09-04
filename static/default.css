@@ -511,3 +511,8 @@ input[type=checkbox] {
     color: #eee;
     background-color: #222;
 }
+
+.picon {
+    margin-left: 5px;
+    display: inline-block;
+}

@@ -341,6 +341,38 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(players)
 }
 
+// Toggles player pause
+func togglepause(db *bolt.DB, p gcore.Player) gcore.Player {
+
+    if p.Pause {
+        fmt.Printf("Unpausing player %s\n", p.Pi.Name)
+
+    } else {
+        fmt.Printf("Pausing player %s\n", p.Pi.Name)
+    }
+
+    p.Pause = !p.Pause
+
+    return p
+}
+
+// Reloads current tournament player object from db
+func refreshplayer(db *bolt.DB, pid int) {
+
+    p := getdbplayerbyid(db, pid)
+    t, e := getct(db)
+    gcore.Cherr(e)
+
+    for i := 0; i < len(t.P); i++ {
+        if t.P[i].ID == pid {
+            t.P[i] = p
+        }
+    }
+
+    e  = storect(db, t)
+    gcore.Cherr(e)
+}
+
 // HTTP handler - edit player
 func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
@@ -363,13 +395,18 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     cplayer := getdbplayerbyid(db, id)
 
-    if raction == "deac" { // deactivate
+    if raction == "deac" {
         cplayer.Active = false
         fmt.Printf("Deactivating player %d: %s\n", cplayer.ID, cplayer.Pi.Name)
 
     } else if raction == "activate" {
         cplayer.Active = true
         fmt.Printf("Activating player %d: %s\n", cplayer.ID, cplayer.Pi.Name)
+
+    } else if raction == "pause" {
+        cplayer = togglepause(db, cplayer)
+        storeplayer(db, cplayer)
+        refreshplayer(db, id)
     }
 
     buf, e := json.Marshal(cplayer)
@@ -504,14 +541,10 @@ func findopp(id int, t gcore.Tournament) int {
     var opps []int
 
     for _, p := range t.P {
-        if p.ID == id {
-            continue
-        } else if ingame(p.ID, t) {
-            continue
-        } else if haveplayed(id, p.ID, t) {
+        if p.ID == id || ingame(p.ID, t) ||
+           haveplayed(id, p.ID, t) || ispaused(p.ID, t) {
             continue
         }
-
         opps = append(opps, p.ID)
     }
 
@@ -583,13 +616,23 @@ func blackwhite(p1 int, p2 int, t gcore.Tournament) (int, int) {
     return rndflip(p1, p2)
 }
 
+// Returns player pause status
+func ispaused(id int, t gcore.Tournament) bool {
+
+    for _, p := range t.P {
+        if p.ID == id { return p.Pause }
+    }
+
+    return false
+}
+
 // Creates matchups within tournament
 func seed(t gcore.Tournament) gcore.Tournament {
 
     ap := availableplayers(t)
 
     for _, pid := range ap {
-        if ingame(pid, t) { continue }
+        if ingame(pid, t) || ispaused(pid, t) { continue }
         opp := findopp(pid, t)
         if opp == 0 { continue }
         game := mkgame(t)
@@ -690,6 +733,7 @@ func apt(db *bolt.DB, t gcore.Tournament, p int) gcore.Tournament {
 
     cp := getdbplayerbyid(db, p)
     cp.Points = 0
+    cp.Pause = false
 
     t.P = append(t.P, cp)
 
@@ -721,6 +765,7 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
             ie, e := strconv.Atoi(clean)
             gcore.Cherr(e)
             t = apt(db, t, ie)
+            storeplayer(db, gettplayerbyid(ie, t))
         }
         t = seed(t)
     }
@@ -1008,7 +1053,7 @@ func gettplayerbyid(pid int, t gcore.Tournament) gcore.Player {
     return gcore.Player{}
 }
 
-// Updates database record for player p TODO adjust for continuous writes
+// Updates database record for player p
 func storeplayer(db *bolt.DB, p gcore.Player) {
 
     wp, e := json.Marshal(p)
@@ -1107,21 +1152,20 @@ func sumslice(s1 []int, s2 []int) []int {
 // Ends tournament t
 func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
-    t.End = time.Now()
-
-    wt, e := json.Marshal(t)
-    gcore.Cherr(e)
-
-    e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
-    gcore.Cherr(e)
-
-    for _, p := range t.P { storeplayer(db, p) }
-
     if t.ID == 0 { // TODO check before write
         t.Status = S_ERR
         fmt.Printf("No tournament running - cannot end\n")
 
     } else {
+        t.End = time.Now()
+
+        for _, p := range t.P { storeplayer(db, p) }
+
+        wt, e := json.Marshal(t)
+        gcore.Cherr(e)
+
+        e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
+        gcore.Cherr(e)
         t.Status = S_OK
         fmt.Printf("Tournament %d ended at %d-%02d-%02d %02d:%02d\n", t.ID,
                 t.End.Year(), t.End.Month(), t.End.Day(),
@@ -1172,7 +1216,7 @@ func getbenchplayers(t gcore.Tournament) []int {
     ret := []int{}
 
     for _, p := range t.P {
-        if !ingame(p.ID, t) { ret = append(ret, p.ID) }
+        if !ingame(p.ID, t) && !ispaused(p.ID, t) { ret = append(ret, p.ID) }
     }
 
     return ret
@@ -1214,8 +1258,6 @@ func mkgamehandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     bp := getbenchplayers(t)
     bp = rmitemfromintslice(pid, bp)
     blen := len(bp)
-
-    fmt.Printf("%+v\n", bp)
 
     if blen > 0 {
         opp :=  bp[rand.Intn(blen)]

@@ -107,13 +107,31 @@ function forcegame(id) {
     mkxhr("/mkgame", params, playersadded); // TODO
 }
 
+// Verifies receipt of player object and calls for refresh
+function verpauseplayer(xhr) {
+
+    let p = JSON.parse(xhr.responseText);
+    if(p.ID != 0) gettournamentstatus();
+}
+
+// Puts a player on pause to exclude from game seeding
+function togglepause(id) {
+
+    let params = "id=" + id + "&action=pause&skey=" + gss("gambotkey");
+
+    mkxhr("/ep", params, verpauseplayer);
+}
+
 // Creates a popup menu for bench players
-function benchpopup(id, t) {
+function benchpopup(id, t, pstat) {
 
     let bpop = mkminipop();
+    let pdiv = gid("tnmt");
+    let ptext = pstat ? "Unpause" : "Pause";
+
     let rembtn = mkobj("div", "minipopitem", "Remove");
     let forcebtn = mkobj("div", "minipopitem", "Force");
-    let pdiv = gid("tnmt");
+    let pausebtn = mkobj("div", "minipopitem", ptext);
 
     mkminipop(bpop);
 
@@ -127,8 +145,14 @@ function benchpopup(id, t) {
         bpop.remove();
     });
 
+    pausebtn.addEventListener("click", () => {
+        togglepause(id)
+        bpop.remove();
+    });
+
     bpop.appendChild(rembtn)
     bpop.appendChild(forcebtn)
+    bpop.appendChild(pausebtn)
     pdiv.appendChild(bpop);
 }
 
@@ -156,15 +180,30 @@ function igppopup(id, gameid, t) {
     pdiv.appendChild(bpop);
 }
 
+// Returns player pause stat by id
+function getpstat(id, t) {
+
+    for(const p of t.P) {
+        if(p.ID === id) return p.Pause;
+    }
+
+    return null;
+}
 
 // Adds player to bench by id
 function addbench(id, t) {
 
     let pdiv = gid("bench");
     let player = mkobj("div", "benchp", getplayername(id, t));
+    let pstat = getpstat(id, t);
+
+    if(pstat) {
+        let picon = mkobj("p", "picon", " (P)");
+        player.appendChild(picon);
+    }
 
     player.addEventListener("click", () => {
-        benchpopup(id, t);
+        benchpopup(id, t, pstat);
     });
 
     pdiv.appendChild(player);
