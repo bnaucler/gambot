@@ -344,14 +344,14 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 // Toggles player pause
 func togglepause(db *bolt.DB, p gcore.Player) gcore.Player {
 
+    p.Pause = !p.Pause
+
     if p.Pause {
         fmt.Printf("Unpausing player %s\n", p.Pi.Name)
 
     } else {
         fmt.Printf("Pausing player %s\n", p.Pi.Name)
     }
-
-    p.Pause = !p.Pause
 
     return p
 }
@@ -408,7 +408,12 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         storeplayer(db, cplayer)
         t = refreshplayer(db, id, t)
 
-        if ingame(id, t) { cancelgamebyuid(db, id, t) }
+        if ingame(id, t) {
+            cancelgamebyuid(db, id, t)
+            t = seed(t)
+        }
+
+        if !cplayer.Pause { t = seed(t) }
 
         e  = storect(db, t)
         gcore.Cherr(e)
