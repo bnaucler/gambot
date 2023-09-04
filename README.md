@@ -74,7 +74,6 @@ Pull requests welcome!
 * See all players and respective scores in tournament history
 * Tournament history data download
 * Auto-seed after unpausing players
-* Possibility to pause players currently in a game
 * Better looking pause icon
 * 'soft end' to stop seeding
 * Licess API bindings

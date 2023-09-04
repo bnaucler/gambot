@@ -357,11 +357,9 @@ func togglepause(db *bolt.DB, p gcore.Player) gcore.Player {
 }
 
 // Reloads current tournament player object from db
-func refreshplayer(db *bolt.DB, pid int) {
+func refreshplayer(db *bolt.DB, pid int, t gcore.Tournament) gcore.Tournament {
 
     p := getdbplayerbyid(db, pid)
-    t, e := getct(db)
-    gcore.Cherr(e)
 
     for i := 0; i < len(t.P); i++ {
         if t.P[i].ID == pid {
@@ -369,8 +367,7 @@ func refreshplayer(db *bolt.DB, pid int) {
         }
     }
 
-    e  = storect(db, t)
-    gcore.Cherr(e)
+    return t
 }
 
 // HTTP handler - edit player
@@ -404,9 +401,17 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         fmt.Printf("Activating player %d: %s\n", cplayer.ID, cplayer.Pi.Name)
 
     } else if raction == "pause" {
+        t, e := getct(db)
+        gcore.Cherr(e)
+
         cplayer = togglepause(db, cplayer)
         storeplayer(db, cplayer)
-        refreshplayer(db, id)
+        t = refreshplayer(db, id, t)
+
+        if ingame(id, t) { cancelgamebyuid(db, id, t) }
+
+        e  = storect(db, t)
+        gcore.Cherr(e)
     }
 
     buf, e := json.Marshal(cplayer)

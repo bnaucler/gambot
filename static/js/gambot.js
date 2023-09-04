@@ -162,11 +162,17 @@ function igppopup(id, gameid, t) {
     let bpop = mkminipop();
     let dwbtn = mkobj("div", "minipopitem", "Declare win");
     let rembtn = mkobj("div", "minipopitem", "Remove");
+    let pausebtn = mkobj("div", "minipopitem", "Pause");
     let pdiv = gid("tnmt");
 
     dwbtn.addEventListener("click", () => {
         let pname = getplayername(id, t);
         declareresult(gameid, id, pname);
+        bpop.remove();
+    });
+
+    pausebtn.addEventListener("click", () => {
+        togglepause(id)
         bpop.remove();
     });
 
@@ -176,6 +182,7 @@ function igppopup(id, gameid, t) {
     });
 
     bpop.appendChild(dwbtn);
+    bpop.appendChild(pausebtn);
     bpop.appendChild(rembtn);
     pdiv.appendChild(bpop);
 }
