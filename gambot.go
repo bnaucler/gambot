@@ -221,7 +221,7 @@ func currenttop(db *bolt.DB, n int, t gcore.Tournament) ([]gcore.Player, bool) {
     copy(players, t.P)
 
     sort.Slice(players, func(i, j int) bool {
-        return players[i].Points > players[j].Points
+        return players[i].TN.Points > players[j].TN.Points
     })
 
     if n >= len(players) {
@@ -241,7 +241,7 @@ func alltimetop(db *bolt.DB, n int) ([]gcore.Player, bool) {
     players = rmdeacplayers(players)
 
     sort.Slice(players, func(i, j int) bool {
-        return players[i].TPoints > players[j].TPoints
+        return players[i].AT.Points > players[j].AT.Points
     })
 
     if n >= len(players) {
@@ -469,7 +469,9 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
     }
 
-    p := gcore.Player{Active: true, Stat: make([]int, 6)}
+    p := gcore.Player{Active: true}
+    p.TN.Stat = make([]int, 6)
+    p.AT.Stat = make([]int, 6)
 
     p.Pi = gcore.Pdata{FName: r.FormValue("fname"),
                        LName: r.FormValue("lname"),
@@ -744,8 +746,10 @@ func apt(db *bolt.DB, t gcore.Tournament, p int) gcore.Tournament {
     if t.ID == 0 || isintournament(t, p) { return t }
 
     cp := getdbplayerbyid(db, p)
-    cp.Points = 0
+    cp.TN.Points = 0
     cp.Pause = false
+    cp.TN.Stat = make([]int, len(cp.AT.Stat))
+    cp.TN.Ngames = 0
 
     t.P = append(t.P, cp)
 
@@ -902,8 +906,8 @@ func incrngame(g gcore.Game, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.P); i++ {
         if g.W == t.P[i].ID || g.B == t.P[i].ID {
-            t.P[i].Ngames++
-            t.P[i].TNgames++
+            t.P[i].TN.Ngames++
+            t.P[i].AT.Ngames++
         }
     }
 
@@ -931,8 +935,8 @@ func addpoints(id int, p int, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.P) ; i++ {
         if t.P[i].ID == id {
-            t.P[i].Points += p
-            t.P[i].TPoints += p
+            t.P[i].TN.Points += p
+            t.P[i].AT.Points += p
         }
     }
     return t
@@ -1037,7 +1041,8 @@ func addstat(pid int, col int, res int, t gcore.Tournament) gcore.Tournament {
             index = BLOSS
         }
 
-        t.P[i].Stat[index]++
+        t.P[i].TN.Stat[index]++
+        t.P[i].AT.Stat[index]++
     }
 
     return t

@@ -312,12 +312,12 @@ function ttop(n, t) {
     let ret = [];
     let plen = tc.length;
 
-    tc.sort((i, j) => i.Points - j.Points);
+    tc.sort((i, j) => i.TN.Points - j.TN.Points);
     tc.reverse();
 
     if(n > plen) n = plen;
 
-    for(let i = 0; i < n; i++) ret.push(tc[i].Pi.Name + " " + tc[i].Points)
+    for(let i = 0; i < n; i++) ret.push(tc[i].Pi.Name + " " + tc[i].TN.Points)
 
     return ret;
 }
@@ -454,13 +454,15 @@ function showplayerdata(xhr) {
     let indpoints = gid("indpointsval");
     let indppg = gid("indppgval");
     let editbtn = gid("editplayer");
+    let intourn = gss("gambotintournament");
+    let statobj = intourn == 1 ? obj[0].TN : obj[0].AT;
 
     pname.innerHTML = obj[0].Pi.Name;
     pname.setAttribute("name", obj[0].ID);
 
-    indgames.innerHTML = obj[0].TNgames;
-    indpoints.innerHTML = obj[0].TPoints;
-    indppg.innerHTML = calcppg(obj[0].TPoints, obj[0].TNgames)
+    indgames.innerHTML = statobj.Ngames;
+    indpoints.innerHTML = statobj.Points;
+    indppg.innerHTML = calcppg(statobj.Points, statobj.Ngames)
 
     if(obj[0].Active == true) {
         editbtn.innerHTML = "Deactivate";
@@ -471,11 +473,11 @@ function showplayerdata(xhr) {
         editbtn.setAttribute("name", "activate");
     }
 
-    fillbar(TOTAL, obj[0].Stat[WWIN] + obj[0].Stat[BWIN],
-                   obj[0].Stat[WDRAW] + obj[0].Stat[BDRAW],
-                   obj[0].Stat[WLOSS] + obj[0].Stat[BLOSS]);
-    fillbar(WHITE, obj[0].Stat[WWIN], obj[0].Stat[WDRAW], obj[0].Stat[WLOSS]);
-    fillbar(BLACK, obj[0].Stat[BWIN], obj[0].Stat[BDRAW], obj[0].Stat[BLOSS]);
+    fillbar(TOTAL, statobj.Stat[WWIN] + statobj.Stat[BWIN],
+                   statobj.Stat[WDRAW] + statobj.Stat[BDRAW],
+                   statobj.Stat[WLOSS] + statobj.Stat[BLOSS]);
+    fillbar(WHITE, statobj.Stat[WWIN], statobj.Stat[WDRAW], statobj.Stat[WLOSS]);
+    fillbar(BLACK, statobj.Stat[BWIN], statobj.Stat[BDRAW], statobj.Stat[BLOSS]);
     showpopup("indplayer");
 }
 
@@ -672,8 +674,8 @@ function tournamentended() {
 function addtopplayer(p, s, pdiv) {
     let text;
 
-    if(s == "a") text = p.Pi.Name + " " + p.TPoints;
-    else if(s == "c") text = p.Pi.Name + " " + p.Points;
+    if(s == "a") text = p.Pi.Name + " " + p.AT.Points;
+    else if(s == "c") text = p.Pi.Name + " " + p.TN.Points;
 
     let item = mkobj("div", "topplayer");
     let name = mkobj("p", "tpname", text);

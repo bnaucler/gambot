@@ -56,7 +56,6 @@ Pull requests welcome!
 * Better looking popups
 * Better looking minipops
 * Move macro definitions to JSON file - import in both back- & frontend
-* Player object stat for ongoing tournament
 * Adjust color picking algo to account for % of games as white
 * Alternate top 5 with APPG instead of total points
     - Store APPG in player object and calculate in backend
@@ -74,7 +73,6 @@ Pull requests welcome!
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
-* Exclude cancelled games from seeding calculations
 * Better looking pause icon
 * Same button for admin registration and login
 * Same button for starting and ending tournament

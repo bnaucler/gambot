@@ -53,21 +53,24 @@ type Admin struct {
     Status int
 }
 
+type Pstat struct {
+    Points int
+    Ngames int
+    APPG float32
+    WAPPG float32
+    BAPPG float32
+    Stat []int
+}
+
 type Player struct {
     ID int
     Uname string
     Pass []byte
     Pi Pdata
-    Ngames int
-    TNgames int
-    Points int
-    TPoints int
+    TN Pstat
+    AT Pstat
     Active bool
     Pause bool
-    Stat []int
-    APPG float32
-    WAPPG float32
-    BAPPG float32
     Status int
 }
 
