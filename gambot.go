@@ -901,7 +901,7 @@ func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(t)
 }
 
-// Increments the Ngames parameter per user
+// Increments the Ngames parameter per user TODO: simplify
 func incrngame(g gcore.Game, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.P); i++ {
@@ -931,12 +931,20 @@ func endgame(gid string, wid int, t gcore.Tournament) gcore.Tournament {
 }
 
 // Adds p points to player, ID as key
-func addpoints(id int, p int, t gcore.Tournament) gcore.Tournament {
+func addpoints(id int, p int, col int, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.P) ; i++ {
         if t.P[i].ID == id {
             t.P[i].TN.Points += p
             t.P[i].AT.Points += p
+
+            if col == WHITE {
+                t.P[i].TN.Wpoints += p
+                t.P[i].AT.Wpoints += p
+            } else {
+                t.P[i].TN.Bpoints += p
+                t.P[i].AT.Bpoints += p
+            }
         }
     }
     return t
@@ -947,10 +955,10 @@ func declaredraw(gid string, p int, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.G) ; i++ {
         if t.G[i].ID == gid {
-            t = addpoints(t.G[i].W, p, t)
+            t = addpoints(t.G[i].W, p, WHITE, t)
             t = addstat(t.G[i].W, WHITE, DRAW, t)
 
-            t = addpoints(t.G[i].B, p, t)
+            t = addpoints(t.G[i].B, p, BLACK, t)
             t = addstat(t.G[i].B, BLACK, DRAW, t)
         }
     }
@@ -1092,6 +1100,55 @@ func storegameplayers(db *bolt.DB, gid string, t gcore.Tournament) {
     }
 }
 
+// Calucates APPG value and returns result
+func calcappg(points int, win int, draw int, loss int) float32 {
+
+    sum := win + draw + loss
+
+    if sum == 0 { return 0 }
+    return float32(points) / float32(sum)
+}
+
+// Updates APPG values per player object TODO: make pretty
+func updateappg(p gcore.Player) gcore.Player {
+
+    p.TN.WAPPG = calcappg(p.TN.Wpoints, p.TN.Stat[WWIN],
+                          p.TN.Stat[WDRAW], p.TN.Stat[WLOSS])
+    p.TN.BAPPG = calcappg(p.TN.Bpoints, p.TN.Stat[BWIN],
+                          p.TN.Stat[BDRAW], p.TN.Stat[BLOSS])
+    p.TN.APPG = float32(p.TN.Points) / float32(p.TN.Ngames)
+
+    p.AT.WAPPG = calcappg(p.AT.Wpoints, p.AT.Stat[WWIN],
+                          p.AT.Stat[WDRAW], p.AT.Stat[WLOSS])
+    p.AT.BAPPG = calcappg(p.AT.Bpoints, p.AT.Stat[BWIN],
+                          p.AT.Stat[BDRAW], p.AT.Stat[BLOSS])
+    p.AT.APPG = float32(p.AT.Points) / float32(p.AT.Ngames)
+
+    return p
+}
+
+// Updates player APPG values based on gid
+func updateappgbygid(gid string, t gcore.Tournament) gcore.Tournament {
+
+    wpid := 0
+    bpid := 0
+
+    for i := 0; i < len(t.G); i++ {
+        if t.G[i].ID == gid {
+            wpid = t.G[i].W
+            bpid = t.G[i].B
+        }
+    }
+
+    for i := 0; i < len(t.P); i++ {
+        if t.P[i].ID == wpid || t.P[i].ID == bpid {
+            t.P[i] = updateappg(t.P[i])
+        }
+    }
+
+    return t
+}
+
 // HTTP handler - declare game result
 func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
@@ -1124,16 +1181,17 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     } else {
         wcol := getcol(iid, t)
-        t = addpoints(iid, a.Pwin, t)
+        t = addpoints(iid, a.Pwin, wcol, t)
         t = addstat(iid, wcol, WIN, t)
         t = addstat(gloser(iid, t), oppcol(wcol), LOSS, t)
 
-        if a.Ploss != 0 { t = addpoints(gloser(iid, t), a.Ploss, t) }
+        if a.Ploss != 0 { t = addpoints(gloser(iid, t), a.Ploss, oppcol(wcol), t) }
 
         fmt.Printf("Game %s won by %s\n", gid, getplayername(db, iid))
     }
 
     t = endgame(gid, iid, t)
+    t = updateappgbygid(gid, t)
     storegameplayers(db, gid, t)
     t = seed(t)
 
@@ -1170,7 +1228,7 @@ func sumslice(s1 []int, s2 []int) []int {
 // Ends tournament t
 func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
-    if t.ID == 0 { // TODO check before write
+    if t.ID == 0 {
         t.Status = S_ERR
         fmt.Printf("No tournament running - cannot end\n")
 
@@ -1228,7 +1286,7 @@ func rtplayer(db *bolt.DB, pid int, t gcore.Tournament) gcore.Tournament {
     return t
 }
 
-// Returns slice of IDs for players currently not in a game
+// Returns slice of IDs for players currently available to play
 func getbenchplayers(t gcore.Tournament) []int {
 
     ret := []int{}
@@ -1246,7 +1304,7 @@ func rmitemfromintslice(v int, s []int) []int {
     ret := []int{}
 
     for _, sv := range s {
-        if v != sv { ret = append(ret, sv)}
+        if sv != v { ret = append(ret, sv)}
     }
 
     return ret

@@ -58,7 +58,7 @@ Pull requests welcome!
 * Move macro definitions to JSON file - import in both back- & frontend
 * Adjust color picking algo to account for % of games as white
 * Alternate top 5 with APPG instead of total points
-    - Store APPG in player object and calculate in backend
+* Use backend caluclated APPG in player stats
 * Logic to determine top players when points are equal
     - APPG based
     - If still equal: APPG as black
@@ -70,6 +70,7 @@ Pull requests welcome!
     - backend
 * Send player added status report to frontend
 * Participant attendance & results report per tournament
+* Selector for tournament & all time stats in player info window
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
@@ -77,6 +78,7 @@ Pull requests welcome!
 * Same button for admin registration and login
 * Same button for starting and ending tournament
 * 'soft end' to stop seeding
+* Replace mkxhr with fetch()
 * Licess API bindings
 
 ## License
