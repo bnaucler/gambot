@@ -443,6 +443,8 @@ function showplayerdata(xhr) {
     let indgames = gid("indgamesval");
     let indpoints = gid("indpointsval");
     let indppg = gid("indppgval");
+    let indppgw = gid("indppgwval");
+    let indppgb = gid("indppgbval");
     let editbtn = gid("editplayer");
     let intourn = gss("gambotintournament");
     let statobj = intourn == 1 ? obj[0].TN : obj[0].AT;
@@ -453,6 +455,8 @@ function showplayerdata(xhr) {
     indgames.innerHTML = statobj.Ngames;
     indpoints.innerHTML = statobj.Points;
     indppg.innerHTML = statobj.APPG.toFixed(2);
+    indppgw.innerHTML = statobj.WAPPG.toFixed(2);
+    indppgb.innerHTML = statobj.BAPPG.toFixed(2);
 
     if(obj[0].Active == true) {
         editbtn.innerHTML = "Deactivate";
