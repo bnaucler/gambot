@@ -742,7 +742,7 @@ function updatetopplayers(xhr) {
 
     pdiv.innerHTML = "";
 
-    if(obj.S == "a") {
+    if(obj.S == "a" || oplen == 0) {
         gid("games").style.width = "0";
         gid("topfive").style.width = "100%";
         gid("topfive").style.display = "block";
@@ -858,6 +858,7 @@ function trylogin(xhr) {
     let obj = JSON.parse(xhr.responseText);
 
     if(obj.Skey) {
+        gettournamentstatus();
         sessionStorage.gambotkey = obj.Skey;
         gid("login").style.display = "none";
     }

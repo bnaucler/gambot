@@ -73,7 +73,6 @@ Pull requests welcome!
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
-* Remove initial top 5 shown on fresh installation
 * Better looking pause icon
 * Same button for admin registration and login
 * Same button for starting and ending tournament
