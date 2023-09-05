@@ -55,6 +55,8 @@ type Admin struct {
 
 type Pstat struct {
     Points int
+    Wpoints int
+    Bpoints int
     Ngames int
     APPG float32
     WAPPG float32
@@ -76,8 +78,10 @@ type Player struct {
 
 type Tournament struct {
     ID int
+    Algo int
     P []Player
     G []Game
+    Seeding bool
     Start time.Time
     End time.Time
     Status int
