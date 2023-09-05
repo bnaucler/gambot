@@ -1416,8 +1416,18 @@ func sighandler(pidfile string) {
     }()
 }
 
+// Creates requested bucket if it doesn't already exist
+func mkbucket(db *bolt.DB, cbuc []byte) error {
+    e := db.Update(func(tx *bolt.Tx) error {
+        tx.CreateBucketIfNotExists(cbuc)
+        return nil
+    })
+
+    return e
+}
+
 // Creates PID file and launches signal handler
-func ginit() {
+func ginit(db *bolt.DB) {
 
     prgname := filepath.Base(os.Args[0])
     pid := os.Getpid()
@@ -1425,6 +1435,11 @@ func ginit() {
     pidfile := fmt.Sprintf("%s.pid", prgname)
     e := ioutil.WriteFile(pidfile, []byte(strconv.Itoa(pid)), 0644)
     gcore.Cherr(e)
+
+    mkbucket(db, gcore.Abuc)
+    mkbucket(db, gcore.Pbuc)
+    mkbucket(db, gcore.Gbuc)
+    mkbucket(db, gcore.Tbuc)
 
     sighandler(pidfile)
 }
@@ -1436,11 +1451,12 @@ func main() {
     flag.Parse()
 
     rand.Seed(time.Now().UnixNano())
-    ginit()
 
     db, e := bolt.Open(*dbptr, 0640, nil)
     gcore.Cherr(e)
     defer db.Close()
+
+    ginit(db)
 
     et := gcore.Tournament{}
     e = storect(db, et)
