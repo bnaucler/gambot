@@ -58,7 +58,6 @@ Pull requests welcome!
 * Move macro definitions to JSON file - import in both back- & frontend
 * Adjust color picking algo to account for % of games as white
 * Alternate top 5 with APPG instead of total points
-* Use backend caluclated APPG in player stats
 * Logic to determine top players when points are equal
     - APPG based
     - If still equal: APPG as black

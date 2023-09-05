@@ -398,16 +398,6 @@ function playertotournament(elem) {
     gid("playerdata").style.display = "none";
 }
 
-// Calculates points per game value
-function calcppg(points, games) {
-
-    let ret = points / games;
-
-    if(ret !== ret) ret = 0;
-
-    return ret.toFixed(2);
-}
-
 // Fills the horizontal bar for win / draw / loss
 function fillbar(col, win, draw, loss) {
 
@@ -462,7 +452,7 @@ function showplayerdata(xhr) {
 
     indgames.innerHTML = statobj.Ngames;
     indpoints.innerHTML = statobj.Points;
-    indppg.innerHTML = calcppg(statobj.Points, statobj.Ngames)
+    indppg.innerHTML = statobj.APPG.toFixed(2);
 
     if(obj[0].Active == true) {
         editbtn.innerHTML = "Deactivate";
