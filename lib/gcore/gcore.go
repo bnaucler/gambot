@@ -85,6 +85,7 @@ type Game struct {
     W int
     B int
     Winner int
+    Compl bool
     Start time.Time
     End time.Time
 }

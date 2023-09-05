@@ -515,6 +515,7 @@ func mkgame(t gcore.Tournament) gcore.Game {
     game := gcore.Game{}
 
     game.Start = time.Now()
+    game.Compl = false
     game.ID = fmt.Sprintf("%d/%d", t.ID, len(t.G) + 1)
 
     return game
@@ -524,6 +525,7 @@ func mkgame(t gcore.Tournament) gcore.Game {
 func haveplayed(p1 int, p2 int, t gcore.Tournament) bool {
 
     for _, g := range t.G {
+        if g.Compl == false { continue }
         if g.W == p1 && g.B == p2 { return true }
         if g.W == p2 && g.B == p1 { return true }
     }
@@ -915,6 +917,7 @@ func endgame(gid string, wid int, t gcore.Tournament) gcore.Tournament {
         if t.G[i].ID == gid {
             t.G[i].End = time.Now();
             t.G[i].Winner = wid
+            t.G[i].Compl = true
             t = incrngame(t.G[i], t)
             break
         }
