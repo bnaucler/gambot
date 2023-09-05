@@ -487,7 +487,7 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     tm, e := time.Parse("2006-01-02", r.FormValue("dbirth"))
     if e == nil { p.Pi.Dbirth = tm }
 
-    if p.Pi.Name == "" {
+    if len(p.Pi.Name) < 3 {
         p.Status = S_ERR
 
     } else {

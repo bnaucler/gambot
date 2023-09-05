@@ -526,7 +526,10 @@ function showplayers(xhr) {
     pdiv.style.display = "block";
     pdiv.appendChild(br);
 
-    for(const p of obj) showplayer(p, pdiv, intourn);
+    for(const p of obj) {
+        if(p.Status == S_OK) showplayer(p, pdiv, intourn);
+        else console.log("Error displaying player"); // TMP
+    }
 
     if(intourn == 1) {
         let btn = mkobj("button", "", "Add selected players to tournament");
@@ -631,6 +634,7 @@ function addplayer(elem) {
                  "&skey=" + gss("gambotkey");
 
     gid("addplayerform").reset();
+    showpopup("pmgmt");
 
     mkxhr("/ap", params, showplayers);
 }
