@@ -591,25 +591,30 @@ func rndflip(p1 int, p2 int) (int, int) {
     return p2, p1
 }
 
-// Returns total number of games where id played white
-func whitepp(id int, t gcore.Tournament) int {
+// Returns number of games in tournament where p played as white
+func wgamesppt(p gcore.Player) int {
 
-    ret := 0
-
-    for _, g := range t.G  {
-        if g.W == id { ret++ }
-    }
-
-    return ret
+    return p.TN.Stat[WWIN] + p.TN.Stat[WDRAW] + p.TN.Stat[WLOSS]
 }
 
-// Returns total number of games where id played black
-func blackpp(id int, t gcore.Tournament) int {
+// Returns number of games in tournament where p played as black
+func bgamesppt(p gcore.Player) int {
 
-    ret := 0
+    return p.TN.Stat[BWIN] + p.TN.Stat[BDRAW] + p.TN.Stat[BLOSS]
+}
 
-    for _, g := range t.G  {
-        if g.B == id { ret++ }
+// Returns last color player had in tournament game or -1 if no games
+func lastcol(pid int, t gcore.Tournament) int {
+
+    ret := -1
+
+    for _, g := range t.G {
+        if !g.Compl { continue }
+        if pid == g.W {
+            ret = WHITE
+        } else if pid == g.B {
+            ret = BLACK
+        }
     }
 
     return ret
@@ -618,12 +623,31 @@ func blackpp(id int, t gcore.Tournament) int {
 // Locic to determine colors per player
 func blackwhite(p1 int, p2 int, t gcore.Tournament) (int, int) {
 
-    w1 := whitepp(p1, t)
-    w2 := whitepp(p2, t)
+    // First check if players had opposite colors in last game and reverse
+    p1last := lastcol(p1, t)
+    p2last := lastcol(p2, t)
 
-    if w1 < w2 {
+    if p1last == WHITE && p2last == BLACK {
+        return p2, p1
+
+    } else if p1last == BLACK && p2last == WHITE {
         return p1, p2
-    } else if w2 < w1 {
+    }
+
+    // Second, check % of games as white
+    po1 := gettplayerbyid(p1, t)
+    po2 := gettplayerbyid(p2, t)
+
+    w1sum := wgamesppt(po1)
+    w2sum := wgamesppt(po2)
+
+    w1avg := float32(w1sum) / float32(po1.TN.Ngames)
+    w2avg := float32(w2sum) / float32(po2.TN.Ngames)
+
+    if w1avg < w2avg {
+        return p1, p2
+
+    } else if w2avg < w1avg {
         return p2, p1
     }
 
@@ -901,7 +925,7 @@ func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(t)
 }
 
-// Increments the Ngames parameter per user TODO: simplify
+// Increments the Ngames parameter per user
 func incrngame(g gcore.Game, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.P); i++ {
@@ -1073,7 +1097,7 @@ func getdbplayerbyid(db *bolt.DB, pid int) gcore.Player {
 func gettplayerbyid(pid int, t gcore.Tournament) gcore.Player {
 
     for _, p := range t.P {
-        if p.ID == pid {return p }
+        if p.ID == pid { return p }
     }
 
     return gcore.Player{}

@@ -54,10 +54,11 @@ Pull requests welcome!
 * Reorganize CSS and comment for readability
 * Tool to import player & tournament JSON data to db
 * Better looking popups
+* Set admin default points at bucket creation
 * Better looking minipops
 * Move macro definitions to JSON file - import in both back- & frontend
-* Adjust color picking algo to account for % of games as white
 * Alternate top 5 with APPG instead of total points
+* Logic to pick longest waiting bench player if all other things are equal
 * Logic to determine top players when points are equal
     - APPG based
     - If still equal: APPG as black
