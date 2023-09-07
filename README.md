@@ -39,7 +39,6 @@ Pull requests welcome!
 * CONTRIBUTING doc
 * Shutdown sequence
 * Server side logging
-* Function for returning empty objects at key verification failure
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
 * Seeding algorithm selector (minipop when 'start new tournament' is pressed

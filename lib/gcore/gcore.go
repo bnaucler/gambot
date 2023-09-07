@@ -120,6 +120,7 @@ type Game struct {
     Compl bool
     Start time.Time
     End time.Time
+    Status int
 }
 
 // Check error and panic

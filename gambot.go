@@ -39,6 +39,12 @@ const BWIN = 3
 const BDRAW = 4
 const BLOSS = 5
 
+const ADMIN = 0
+const TOURNAMENT = 1
+const GAME = 2
+const PLAYER = 3
+const NULL = 4
+
 type Tpresp struct {
     P []gcore.Player
     S string
@@ -64,6 +70,37 @@ func validateuser(a gcore.Admin, pass string) (bool) {
 
     if e == nil { return true
     } else { return false }
+}
+
+// Sends empty response (called in case of key verification failure)
+func emptyresp(w http.ResponseWriter, t int) {
+
+    enc := json.NewEncoder(w)
+
+    switch t {
+        case NULL:
+            enc.Encode([]int{})
+
+        case ADMIN:
+            a := gcore.Admin{}
+            a.Status = S_ERR
+            enc.Encode(a)
+
+        case TOURNAMENT:
+            t := gcore.Tournament{}
+            t.Status = S_ERR
+            enc.Encode(t)
+
+        case GAME:
+            g := gcore.Game{}
+            g.Status = S_ERR
+            enc.Encode(g)
+
+        case PLAYER:
+            p := gcore.Player{}
+            p.Status = S_ERR
+            enc.Encode(p)
+    }
 }
 
 // Processes API call and populates object
@@ -196,10 +233,7 @@ func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     gcore.Cherr(e)
 
     if !valskey(db, call.Skey) {
-        ea := gcore.Admin{}
-        ea.Status = S_ERR
-        enc := json.NewEncoder(w)
-        enc.Encode(ea)
+        emptyresp(w, ADMIN)
         return
     }
 
@@ -280,8 +314,7 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        enc := json.NewEncoder(w)
-        enc.Encode(resp)
+        emptyresp(w, NULL)
         return
     }
 
@@ -316,8 +349,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        enc := json.NewEncoder(w)
-        enc.Encode(players)
+        emptyresp(w, NULL)
         return
     }
 
@@ -383,9 +415,7 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        ep := gcore.Player{}
-        enc := json.NewEncoder(w)
-        enc.Encode(ep)
+        emptyresp(w, PLAYER)
         return
     }
 
@@ -466,8 +496,7 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        enc := json.NewEncoder(w)
-        enc.Encode(players)
+        emptyresp(w, NULL)
         return
     }
 
@@ -711,8 +740,7 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
 
     } else if !valskey(db, call.Skey) {
-        enc := json.NewEncoder(w)
-        enc.Encode(t)
+        emptyresp(w, TOURNAMENT)
         fmt.Printf("Admin verification failed\n")
         return
     };
@@ -870,9 +898,7 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        ts := []gcore.Tournament{}
-        enc := json.NewEncoder(w)
-        enc.Encode(ts)
+        emptyresp(w, NULL)
         return
     }
 
@@ -1172,9 +1198,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        et := gcore.Tournament{}
-        enc := json.NewEncoder(w)
-        enc.Encode(et)
+        emptyresp(w, TOURNAMENT)
         return
     }
 
@@ -1329,9 +1353,7 @@ func mkgamehandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        et := gcore.Tournament{}
-        enc := json.NewEncoder(w)
-        enc.Encode(et)
+        emptyresp(w, TOURNAMENT)
         return
     }
 
@@ -1364,9 +1386,7 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        et := gcore.Tournament{}
-        enc := json.NewEncoder(w)
-        enc.Encode(et)
+        emptyresp(w, TOURNAMENT)
         return
     }
 
