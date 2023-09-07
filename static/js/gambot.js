@@ -441,8 +441,6 @@ function setapbutton(func) {
     let btn = gid("apsubmit");
     let form = gid("addplayerform");
 
-    console.log(btn);
-
     if(func == "edit") {
         btn.value = "Edit player";
 
@@ -464,12 +462,10 @@ function popplayereditwin(xhr) {
     form.dbirth.value = pd.Dbirth.slice(0, 10);
     form.gender.value = pd.Gender;
     form.email.value = pd.Email;
-    form.postal.value = pd.Postal;
+    form.postal.value = pd.PostalAddr;
     form.zip.value = pd.Zip;
     form.phone.value = pd.Phone;
     form.club.value = pd.Club;
-
-    console.log(obj);
 
     setapbutton("edit");
     showpopup("addplayer");
