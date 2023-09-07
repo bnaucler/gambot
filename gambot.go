@@ -381,7 +381,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 }
 
 // Toggles player pause
-func togglepause(db *bolt.DB, p gcore.Player) gcore.Player {
+func togglepause(p gcore.Player) gcore.Player {
 
     p.Pause = !p.Pause
 
@@ -393,6 +393,18 @@ func togglepause(db *bolt.DB, p gcore.Player) gcore.Player {
     }
 
     return p
+}
+
+// Toggle pause for player in tournament struct by ID
+func unpausebyid(id int, t gcore.Tournament) gcore.Tournament {
+
+    for i := 0; i < len(t.P); i++ {
+        if t.P[i].ID == id && t.P[i].Pause == true {
+            t.P[i] = togglepause(t.P[i])
+        }
+    }
+
+    return t
 }
 
 // Reloads current tournament player object from db
@@ -436,7 +448,7 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         t, e := getct(db)
         gcore.Cherr(e)
 
-        cplayer = togglepause(db, cplayer)
+        cplayer = togglepause(cplayer)
         storeplayer(db, cplayer)
         t = refreshplayer(db, id, t)
 
@@ -1370,6 +1382,7 @@ func mkgamehandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         opp :=  bp[rand.Intn(blen)]
         game := mkgame(t)
         game.W, game.B = blackwhite(pid, opp, t)
+        t = unpausebyid(pid, t)
         t.G = append(t.G, game)
     }
 
