@@ -211,6 +211,15 @@ input[type=checkbox] {
     float: left;
 }
 
+.picon {
+    display: inline-block;
+    margin-left: 5px;
+    height: 18px;
+    width: 18px;
+    background: url("/img/ico/pause.png") no-repeat center;
+	background-size: cover;
+}
+
 .hicon:hover {
     opacity: 1;
 }
@@ -358,6 +367,7 @@ input[type=checkbox] {
 }
 
 .benchp {
+    display: flex;
     width: fit-content;
     color: #bbb;
     padding: 5px;
@@ -511,9 +521,4 @@ input[type=checkbox] {
 .minipopitem:hover {
     color: #eee;
     background-color: #222;
-}
-
-.picon {
-    margin-left: 5px;
-    display: inline-block;
 }

@@ -207,7 +207,7 @@ function addbench(id, t) {
     let pstat = getpstat(id, t);
 
     if(pstat) {
-        let picon = mkobj("p", "picon", " (P)");
+        let picon = mkobj("div", "picon");
         player.appendChild(picon);
     }
 

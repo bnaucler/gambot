@@ -39,6 +39,7 @@ Pull requests welcome!
 * CONTRIBUTING doc
 * Shutdown sequence
 * Server side logging
+* valskey() wrapper for sending empty responses
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
 * Seeding algorithm selector (minipop when 'start new tournament' is pressed
@@ -71,7 +72,6 @@ Pull requests welcome!
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
-* Better looking pause icon
 * Same button for admin registration and login
 * Same button for starting and ending tournament
 * 'soft end' to stop seeding
