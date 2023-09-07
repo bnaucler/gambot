@@ -66,8 +66,8 @@ function getplayername(id, t) {
 // Requests processing of won game
 function declareresult(gid, pid, wname) {
 
-    if(pid === 0) log("Game " + gid + " is a draw.")
-    else log("Game " + gid + " won by " + wname)
+    if(pid === 0) log("Game " + gid + " is a draw.");
+    else log("Game " + gid + " won by " + wname);
 
     let params = "id=" + pid + "&game=" + gid + "&skey=" + gss("gambotkey");
 
@@ -98,7 +98,7 @@ function mkminipop() {
         elem.remove();
     });
 
-    return elem
+    return elem;
 }
 
 // Requests a game when seeding algo is not automatically creating one
@@ -143,18 +143,18 @@ function benchpopup(id, t, pstat) {
     });
 
     forcebtn.addEventListener("click", () => {
-        forcegame(id)
+        forcegame(id);
         bpop.remove();
     });
 
     pausebtn.addEventListener("click", () => {
-        togglepause(id)
+        togglepause(id);
         bpop.remove();
     });
 
-    bpop.appendChild(rembtn)
-    bpop.appendChild(forcebtn)
-    bpop.appendChild(pausebtn)
+    bpop.appendChild(rembtn);
+    bpop.appendChild(forcebtn);
+    bpop.appendChild(pausebtn);
     pdiv.appendChild(bpop);
 }
 
@@ -174,7 +174,7 @@ function igppopup(id, gameid, t) {
     });
 
     pausebtn.addEventListener("click", () => {
-        togglepause(id)
+        togglepause(id);
         bpop.remove();
     });
 
@@ -224,7 +224,7 @@ function popbench(t) {
     let bp = [];
 
     for(const p of t.P) {
-        if(!ingame(p.ID, t)) bp.push(p.ID)
+        if(!ingame(p.ID, t)) bp.push(p.ID);
     }
 
     if(bp.length === 0) gid("bench").style.display = "none";
@@ -317,7 +317,7 @@ function ttop(n, t) {
 
     if(n > plen) n = plen;
 
-    for(let i = 0; i < n; i++) ret.push(tc[i].Pi.Name + " " + tc[i].TN.Points)
+    for(let i = 0; i < n; i++) ret.push(tc[i].Pi.Name + " " + tc[i].TN.Points);
 
     return ret;
 }
@@ -618,7 +618,7 @@ function tournamentstart(xhr) {
 
     if(obj.Status === S_ERR) log("Could not start new tournament");
     else {
-        log("Tournament " + obj.ID + " started at " + date + " "+ time)
+        log("Tournament " + obj.ID + " started at " + date + " "+ time);
 
         if(obj.P === undefined) gid("games").innerHTML = "";
         else updatewindow(obj);
@@ -631,11 +631,11 @@ function tournamentstart(xhr) {
 function tournamentend(xhr) {
 
     let obj = JSON.parse(xhr.responseText);
-    let date = obj.End.slice(0, 10)
-    let time = obj.End.slice(11, 16)
+    let date = obj.End.slice(0, 10);
+    let time = obj.End.slice(11, 16);
 
     if(obj.Status === S_ERR) log("No tournament running - cannot end!");
-    else log("Tournament " + obj.ID + " ended at " + date + " "+ time)
+    else log("Tournament " + obj.ID + " ended at " + date + " "+ time);
 
     tournamentended();
     updatestatus(xhr);
