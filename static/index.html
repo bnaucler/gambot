@@ -74,12 +74,13 @@
         </form>
 
         <div id="playerdata"></div>
-        <button id="addplayerbtn" onclick="showpopup('addplayer'); return false;">Add new player</button>
+        <button id="addplayerbtn" onclick="showpopup('addplayer'); setapbutton('add') ;return false;">Add new player</button>
         <button id="closepmgmt" onclick="showpopup('none'); return false;">Close</button>
     </div>
 
     <div id="addplayer" class="popup">
         <form id="addplayerform" onsubmit="addplayer(this); return false;" method="post">
+            <input type="hidden" name="id"></input>
             <input type="text" name="fname" Placeholder="First Name"></input><br>
             <input type="text" name="lname" Placeholder="Last Name"></input><br>
             <input type="text" name="dbirth" Placeholder="Date of birth (YYYY-MM-DD)"></input><br>
@@ -94,12 +95,13 @@
             <input type="text" name="zip" Placeholder="Zip/postal code"></input><br>
             <input type="text" name="phone" Placeholder="Phone number"></input><br>
             <input type="text" name="club" Placeholder="Club"></input><br>
-            <input type="submit" value="Add new player">
+            <input id="apsubmit" type="submit">
         </form>
         <button id="closeaddplayer" onclick="showpopup('none'); return false;">Cancel</button>
     </div>
 
     <div id="indplayer" class="popup">
+        <div id="indplayeredit">edit</div>
         <div id="indplayername"></div>
         <div id="indplayerdata">
             <div id="indgames" class="inddatalbl">Total games played:</div>

@@ -435,6 +435,54 @@ function fillbar(col, win, draw, loss) {
     lbar.style.width = lwidth + "%";
 }
 
+// Sets form submit button to add or edit player
+function setapbutton(func) {
+
+    let btn = gid("apsubmit");
+    let form = gid("addplayerform");
+
+    console.log(btn);
+
+    if(func == "edit") {
+        btn.value = "Edit player";
+
+    } else {
+        btn.value = "Add new player";
+    }
+}
+
+// Populates the player edit window
+function popplayereditwin(xhr) {
+
+    let obj = JSON.parse(xhr.responseText);
+    let form = gid("addplayerform");
+    let pd = obj[0].Pi;
+
+    form.id.value = obj[0].ID;
+    form.fname.value = pd.FName;
+    form.lname.value = pd.LName;
+    form.dbirth.value = pd.Dbirth.slice(0, 10);
+    form.gender.value = pd.Gender;
+    form.email.value = pd.Email;
+    form.postal.value = pd.Postal;
+    form.zip.value = pd.Zip;
+    form.phone.value = pd.Phone;
+    form.club.value = pd.Club;
+
+    console.log(obj);
+
+    setapbutton("edit");
+    showpopup("addplayer");
+}
+
+// Requests to open and populate the edit player data form
+function openplayeredit(id) {
+
+    let params = "id=" + id + "&skey=" + gss("gambotkey");
+
+    mkxhr("/gp", params, popplayereditwin);
+}
+
 // Shows data on individual player
 function showplayerdata(xhr) {
 
@@ -446,6 +494,7 @@ function showplayerdata(xhr) {
     let indppgw = gid("indppgwval");
     let indppgb = gid("indppgbval");
     let editbtn = gid("editplayer");
+    let editdatabtn = gid("indplayeredit");
     let intourn = gss("gambotintournament");
     let statobj = intourn == 1 ? obj[0].TN : obj[0].AT;
 
@@ -466,6 +515,10 @@ function showplayerdata(xhr) {
         editbtn.innerHTML = "Activate";
         editbtn.setAttribute("name", "activate");
     }
+
+    editdatabtn.addEventListener("click", () => {
+        openplayeredit(obj[0].ID);
+    });
 
     fillbar(TOTAL, statobj.Stat[WWIN] + statobj.Stat[BWIN],
                    statobj.Stat[WDRAW] + statobj.Stat[BDRAW],
@@ -564,8 +617,8 @@ function log(data) {
 function tournamentstart(xhr) {
 
     let obj = JSON.parse(xhr.responseText);
-    let date = obj.Start.slice(0, 10)
-    let time = obj.Start.slice(11, 16)
+    let date = obj.Start.slice(0, 10);
+    let time = obj.Start.slice(11, 16);
 
     if(obj.Status === S_ERR) log("Could not start new tournament");
     else {
@@ -612,6 +665,7 @@ function edittournament(action, id) {
 // Requests adding new player to database
 function addplayer(elem) {
 
+    let id = elem.elements["id"].value;
     let fname = elem.elements["fname"].value;
     let lname = elem.elements["lname"].value;
     let dbirth = elem.elements["dbirth"].value;
@@ -622,7 +676,8 @@ function addplayer(elem) {
     let phone = elem.elements["phone"].value;
     let club = elem.elements["club"].value;
 
-    let params = "fname=" + fname +
+    let params = "id=" + id +
+                 "&fname=" + fname +
                  "&lname=" + lname +
                  "&dbirth=" + dbirth +
                  "&gender=" + gender +

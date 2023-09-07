@@ -60,9 +60,7 @@ Pull requests welcome!
 * Logic to determine top players when points are equal
     - APPG based
     - If still equal: APPG as black
-* Edit player function to change name, email etc
-    - Recycle player add window
-    - Window styling
+* Add/edit player window styling
 * Better player data validation
     - frontend
     - backend

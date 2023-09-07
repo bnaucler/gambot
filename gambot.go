@@ -500,7 +500,26 @@ func valplayername(p gcore.Player) gcore.Player {
     return p
 }
 
-// HTTP handler - add new player
+// Assigns new ID and stores player in database
+func storeplayerwithnewid(db *bolt.DB, p gcore.Player) error {
+
+    e := db.Update(func(tx *bolt.Tx) error {
+        b, _ := tx.CreateBucketIfNotExists(gcore.Pbuc)
+
+        id, _ := b.NextSequence()
+        p.ID = int(id)
+
+        buf, e := json.Marshal(p)
+        key := []byte(strconv.Itoa(p.ID))
+        b.Put(key, buf)
+
+        return e
+    })
+
+    return e
+}
+
+// HTTP handler - add / edit player
 func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     var players []gcore.Player
@@ -512,9 +531,17 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
     }
 
-    p := gcore.Player{Active: true}
-    p.TN.Stat = make([]int, 6)
-    p.AT.Stat = make([]int, 6)
+    p := gcore.Player{}
+    pid, e := strconv.Atoi(call.ID)
+
+    if e == nil { // ID provided - editing player
+        p = getdbplayerbyid(db, pid)
+
+    } else { // No ID, creating new player
+        p.Active = true;
+        p.TN.Stat = make([]int, 6)
+        p.AT.Stat = make([]int, 6)
+    }
 
     p.Pi = gcore.Pdata{FName:       call.Fname,
                        LName:       call.Lname,
@@ -534,19 +561,11 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     if len(p.Pi.Name) < 3 {
         p.Status = S_ERR
 
+    } else if p.ID > 0 {
+        storeplayer(db, p)
+
     } else {
-        db.Update(func(tx *bolt.Tx) error { // TODO refactor to separate func
-            b, _ := tx.CreateBucketIfNotExists(gcore.Pbuc)
-
-            id, _ := b.NextSequence()
-            p.ID = int(id)
-
-            buf, e := json.Marshal(p)
-            key := []byte(strconv.Itoa(p.ID))
-            b.Put(key, buf)
-
-            return e
-        })
+        storeplayerwithnewid(db, p)
         p.Status = S_OK
     }
 

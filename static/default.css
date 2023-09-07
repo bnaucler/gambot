@@ -522,3 +522,21 @@ input[type=checkbox] {
     color: #eee;
     background-color: #222;
 }
+
+#indplayeredit {
+    position: absolute;
+    font-size: 14px;
+    right: 0;
+    top: 0;
+    color: #222;
+    background-color: #ccc;
+    border-radius: 0 0 0 4px;
+    padding: 3px;
+    opacity: .8;
+    transition: .3s;
+    cursor: pointer;
+}
+
+#indplayeredit:hover {
+    opacity: 1;
+}
