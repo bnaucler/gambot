@@ -148,10 +148,6 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     a, e := gcore.Getadmin(db)
-    if e != nil {
-        a = gcore.Admin{}
-        a = setdefaultpoints(a)
-    }
 
     if len(a.Pass) < 1 || validateuser(a, call.Opass) {
         a.Pass, e = bcrypt.GenerateFromPassword([]byte(call.Pass), bcrypt.DefaultCost)
@@ -1436,6 +1432,19 @@ func mkbucket(db *bolt.DB, cbuc []byte) error {
     return e
 }
 
+// Initializes admin object if non-exixting (fresh install)
+func initadmin(db *bolt.DB) {
+
+    a, e := gcore.Getadmin(db)
+
+    if e != nil || len(a.Pass) < 1 {
+        a = gcore.Admin{}
+        a = setdefaultpoints(a)
+    }
+
+    writeadmin(a, db)
+}
+
 // Creates PID file and launches signal handler
 func ginit(db *bolt.DB) {
 
@@ -1450,6 +1459,8 @@ func ginit(db *bolt.DB) {
     mkbucket(db, gcore.Pbuc)
     mkbucket(db, gcore.Gbuc)
     mkbucket(db, gcore.Tbuc)
+
+    initadmin(db)
 
     sighandler(pidfile)
 }

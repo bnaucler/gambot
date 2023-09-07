@@ -39,7 +39,6 @@ Pull requests welcome!
 * CONTRIBUTING doc
 * Shutdown sequence
 * Server side logging
-* API call object to streamline request handling
 * Function for returning empty objects at key verification failure
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
@@ -54,7 +53,6 @@ Pull requests welcome!
 * Reorganize CSS and comment for readability
 * Tool to import player & tournament JSON data to db
 * Better looking popups
-* Set admin default points at bucket creation
 * Better looking minipops
 * Move macro definitions to JSON file - import in both back- & frontend
 * Alternate top 5 with APPG instead of total points
