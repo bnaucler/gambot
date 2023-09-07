@@ -1271,6 +1271,7 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 func cancelgamebyuid(db *bolt.DB, uid int, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.G); i++ {
+        if !t.G[i].End.IsZero() { continue }
         if t.G[i].W == uid || t.G[i].B == uid {
             t.G[i].End = time.Now(); // Ngames is not incremented
             fmt.Printf("Cancelling game %s\n", t.G[i].ID)
