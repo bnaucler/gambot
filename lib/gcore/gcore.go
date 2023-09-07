@@ -30,6 +30,31 @@ const CTINDEX = 0                   // Database key for current tournament
 // Handler function definition
 type Hfn func(http.ResponseWriter, *http.Request, *bolt.DB)
 
+type Apicall struct {
+    Action string
+    Pass string
+    Opass string
+    Skey string
+    Pwin string
+    Pdraw string
+    Ploss string
+    N string
+    T string
+    I string
+    ID string
+    Game string
+    Name string
+    Fname string
+    Lname string
+    Gender string
+    Dbirth string
+    Email string
+    Postal string
+    Zip string
+    Phone string
+    Club string
+}
+
 type Pdata struct {
     Name string
     FName string

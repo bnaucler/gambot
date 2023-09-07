@@ -75,6 +75,8 @@ Pull requests welcome!
 * See all players and respective scores in tournament history
 * Tournament history data download
 * Better looking pause icon
+* Logic for cancelling games broken - makes 'null' players
+    - Look at 'Compl' status
 * Same button for admin registration and login
 * Same button for starting and ending tournament
 * 'soft end' to stop seeding
