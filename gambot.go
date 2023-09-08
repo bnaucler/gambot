@@ -900,7 +900,6 @@ func verskeyhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     } else {
         ret = true
-        fmt.Printf("DEBUG Key %+v ok\n", a.Skey)
     }
 
     enc := json.NewEncoder(w)
