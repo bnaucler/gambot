@@ -890,10 +890,12 @@ function trylogin(obj) {
 }
 
 // Initiates login procedure
-function loginuser(ep) {
+function loginuser(form) {
 
     let pass = gid("loginpass").value;
+    let ep = gid("logintype").value;
 
+    form.preventDefault();
     gid("loginform").reset();
     gofetch(ep, "pass=" + pass, trylogin);
 }
@@ -991,22 +993,21 @@ function logout() {
 function veradminindb(res) {
 
     let btn = gid("loginbutton");
+    let type = gid("logintype");
+    let form = gid("loginform");
     let btxt;
-    let ep;
 
     if(res == true) {
         btxt = "Login";
-        ep = "/login";
+        type.value = "/login";
 
     } else {
         btxt = "Register";
-        ep = "/reg";
+        type.value = "/reg";
     }
 
     btn.value = btxt;
-    btn.addEventListener("click", () => {
-        loginuser(ep);
-    });
+    form.addEventListener("submit", loginuser);
 }
 
 // Verifies skey match and shows appropriate window
@@ -1019,7 +1020,7 @@ function verskey(res) {
         gettournamentstatus();
 
     } else {
-        lgwin.style.display = "block";
+        logout();
     }
 }
 

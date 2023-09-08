@@ -895,11 +895,12 @@ func verskeyhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
     a, e := gcore.Getadmin(db)
 
-    if e != nil || call.Skey != a.Skey {
+    if e != nil || call.Skey != a.Skey || len(a.Skey) < 1 {
         ret = false
 
     } else {
         ret = true
+        fmt.Printf("DEBUG Key %+v ok\n", a.Skey)
     }
 
     enc := json.NewEncoder(w)

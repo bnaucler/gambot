@@ -18,12 +18,13 @@
 <body>
     <div id="login">
         <div id="logincontainer">
-            <form id="loginform" onsubmit="loginuser(this); return false;" method="post">
+            <form id="loginform" method="post">
                 <div class="header">
                     <div class="hicon"></div>
                     <h1>GAMBOT</h1>
                 </div>
                 <div class="smallgap"></div>
+                <input id="logintype" type="hidden" name="ltype"><br>
                 <input id="loginpass" type="password" name="pass" placeholder="Password"><br>
                 <input id="loginbutton" type="submit" name="login">
             </form>
