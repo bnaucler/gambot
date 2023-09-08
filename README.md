@@ -73,7 +73,6 @@ Pull requests welcome!
 * Same button for admin registration and login
 * Same button for starting and ending tournament
 * 'soft end' to stop seeding
-* Replace mkxhr with fetch()
 * Licess API bindings
 
 ## License

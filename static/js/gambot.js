@@ -22,20 +22,12 @@ const DRAW = 1;
 const LOSS = 2;
 
 // HTTP request wrapper
-function mkxhr(dest, params, rfunc) {
+async function gofetch(ep, params, rfunc) {
 
-    let xhr = new XMLHttpRequest();
+    let url = ep + "?" + params;
+    let resp = await fetch(url);
 
-    xhr.open("POST", dest, true);
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-    xhr.onreadystatechange = function() {
-        if(xhr.readyState == 4 && xhr.status == 200) {
-            rfunc(xhr);
-        }
-    }
-
-    xhr.send(params);
+    if(resp.ok) rfunc(await resp.json());
 }
 
 // Returns DOM object of requested type, and with class & text defined if requested
@@ -71,7 +63,7 @@ function declareresult(gid, pid, wname) {
 
     let params = "id=" + pid + "&game=" + gid + "&skey=" + gss("gambotkey");
 
-    mkxhr("/dr", params, playersadded); // TOOD temp
+    gofetch("/dr", params, playersadded); // TOOD temp
 }
 
 // Returns true if player with name ID is currently in a game
@@ -106,13 +98,12 @@ function forcegame(id) {
 
     let params = "id=" + id + "&skey=" + gss("gambotkey");
 
-    mkxhr("/mkgame", params, playersadded); // TODO
+    gofetch("/mkgame", params, playersadded); // TODO
 }
 
 // Verifies receipt of player object and calls for refresh
-function verpauseplayer(xhr) {
+function verpauseplayer(p) {
 
-    let p = JSON.parse(xhr.responseText);
     if(p.ID != 0) gettournamentstatus();
 }
 
@@ -121,7 +112,7 @@ function togglepause(id) {
 
     let params = "id=" + id + "&action=pause&skey=" + gss("gambotkey");
 
-    mkxhr("/ep", params, verpauseplayer);
+    gofetch("/ep", params, verpauseplayer);
 }
 
 // Creates a popup menu for bench players
@@ -357,9 +348,7 @@ function createtlistitem(t) {
 }
 
 // Displays tournament history
-function updatethist(xhr) {
-
-    let ts = JSON.parse(xhr.responseText);
+function updatethist(ts) {
 
     gid("thist").innerHTML = "";
 
@@ -374,9 +363,8 @@ function updatethist(xhr) {
 }
 
 // Call updatewindow() if request contains players
-function playersadded(xhr) {
+function playersadded(t) {
 
-    let t = JSON.parse(xhr.responseText);
     if(t.P != undefined) updatewindow(t);
 }
 
@@ -393,7 +381,7 @@ function playertotournament(elem) {
     let olen = ids.length;
     let params = "?id=" + JSON.stringify(ids) + "&skey=" + gss("gambotkey");
 
-    mkxhr("/apt", params, playersadded);
+    gofetch("/apt", params, playersadded);
 
     gid("playerdata").style.display = "none";
 }
@@ -450,9 +438,8 @@ function setapbutton(func) {
 }
 
 // Populates the player edit window
-function popplayereditwin(xhr) {
+function popplayereditwin(obj) {
 
-    let obj = JSON.parse(xhr.responseText);
     let form = gid("addplayerform");
     let pd = obj[0].Pi;
 
@@ -476,13 +463,12 @@ function openplayeredit(id) {
 
     let params = "id=" + id + "&skey=" + gss("gambotkey");
 
-    mkxhr("/gp", params, popplayereditwin);
+    gofetch("/gp", params, popplayereditwin);
 }
 
 // Shows data on individual player
-function showplayerdata(xhr) {
+function showplayerdata(obj) {
 
-    let obj = JSON.parse(xhr.responseText);
     let pname = gid("indplayername");
     let indgames = gid("indgamesval");
     let indpoints = gid("indpointsval");
@@ -529,7 +515,7 @@ function getplayerdata(p) {
 
     let params = "id=" + p.getAttribute("name") + "&skey=" + gss("gambotkey");
 
-    mkxhr("/gp", params, showplayerdata);
+    gofetch("/gp", params, showplayerdata);
 }
 
 // Adds player to list
@@ -564,9 +550,8 @@ function showplayer(p, pdiv, intourn) {
 }
 
 // Displays list of players
-function showplayers(xhr) {
+function showplayers(obj) {
 
-    let obj = JSON.parse(xhr.responseText);
     let pdiv = gid("playerdata");
     let intourn = gss("gambotintournament");
     let br = mkobj("br", "", "");
@@ -610,9 +595,8 @@ function log(data) {
 }
 
 // Processes tournament start request and creates appropriate log entries
-function tournamentstart(xhr) {
+function tournamentstart(obj) {
 
-    let obj = JSON.parse(xhr.responseText);
     let date = obj.Start.slice(0, 10);
     let time = obj.Start.slice(11, 16);
 
@@ -628,9 +612,8 @@ function tournamentstart(xhr) {
 }
 
 // Processes tournament end request and creates appropriate log entries
-function tournamentend(xhr) {
+function tournamentend(obj) {
 
-    let obj = JSON.parse(xhr.responseText);
     let date = obj.End.slice(0, 10);
     let time = obj.End.slice(11, 16);
 
@@ -638,7 +621,7 @@ function tournamentend(xhr) {
     else log("Tournament " + obj.ID + " ended at " + date + " "+ time);
 
     tournamentended();
-    updatestatus(xhr);
+    updatestatus(obj);
 }
 
 // Requests start of new tournament
@@ -646,7 +629,7 @@ function newtournament() {
 
     let params = "skey=" + gss("gambotkey");
 
-    mkxhr("/ct", params, tournamentstart);
+    gofetch("/ct", params, tournamentstart);
     gettopplayers(5);
 }
 
@@ -655,7 +638,7 @@ function edittournament(action, id) {
 
     let params = "action=" + action + "&id=" + id + "&skey=" + gss("gambotkey");
 
-    mkxhr("/et", params, tournamentend); // TODO
+    gofetch("/et", params, tournamentend); // TODO
 }
 
 // Requests adding new player to database
@@ -687,7 +670,7 @@ function addplayer(elem) {
     gid("addplayerform").reset();
     showpopup("pmgmt");
 
-    mkxhr("/ap", params, showplayers);
+    gofetch("/ap", params, showplayers);
 }
 
 // Sends request to search database for players
@@ -700,7 +683,7 @@ function getplayers(elem) {
 
     sessionStorage.gambotshowdeac = cb;
 
-    mkxhr("/gp", params, showplayers);
+    gofetch("/gp", params, showplayers);
 }
 
 // Shows & hides appropriate divs for in-tournament-mode
@@ -785,9 +768,8 @@ function addtoplessbtn(s, pdiv) {
 }
 
 // Updates top list
-function updatetopplayers(xhr) {
+function updatetopplayers(obj) {
 
-    let obj = JSON.parse(xhr.responseText);
     let pdiv = gid("topfivecontents");
     let oplen = obj.P.length;
 
@@ -817,9 +799,7 @@ function updatetopplayers(xhr) {
 }
 
 // Process tournament status request and sets appropriate mode
-function updatestatus(xhr) {
-
-    let obj = JSON.parse(xhr.responseText);
+function updatestatus(obj) {
 
     if(obj.ID === 0 || !timezero(obj.End)) {
         tournamentended();
@@ -837,7 +817,7 @@ function updatestatus(xhr) {
 function gettournamentstatus() {
 
     let params = "skey=" + gss("gambotkey");
-    mkxhr("/ts", params, updatestatus);
+    gofetch("/ts", params, updatestatus);
 }
 
 // Requests tournament history (n games starting at index i)
@@ -847,13 +827,11 @@ function getthist(elem) {
     let n = elem.elements["n"].value;
     let params = "i=" + id + "&n=" + n + "&skey=" + gss("gambotkey");
 
-    mkxhr("/th", params, updatethist);
+    gofetch("/th", params, updatethist);
 }
 
 // Verifies server response after adjustment of admin settings
-function verchangeadmin(xhr) {
-
-    let obj = JSON.parse(xhr.responseText);
+function verchangeadmin(obj) {
 
     if(obj.Status == S_ERR) {
         logout();
@@ -864,9 +842,7 @@ function verchangeadmin(xhr) {
 }
 
 // Updates fields of current values for pwin, pdraw & ploss
-function updatepcur(xhr) {
-
-    let obj = JSON.parse(xhr.responseText);
+function updatepcur(obj) {
 
     gid("pwinnum").value = obj.Pwin;
     gid("pdrawnum").value = obj.Pdraw;
@@ -878,7 +854,7 @@ function getpcur() {
 
     let params = "skey=" + gss("gambotkey");
 
-    mkxhr("/admin", params, updatepcur);
+    gofetch("/admin", params, updatepcur);
 }
 
 // Submits change of admin settings
@@ -892,7 +868,7 @@ function changeadmin(elem) {
     gid("adminform").reset();
     showpopup("none");
 
-    mkxhr("/admin", params, verchangeadmin);
+    gofetch("/admin", params, verchangeadmin);
 }
 
 // Requests top players (n players of type t: (a)ll or (c)urrent)
@@ -900,13 +876,11 @@ function gettopplayers(n, t) {
 
     let params = "n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
 
-    mkxhr("/gtp", params, updatetopplayers);
+    gofetch("/gtp", params, updatetopplayers);
 }
 
 // Checks for session key
-function trylogin(xhr) {
-
-    let obj = JSON.parse(xhr.responseText);
+function trylogin(obj) {
 
     if(obj.Skey) {
         gettournamentstatus();
@@ -923,7 +897,7 @@ function loginuser(elem) {
 
     gid("loginform").reset();
 
-    mkxhr("/login", params, trylogin);
+    gofetch("/login", params, trylogin);
 }
 
 // Changes admin password
@@ -936,7 +910,7 @@ function chpass(elem) {
 
     gid("apassform").reset();
 
-    mkxhr("/reg", params, trylogin); // TODO: Update with proper logging / user feedback
+    gofetch("/reg", params, trylogin); // TODO: Update with proper logging / user feedback
     showpopup("none");
 }
 
@@ -1016,11 +990,9 @@ function logout() {
 }
 
 // Receives data on if admin exists in db and opens appropriate window
-function veradminindb(xhr) {
+function veradminindb(res) {
 
-    let res = JSON.parse(xhr.responseText);
-
-    if(res == true) {
+    if(res) {
         gid("regbutton").style.display = "none";
         gid("loginbutton").style.display = "block";
 
@@ -1031,9 +1003,8 @@ function veradminindb(xhr) {
 }
 
 // Verifies skey match and shows appropriate window
-function verskey(xhr) {
+function verskey(res) {
 
-    let res = JSON.parse(xhr.responseText);
     let lgwin = gid("login");
 
     if(res == true) {
@@ -1050,13 +1021,11 @@ function chkskey() {
 
     let params = "skey=" + gss("gambotkey");
 
-    mkxhr("/verskey", params, verskey);
+    gofetch("/verskey", params, verskey);
 }
 
 // Verifies player edit response
-function verplayeredit(xhr) {
-
-    let obj = JSON.parse(xhr.responseText);
+function verplayeredit(obj) {
 
     if(obj.ID != undefined) {
         log("Successfully updated player data");
@@ -1072,7 +1041,7 @@ function editplayer() {
     let action = gid("editplayer").getAttribute("name");
     let params = "id=" + pid + "&action=" + action + "&skey=" + gss("gambotkey");
 
-    mkxhr("/ep", params, verplayeredit);
+    gofetch("/ep", params, verplayeredit);
 
     showpopup("pmgmt");
 }
@@ -1080,7 +1049,7 @@ function editplayer() {
 // Checks if admin account exists in db
 function adminindb() {
 
-    mkxhr("/chkadm", "", veradminindb);
+    gofetch("/chkadm", "", veradminindb);
 }
 
 // Registers new admin user
@@ -1089,7 +1058,7 @@ function register() {
     let params = "pass=" + gid("loginpass").value;
 
     gid("loginform").reset();
-    mkxhr("/reg", params, trylogin);
+    gofetch("/reg", params, trylogin);
 }
 
 // Checks if admin is logged in
