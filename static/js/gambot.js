@@ -890,14 +890,12 @@ function trylogin(obj) {
 }
 
 // Initiates login procedure
-function loginuser(elem) {
+function loginuser(ep) {
 
-    let pass = elem.elements["pass"].value;
-    let params = "pass=" + pass;
+    let pass = gid("loginpass").value;
 
     gid("loginform").reset();
-
-    gofetch("/login", params, trylogin);
+    gofetch(ep, "pass=" + pass, trylogin);
 }
 
 // Changes admin password
@@ -989,17 +987,26 @@ function logout() {
     adminindb();
 }
 
-// Receives data on if admin exists in db and opens appropriate window
+// Receives data on if admin exists in db and changes button endpoint accordingly
 function veradminindb(res) {
 
-    if(res) {
-        gid("regbutton").style.display = "none";
-        gid("loginbutton").style.display = "block";
+    let btn = gid("loginbutton");
+    let btxt;
+    let ep;
+
+    if(res == true) {
+        btxt = "Login";
+        ep = "/login";
 
     } else {
-        gid("regbutton").style.display = "block";
-        gid("loginbutton").style.display = "none";
+        btxt = "Register";
+        ep = "/reg";
     }
+
+    btn.value = btxt;
+    btn.addEventListener("click", () => {
+        loginuser(ep);
+    });
 }
 
 // Verifies skey match and shows appropriate window
@@ -1050,15 +1057,6 @@ function editplayer() {
 function adminindb() {
 
     gofetch("/chkadm", "", veradminindb);
-}
-
-// Registers new admin user
-function register() {
-
-    let params = "pass=" + gid("loginpass").value;
-
-    gid("loginform").reset();
-    gofetch("/reg", params, trylogin);
 }
 
 // Checks if admin is logged in

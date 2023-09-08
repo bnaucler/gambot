@@ -70,7 +70,6 @@ Pull requests welcome!
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
-* Same button for admin registration and login
 * Same button for starting and ending tournament
 * 'soft end' to stop seeding
 * Licess API bindings
