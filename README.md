@@ -42,9 +42,8 @@ Pull requests welcome!
 * valskey() wrapper for sending empty responses
 * Replace local log with API call for server log
 * Mobile friendly / responsive UI
-* Seeding algorithm selector (minipop when 'start new tournament' is pressed
-    - Winner meets winner seeding algo (w. color reversal)
-    - Monrad seeding algo
+* Monrad seeding algo
+* APPG based seeding for draws in Win/Win algo
 * Possibility to 'force' games with specified opponent
 * Better (and consistent) backend error handling
 * Tournament history search by date

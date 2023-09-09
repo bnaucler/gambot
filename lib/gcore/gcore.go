@@ -105,6 +105,7 @@ type Player struct {
 type Tournament struct {
     ID int
     Algo int
+    Round int
     P []Player
     G []Game
     Seeding bool

@@ -663,6 +663,16 @@ func rndflip(p1 int, p2 int) (int, int) {
     return p2, p1
 }
 
+// 50% chance to return true or false
+func coin() bool {
+
+    if rand.Intn(2) == 1 {
+        return true
+    }
+
+    return false
+}
+
 // Returns number of games in tournament where p played as white
 func wgamesppt(p gcore.Player) int {
 
@@ -753,10 +763,109 @@ func seedrandom(t gcore.Tournament) gcore.Tournament {
     return t
 }
 
+// Returns result of last game
+func getlastresult(pid int, t gcore.Tournament) int {
+
+    var ret int
+
+    for _, g := range t.G {
+        if g.B == pid || g.W == pid {
+            if g.Winner == pid {
+                ret = WIN
+
+            } else if g.Winner == 0 {
+                ret = DRAW
+
+            } else {
+                ret = LOSS
+            }
+        }
+    }
+
+    return ret
+}
+
+// Looks at previous games of players in list, returns latest winners & losers
+func getwinlose(ps []int, t gcore.Tournament) ([]int, []int) {
+
+    var w []int
+    var l []int
+    var d []int
+
+    for _, pid := range ps {
+        res := getlastresult(pid, t)
+        if res == WIN {
+            w = append(w, pid)
+
+        } else if res == LOSS {
+            l = append(l, pid)
+
+        } else {
+            d = append(d, pid)
+        }
+    }
+
+    if len(d) != 0 {
+        stwin := coin() // TODO sort slice by APPG instead
+        for _, pid := range d {
+            if stwin {
+                w = append(w, pid)
+
+            } else {
+                l = append(l, pid)
+            }
+            stwin = !stwin
+        }
+    }
+
+    return w, l
+}
+
+// Returns int slice in random order
+func shuffleslice(s []int) []int {
+
+    for i := len(s) - 1; i > 0; i-- {
+        j := rand.Intn(i + 1)
+        s[i], s[j] = s[j], s[i]
+    }
+
+    return s
+}
+
+// Creates games for pids in int slice
+func gamefromslice(pids []int, t gcore.Tournament) gcore.Tournament {
+
+    pids = shuffleslice(pids)
+
+    for i := 1; i < len(pids); i++ {
+        if ingame(pids[i - 1], t) { continue }
+        game := mkgame(t)
+        game.W, game.B = blackwhite(pids[i - 1], pids[i], t)
+        t.G = append(t.G, game)
+    }
+
+    return t
+}
+
 // Creates matchups within tournament (winner meets winner algo)
 func seedwinwin(t gcore.Tournament) gcore.Tournament {
 
-    // TODO
+    fmt.Printf("W/W tournament %d, round %d\n", t.ID, t.Round)
+
+    if t.Round == 1 {
+        t = seedrandom(t)
+        t.Round++
+
+    } else {
+        bp := getbenchplayers(t)
+        if len(bp) > 3 {
+            w, l := getwinlose(bp, t)
+            fmt.Printf("DEBUG w: %+v, l: %+v\n", w, l)
+            t = gamefromslice(w, t)
+            t = gamefromslice(l, t)
+        }
+    }
+
     return t
 }
 
@@ -819,6 +928,7 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     t = gcore.Tournament{}
     t.Start = time.Now()
     t.Status = S_OK;
+    t.Round = 1
     t.Algo, e = strconv.Atoi(call.Algo)
     gcore.Cherr(e)
 
