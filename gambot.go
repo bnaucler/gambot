@@ -28,10 +28,12 @@ const S_ERR = 1                     // Status code: error
 // Macro definitions for readability
 const WHITE = 0
 const BLACK = 1
+
 const WIN = 0
 const DRAW = 1
 const LOSS = 2
 
+// Stat object references
 const WWIN = 0
 const WDRAW = 1
 const WLOSS = 2
@@ -39,11 +41,17 @@ const BWIN = 3
 const BDRAW = 4
 const BLOSS = 5
 
+// Object type references
 const ADMIN = 0
 const TOURNAMENT = 1
 const GAME = 2
 const PLAYER = 3
 const NULL = 4
+
+// Algo type references
+const RANDOM = 0
+const WINWIN = 1
+const MONRAD = 2
 
 type Tpresp struct {
     P []gcore.Player
@@ -117,6 +125,7 @@ func getcall(r *http.Request) gcore.Apicall {
         Pwin:       r.FormValue("pwin"),
         Pdraw:      r.FormValue("pdraw"),
         Ploss:      r.FormValue("ploss"),
+        Algo:       r.FormValue("algo"),
         N:          r.FormValue("n"),
         T:          r.FormValue("t"),
         I:          r.FormValue("i"),
@@ -727,8 +736,8 @@ func ispaused(id int, t gcore.Tournament) bool {
     return false
 }
 
-// Creates matchups within tournament
-func seed(t gcore.Tournament) gcore.Tournament {
+// Creates matchups within tournament (random algo)
+func seedrandom(t gcore.Tournament) gcore.Tournament {
 
     ap := availableplayers(t)
 
@@ -739,6 +748,37 @@ func seed(t gcore.Tournament) gcore.Tournament {
         game := mkgame(t)
         game.W, game.B = blackwhite(pid, opp, t)
         t.G = append(t.G, game)
+    }
+
+    return t
+}
+
+// Creates matchups within tournament (winner meets winner algo)
+func seedwinwin(t gcore.Tournament) gcore.Tournament {
+
+    // TODO
+    return t
+}
+
+// Creates matchups within tournament (monrad algo)
+func seedmonrad(t gcore.Tournament) gcore.Tournament {
+
+    // TODO
+    return t
+}
+
+// Selects seeding algorithm
+func seed(t gcore.Tournament) gcore.Tournament {
+
+    switch t.Algo {
+        case RANDOM:
+            t = seedrandom(t)
+
+        case WINWIN:
+            t = seedwinwin(t)
+
+        case MONRAD:
+            t = seedmonrad(t)
     }
 
     return t
@@ -779,6 +819,20 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     t = gcore.Tournament{}
     t.Start = time.Now()
     t.Status = S_OK;
+    t.Algo, e = strconv.Atoi(call.Algo)
+    gcore.Cherr(e)
+
+    var atxt string
+
+    if t.Algo == RANDOM {
+        atxt = "Random pair"
+
+    } else if t.Algo == WINWIN {
+        atxt = "Winner meets winner"
+
+    } else if t.Algo == MONRAD {
+        atxt = "Monrad"
+    }
 
     db.Update(func(tx *bolt.Tx) error {
         b, _ := tx.CreateBucketIfNotExists(gcore.Tbuc)
@@ -793,8 +847,8 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return e
     })
 
-    fmt.Printf("Tournament %d started at %d-%02d-%02d %02d:%02d\n", t.ID,
-                t.Start.Year(), t.Start.Month(), t.Start.Day(),
+    fmt.Printf("%s tournament (ID: %d) started at %d-%02d-%02d %02d:%02d\n",
+                atxt, t.ID, t.Start.Year(), t.Start.Month(), t.Start.Day(),
                 t.Start.Hour(), t.Start.Minute())
 
     enc := json.NewEncoder(w)

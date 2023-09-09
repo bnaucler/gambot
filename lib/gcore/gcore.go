@@ -32,6 +32,7 @@ type Hfn func(http.ResponseWriter, *http.Request, *bolt.DB)
 
 type Apicall struct {
     Action string
+    Algo string
     Pass string
     Opass string
     Skey string

@@ -50,6 +50,7 @@ Pull requests welcome!
 * Tournament history search by date
     - next / prev buttons
 * Refactor (go & js) and divide in multiple source files
+* Refactor cthandler()
 * Reorganize CSS and comment for readability
 * Tool to import player & tournament JSON data to db
 * Better looking popups
@@ -71,6 +72,7 @@ Pull requests welcome!
 * See all players and respective scores in tournament history
 * Tournament history data download
 * Same button for starting and ending tournament
+* Move activate/deactivate button to edit player popup
 * 'soft end' to stop seeding
 * Licess API bindings
 

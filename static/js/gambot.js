@@ -21,6 +21,10 @@ const WIN = 0;
 const DRAW = 1;
 const LOSS = 2;
 
+const RANDOM = 0
+const WINWIN = 1
+const MONRAD = 2
+
 // HTTP request wrapper
 async function gofetch(ep, params, rfunc) {
 
@@ -624,13 +628,45 @@ function tournamentend(obj) {
     updatestatus(obj);
 }
 
-// Requests start of new tournament
-function newtournament() {
+function launchtournament(algo) {
 
-    let params = "skey=" + gss("gambotkey");
+    let params = "algo=" + algo + "&skey=" + gss("gambotkey");
 
     gofetch("/ct", params, tournamentstart);
     gettopplayers(5);
+}
+
+// Requests start of new tournament
+function newtournament() {
+
+    let bpop = mkminipop();
+    let pdiv = gid("tnmt");
+
+    let rndbtn = mkobj("div", "minipopitem", "Random");
+    let winwinbtn = mkobj("div", "minipopitem", "Winner meets winner");
+    let monradbtn = mkobj("div", "minipopitem", "Monrad");
+
+    mkminipop(bpop);
+
+    rndbtn.addEventListener("click", () => {
+        launchtournament(RANDOM);
+        bpop.remove();
+    });
+
+    winwinbtn.addEventListener("click", () => {
+        launchtournament(WINWIN);
+        bpop.remove();
+    });
+
+    monradbtn.addEventListener("click", () => {
+        launchtournament(MONRAD);
+        bpop.remove();
+    });
+
+    bpop.appendChild(rndbtn);
+    bpop.appendChild(winwinbtn);
+    bpop.appendChild(monradbtn);
+    pdiv.appendChild(bpop);
 }
 
 // Requests ending current tournament
