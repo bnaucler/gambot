@@ -387,7 +387,7 @@ function playertotournament(elem) {
 
     gofetch("/apt", params, playersadded);
 
-    gid("playerdata").style.display = "none";
+    gid("playerdata").style.display = "none"; // TODO
 }
 
 // Fills the horizontal bar for win / draw / loss
@@ -450,7 +450,7 @@ function popplayereditwin(obj) {
     form.id.value = obj[0].ID;
     form.fname.value = pd.FName;
     form.lname.value = pd.LName;
-    form.dbirth.value = pd.Dbirth.slice(0, 10);
+    form.dbirth.value = timezero(pd.Dbirth) ? "" : pd.Dbirth.slice(0, 10);
     form.gender.value = pd.Gender;
     form.email.value = pd.Email;
     form.postal.value = pd.PostalAddr;
