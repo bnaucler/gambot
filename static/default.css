@@ -54,7 +54,7 @@ input[type=text], input[type=password], input[type=number], select {
 
 input[type=submit], button {
     background-color: #222;
-    color: #fff;
+    color: #eee;
     outline: none;
     border: 1px #fff solid;
     border-radius: 4px;
@@ -67,7 +67,7 @@ input[type=submit], button {
 }
 
 input[type=submit]:hover, button:hover {
-    background-color: #fff;
+    background-color: #eee;
     color: #222;
     border: 1px #fff solid;
 }
