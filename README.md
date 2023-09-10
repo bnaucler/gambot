@@ -34,49 +34,8 @@ Usage of bin/dbdump:
 ```
 
 ## Contributing
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for best practices and information on how to get involved in the project.  
 Pull requests welcome!
-
-## TODO
-* CONTRIBUTING doc
-* Shutdown sequence
-* Server side logging
-* valskey() wrapper for sending empty responses
-* Replace local log with API call for server log
-* Mobile friendly / responsive UI
-* Monrad seeding algo
-* APPG based seeding for draws in Win/Win algo
-* Possibility to 'force' games with specified opponent
-* Better (and consistent) backend error handling
-* Tournament history search by date
-    - next / prev buttons
-* Refactor (go & js) and divide in multiple source files
-* Refactor cthandler()
-* Reorganize CSS and comment for readability
-* Tool to import player & tournament JSON data to db
-* Better looking popups
-* Better looking minipops
-* Move macro definitions to JSON file - import in both back- & frontend
-* Alternate top 5 with APPG instead of total points
-* Logic to pick longest waiting bench player if all other things are equal
-* Logic to determine top players when points are equal
-    - APPG based
-    - If still equal: APPG as black
-* Add/edit player window styling
-* Better player data validation
-    - frontend
-    - backend
-* Send player added status report to frontend
-* Participant attendance & results report per tournament
-* Selector for tournament & all time stats in player info window
-* See all games in tournament history
-* See all players and respective scores in tournament history
-* Tournament history data download
-* Same button for starting and ending tournament
-* Move activate/deactivate button to edit player popup
-* 'soft end' to stop seeding
-* Licess API bindings
-* Merge ephandler() and aphandler()
-* Make statuspop on/off defined per log item type
 
 ## License
 MIT (do whatever you want)
