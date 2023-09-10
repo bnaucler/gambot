@@ -1479,7 +1479,7 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
                 t.End.Hour(), t.End.Minute())
     }
 
-    return gcore.Tournament{}
+    return t
 }
 
 // Cancels game containing player with ID uid - awards no points

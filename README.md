@@ -76,7 +76,6 @@ Pull requests welcome!
 * 'soft end' to stop seeding
 * Licess API bindings
 * Merge ephandler() and aphandler()
-* Fix broken tournament end time log
 * Make statuspop on/off defined per log item type
 
 ## License
