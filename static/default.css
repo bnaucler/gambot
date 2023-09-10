@@ -540,3 +540,23 @@ input[type=checkbox] {
 #indplayeredit:hover {
     opacity: 1;
 }
+
+.statuspop {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 50px;
+    border: 1px #ccc solid;
+    background-color: #ccc;
+    color: #222;
+    opacity: .8;
+    transition: 1s;
+}
+
+.fade-out {
+    opacity: 0;
+}

@@ -594,6 +594,8 @@ function log(data) {
     let item = mkobj("div", "log");
     let msg = mkobj("p", "", data);
 
+    statuspopup(data);
+
     item.appendChild(msg);
     pdiv.appendChild(item);
 }
@@ -677,6 +679,30 @@ function edittournament(action, id) {
     gofetch("/et", params, tournamentend); // TODO
 }
 
+// Shows a temporary status message on the screen
+function statuspopup(msg) {
+
+    let mdiv = mkobj("div", "statuspop", msg);
+    let pdiv = gid("tnmt");
+
+    setTimeout(() => { mdiv.remove(); }, 4000);
+    setTimeout(() => { mdiv.classList.add("fade-out"); }, 3000);
+
+    pdiv.appendChild(mdiv);
+}
+
+// Processes confirmation of added player
+function veraddplayer(p) {
+
+    let msg;
+    console.log(p);
+
+    if(p[0].Status == S_OK) msg = p[0].Pi.Name + " added successfully";
+    else msg = "Could not add player";
+
+    log(msg);
+}
+
 // Requests adding new player to database
 function addplayer(elem) {
 
@@ -706,7 +732,7 @@ function addplayer(elem) {
     gid("addplayerform").reset();
     showpopup("pmgmt");
 
-    gofetch("/ap", params, showplayers);
+    gofetch("/ap", params, veraddplayer);
 }
 
 // Sends request to search database for players
