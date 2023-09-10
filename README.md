@@ -18,6 +18,8 @@ Usage of bin/gambot:
     	port number to listen (default 9001)
 ```
 
+For API reference, take a look at [APIREF.md](APIREF.md).
+
 ## Tool - dbdump
 Dumps the database contents to stdout  
 Output of `bin/dbdump -h`:  
@@ -74,6 +76,7 @@ Pull requests welcome!
 * Move activate/deactivate button to edit player popup
 * 'soft end' to stop seeding
 * Licess API bindings
+* Merge ephandler() and aphandler()
 
 ## License
 MIT (do whatever you want)
