@@ -922,9 +922,7 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return e
     })
 
-    log.Printf("%s tournament (ID: %d) started at %d-%02d-%02d %02d:%02d\n",
-                atxt, t.ID, t.Start.Year(), t.Start.Month(), t.Start.Day(),
-                t.Start.Hour(), t.Start.Minute())
+    log.Printf("%s tournament (ID: %d) started\n", atxt, t.ID)
 
     enc := json.NewEncoder(w)
     enc.Encode(t)
@@ -1451,9 +1449,7 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
         e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
         gcore.Cherr(e)
         t.Status = gcore.Mac["S_OK"]
-        log.Printf("Tournament %d ended at %d-%02d-%02d %02d:%02d\n", t.ID,
-                t.End.Year(), t.End.Month(), t.End.Day(),
-                t.End.Hour(), t.End.Minute())
+        log.Printf("Tournament %d ended\n", t.ID)
     }
 
     return t
