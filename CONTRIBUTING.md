@@ -16,7 +16,8 @@ Contributions are very welcome! At this early stage, this file will double as a 
 As you can see below, there is a VERY long list of things which need to be addressed. There should be ample opportunity to get involved. *But most importantly* - if you decide to give gambot a try at your club, let us know what kind of real-world issues you run into.
 
 ### TODO: core functionality
-* Replace local log with API call for server log
+* Skey verification on loghandler()
+* Clean up (remove) old frontend local log entries
 * Better (and consistent) backend error handling
 * Better player data validation
     - frontend
@@ -29,6 +30,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Add/edit player window styling
 * Same button for starting and ending tournament
 * Move activate/deactivate button to edit player popup
+* Prev / next buttons for browsing through log
 
 ### TODO: structure
 * Refactor (go & js) and divide in multiple source files

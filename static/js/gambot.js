@@ -567,13 +567,13 @@ function timezero(ttime) {
 }
 
 // Creates an entry in the local log
-function log(data) {
+function log(data, pop) {
 
     let pdiv = gid("logwin");
     let item = mkobj("div", "log");
     let msg = mkobj("p", "", data);
 
-    statuspopup(data);
+    if(pop) statuspopup(data);
 
     item.appendChild(msg);
     pdiv.appendChild(item);
@@ -675,7 +675,6 @@ function statuspopup(msg) {
 function veraddplayer(p) {
 
     let msg;
-    console.log(p);
 
     if(p[0].Status == mac.S_OK) msg = p[0].Pi.Name + " added successfully";
     else msg = "Could not add player";
@@ -1109,18 +1108,27 @@ function checklogin() {
     chkskey();
 }
 
-// Loads default values from file
-function loaddefaults(obj) {
+// Displays log
+function verlog(llist) {
 
-    mac = obj;
-    console.log(obj);
+    for(const l of llist) log(l, false);
+}
+
+// Retrieves log from server
+function getlog(i, n) {
+
+    if(i === undefined) i = 0;
+    if(n === undefined) n = 10;
+
+    gofetch("/log", "i=" + i + "&n=" + n, verlog);
+    showpopup("log");
 }
 
 // Retrieves macro definitions
 async function getdefaults() {
 
     let resp = await fetch("../mac.json");
-    if(resp.ok) loaddefaults(await resp.json());
+    if(resp.ok) mac = await resp.json();
 }
 
 // Request necessary data after window refresh
