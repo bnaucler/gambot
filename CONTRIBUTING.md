@@ -34,7 +34,6 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Tool to import player & tournament JSON data to db
 * Better looking popups
 * Better looking minipops
-* Move macro definitions to JSON file - import in both back- & frontend
 * Alternate top 5 with APPG instead of total points
 * Logic to pick longest waiting bench player if all other things are equal
 * Logic to determine top players when points are equal

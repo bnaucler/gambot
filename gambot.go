@@ -22,37 +22,6 @@ import (
     bcrypt "golang.org/x/crypto/bcrypt"
 )
 
-const S_OK = 0                      // Status code: OK
-const S_ERR = 1                     // Status code: error
-
-// Macro definitions for readability
-const WHITE = 0
-const BLACK = 1
-
-const WIN = 0
-const DRAW = 1
-const LOSS = 2
-
-// Stat object references
-const WWIN = 0
-const WDRAW = 1
-const WLOSS = 2
-const BWIN = 3
-const BDRAW = 4
-const BLOSS = 5
-
-// Object type references
-const ADMIN = 0
-const TOURNAMENT = 1
-const GAME = 2
-const PLAYER = 3
-const NULL = 4
-
-// Algo type references
-const RANDOM = 0
-const WINWIN = 1
-const MONRAD = 2
-
 type Tpresp struct {
     P []gcore.Player
     S string
@@ -86,27 +55,27 @@ func emptyresp(w http.ResponseWriter, t int) {
     enc := json.NewEncoder(w)
 
     switch t {
-        case NULL:
+        case gcore.Mac["NULL"]:
             enc.Encode([]int{})
 
-        case ADMIN:
+        case gcore.Mac["ADMIN"]:
             a := gcore.Admin{}
-            a.Status = S_ERR
+            a.Status = gcore.Mac["S_ERR"]
             enc.Encode(a)
 
-        case TOURNAMENT:
+        case gcore.Mac["TOURNAMENT"]:
             t := gcore.Tournament{}
-            t.Status = S_ERR
+            t.Status = gcore.Mac["S_ERR"]
             enc.Encode(t)
 
-        case GAME:
+        case gcore.Mac["GAME"]:
             g := gcore.Game{}
-            g.Status = S_ERR
+            g.Status = gcore.Mac["S_ERR"]
             enc.Encode(g)
 
-        case PLAYER:
+        case gcore.Mac["PLAYER"]:
             p := gcore.Player{}
-            p.Status = S_ERR
+            p.Status = gcore.Mac["S_ERR"]
             enc.Encode(p)
     }
 }
@@ -146,22 +115,12 @@ func getcall(r *http.Request) gcore.Apicall {
     return ret
 }
 
-// Stores admin object to database
-func writeadmin(a gcore.Admin, db *bolt.DB) {
-
-    buf, e := json.Marshal(a)
-    gcore.Cherr(e)
-
-    e = gcore.Wrdb(db, gcore.A_ID, buf, gcore.Abuc)
-    gcore.Cherr(e)
-}
-
 // Initializes points for win/draw/loss to default values
 func setdefaultpoints(a gcore.Admin) gcore.Admin {
 
-    a.Pwin = gcore.DEF_PWIN
-    a.Pdraw = gcore.DEF_PDRAW
-    a.Ploss = gcore.DEF_PLOSS
+    a.Pwin = gcore.Mac["PWIN"]
+    a.Pdraw = gcore.Mac["PDRAW"]
+    a.Ploss = gcore.Mac["PLOSS"]
 
     return a
 }
@@ -172,7 +131,7 @@ func storect(db *bolt.DB, t gcore.Tournament) error {
     wt, e := json.Marshal(t)
     gcore.Cherr(e)
 
-    e = gcore.Wrdb(db, gcore.CTINDEX, []byte(wt), gcore.Tbuc)
+    e = gcore.Wrdb(db, gcore.Mac["CTINDEX"], []byte(wt), gcore.Tbuc)
 
     return e
 }
@@ -181,7 +140,7 @@ func storect(db *bolt.DB, t gcore.Tournament) error {
 func getct(db *bolt.DB) (gcore.Tournament, error){
 
     t := gcore.Tournament{}
-    wt, e := gcore.Rdb(db, gcore.CTINDEX, gcore.Tbuc)
+    wt, e := gcore.Rdb(db, gcore.Mac["CTINDEX"], gcore.Tbuc)
 
     e = json.Unmarshal(wt, &t)
 
@@ -199,7 +158,7 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         a.Pass, e = bcrypt.GenerateFromPassword([]byte(call.Pass), bcrypt.DefaultCost)
         gcore.Cherr(e)
         a.Skey = randstr(30)
-        writeadmin(a, db)
+        gcore.Wradmin(a, db)
         a.Pass = []byte("")
 
     } else if len(a.Pass) > 1 && !validateuser(a, call.Pass) {
@@ -222,7 +181,7 @@ func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     if validateuser(a, call.Pass) {
         fmt.Printf("Admin login successful\n")
         a.Skey = randstr(30)
-        writeadmin(a, db)
+        gcore.Wradmin(a, db)
         a.Pass = []byte("")
 
     } else {
@@ -242,7 +201,7 @@ func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     gcore.Cherr(e)
 
     if !valskey(db, call.Skey) {
-        emptyresp(w, ADMIN)
+        emptyresp(w, gcore.Mac["ADMIN"])
         return
     }
 
@@ -255,9 +214,9 @@ func adminhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     ploss, e := strconv.Atoi(call.Ploss)
     if e == nil { a.Ploss = ploss }
 
-    writeadmin(a, db)
+    gcore.Wradmin(a, db)
 
-    a.Status = S_OK
+    a.Status = gcore.Mac["S_OK"]
     a.Pass = []byte("")
 
     enc := json.NewEncoder(w)
@@ -323,7 +282,7 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        emptyresp(w, NULL)
+        emptyresp(w, gcore.Mac["NULL"])
         return
     }
 
@@ -358,7 +317,7 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        emptyresp(w, NULL)
+        emptyresp(w, gcore.Mac["NULL"])
         return
     }
 
@@ -436,7 +395,7 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        emptyresp(w, PLAYER)
+        emptyresp(w, gcore.Mac["PLAYER"])
         return
     }
 
@@ -536,7 +495,7 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        emptyresp(w, NULL)
+        emptyresp(w, gcore.Mac["NULL"])
         return
     }
 
@@ -568,14 +527,13 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     if e == nil { p.Pi.Dbirth = tm }
 
     if len(p.Pi.Name) < 3 {
-        p.Status = S_ERR
-
+        p.Status = gcore.Mac["S_ERR"]
     } else if p.ID > 0 {
         storeplayer(db, p)
 
     } else {
         storeplayerwithnewid(db, p)
-        p.Status = S_OK
+        p.Status = gcore.Mac["S_OK"]
     }
 
     players = append(players, p)
@@ -676,13 +634,17 @@ func coin() bool {
 // Returns number of games in tournament where p played as white
 func wgamesppt(p gcore.Player) int {
 
-    return p.TN.Stat[WWIN] + p.TN.Stat[WDRAW] + p.TN.Stat[WLOSS]
+    return p.TN.Stat[gcore.Mac["WWIN"]] +
+           p.TN.Stat[gcore.Mac["WDRAW"]] +
+           p.TN.Stat[gcore.Mac["WLOSS"]]
 }
 
 // Returns number of games in tournament where p played as black
 func bgamesppt(p gcore.Player) int {
 
-    return p.TN.Stat[BWIN] + p.TN.Stat[BDRAW] + p.TN.Stat[BLOSS]
+    return p.TN.Stat[gcore.Mac["BWIN"]] +
+           p.TN.Stat[gcore.Mac["BDRAW"]] +
+           p.TN.Stat[gcore.Mac["BLOSS"]]
 }
 
 // Returns last color player had in tournament game or -1 if no games
@@ -693,9 +655,9 @@ func lastcol(pid int, t gcore.Tournament) int {
     for _, g := range t.G {
         if !g.Compl { continue }
         if pid == g.W {
-            ret = WHITE
+            ret = gcore.Mac["WHITE"]
         } else if pid == g.B {
-            ret = BLACK
+            ret = gcore.Mac["BLACK"]
         }
     }
 
@@ -709,10 +671,10 @@ func blackwhite(p1 int, p2 int, t gcore.Tournament) (int, int) {
     p1last := lastcol(p1, t)
     p2last := lastcol(p2, t)
 
-    if p1last == WHITE && p2last == BLACK {
+    if p1last == gcore.Mac["WHITE"] && p2last == gcore.Mac["BLACK"] {
         return p2, p1
 
-    } else if p1last == BLACK && p2last == WHITE {
+    } else if p1last == gcore.Mac["BLACK"] && p2last == gcore.Mac["WHITE"] {
         return p1, p2
     }
 
@@ -771,13 +733,13 @@ func getlastresult(pid int, t gcore.Tournament) int {
     for _, g := range t.G {
         if g.B == pid || g.W == pid {
             if g.Winner == pid {
-                ret = WIN
+                ret = gcore.Mac["WIN"]
 
             } else if g.Winner == 0 {
-                ret = DRAW
+                ret = gcore.Mac["DRAW"]
 
             } else {
-                ret = LOSS
+                ret = gcore.Mac["LOSS"]
             }
         }
     }
@@ -794,10 +756,10 @@ func getwinlose(ps []int, t gcore.Tournament) ([]int, []int) {
 
     for _, pid := range ps {
         res := getlastresult(pid, t)
-        if res == WIN {
+        if res == gcore.Mac["WIN"] {
             w = append(w, pid)
 
-        } else if res == LOSS {
+        } else if res == gcore.Mac["LOSS"] {
             l = append(l, pid)
 
         } else {
@@ -860,7 +822,6 @@ func seedwinwin(t gcore.Tournament) gcore.Tournament {
         bp := getbenchplayers(t)
         if len(bp) > 3 {
             w, l := getwinlose(bp, t)
-            fmt.Printf("DEBUG w: %+v, l: %+v\n", w, l)
             t = gamefromslice(w, t)
             t = gamefromslice(l, t)
         }
@@ -880,13 +841,13 @@ func seedmonrad(t gcore.Tournament) gcore.Tournament {
 func seed(t gcore.Tournament) gcore.Tournament {
 
     switch t.Algo {
-        case RANDOM:
+        case gcore.Mac["RANDOM"]:
             t = seedrandom(t)
 
-        case WINWIN:
+        case gcore.Mac["WINWIN"]:
             t = seedwinwin(t)
 
-        case MONRAD:
+        case gcore.Mac["MONRAD"]:
             t = seedmonrad(t)
     }
 
@@ -913,34 +874,34 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     gcore.Cherr(e)
 
     if t.ID != 0 {
-        t.Status = S_ERR;
+        t.Status = gcore.Mac["S_ERR"]
         enc := json.NewEncoder(w)
         enc.Encode(t)
         fmt.Printf("Tournament already ongoing!\n")
         return
 
     } else if !valskey(db, call.Skey) {
-        emptyresp(w, TOURNAMENT)
+        emptyresp(w, gcore.Mac["TOURNAMENT"])
         fmt.Printf("Admin verification failed\n")
         return
     };
 
     t = gcore.Tournament{}
     t.Start = time.Now()
-    t.Status = S_OK;
+    t.Status = gcore.Mac["S_OK"]
     t.Round = 1
     t.Algo, e = strconv.Atoi(call.Algo)
     gcore.Cherr(e)
 
     var atxt string
 
-    if t.Algo == RANDOM {
+    if t.Algo == gcore.Mac["RANDOM"] {
         atxt = "Random pair"
 
-    } else if t.Algo == WINWIN {
+    } else if t.Algo == gcore.Mac["WINWIN"] {
         atxt = "Winner meets winner"
 
-    } else if t.Algo == MONRAD {
+    } else if t.Algo == gcore.Mac["MONRAD"] {
         atxt = "Monrad"
     }
 
@@ -1093,7 +1054,7 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        emptyresp(w, NULL)
+        emptyresp(w, gcore.Mac["NULL"])
         return
     }
 
@@ -1176,7 +1137,7 @@ func addpoints(id int, p int, col int, t gcore.Tournament) gcore.Tournament {
             t.P[i].TN.Points += p
             t.P[i].AT.Points += p
 
-            if col == WHITE {
+            if col == gcore.Mac["WHITE"] {
                 t.P[i].TN.Wpoints += p
                 t.P[i].AT.Wpoints += p
             } else {
@@ -1193,11 +1154,11 @@ func declaredraw(gid string, p int, t gcore.Tournament) gcore.Tournament {
 
     for i := 0; i < len(t.G) ; i++ {
         if t.G[i].ID == gid {
-            t = addpoints(t.G[i].W, p, WHITE, t)
-            t = addstat(t.G[i].W, WHITE, DRAW, t)
+            t = addpoints(t.G[i].W, p, gcore.Mac["WHITE"], t)
+            t = addstat(t.G[i].W, gcore.Mac["WHITE"], gcore.Mac["DRAW"], t)
 
-            t = addpoints(t.G[i].B, p, BLACK, t)
-            t = addstat(t.G[i].B, BLACK, DRAW, t)
+            t = addpoints(t.G[i].B, p, gcore.Mac["BLACK"], t)
+            t = addstat(t.G[i].B, gcore.Mac["BLACK"], gcore.Mac["DRAW"], t)
         }
     }
 
@@ -1242,10 +1203,10 @@ func getcol(pid int, t gcore.Tournament) int {
             continue;
 
         } else if pid == g.W {
-            return WHITE
+            return gcore.Mac["WHITE"]
 
         } else if pid == g.B {
-            return BLACK
+            return gcore.Mac["BLACK"]
         }
     }
 
@@ -1255,9 +1216,9 @@ func getcol(pid int, t gcore.Tournament) int {
 // Returns opposite color
 func oppcol(col int) int {
 
-    if col == WHITE { return BLACK }
+    if col == gcore.Mac["WHITE"] { return gcore.Mac["BLACK"] }
 
-    return WHITE
+    return gcore.Mac["WHITE"]
 }
 
 // Adds appropriate statistics to player object
@@ -1268,23 +1229,23 @@ func addstat(pid int, col int, res int, t gcore.Tournament) gcore.Tournament {
     for i := 0; i < len(t.P); i++ {
         if t.P[i].ID != pid { continue }
 
-        if col == WHITE && res == WIN {
-            index = WWIN
+        if col == gcore.Mac["WHITE"] && res == gcore.Mac["WIN"] {
+            index = gcore.Mac["WWIN"]
 
-        } else if col == WHITE && res == DRAW {
-            index = WDRAW
+        } else if col == gcore.Mac["WHITE"] && res == gcore.Mac["DRAW"] {
+            index = gcore.Mac["WDRAW"]
 
-        } else if col == WHITE && res == LOSS {
-            index = WLOSS
+        } else if col == gcore.Mac["WHITE"] && res == gcore.Mac["LOSS"] {
+            index = gcore.Mac["WLOSS"]
 
-        } else if col == BLACK && res == WIN {
-            index = BWIN
+        } else if col == gcore.Mac["BLACK"] && res == gcore.Mac["WIN"] {
+            index = gcore.Mac["BWIN"]
 
-        } else if col == BLACK && res == DRAW {
-            index = BDRAW
+        } else if col == gcore.Mac["BLACK"] && res == gcore.Mac["DRAW"] {
+            index = gcore.Mac["BDRAW"]
 
-        } else if col == BLACK && res == LOSS {
-            index = BLOSS
+        } else if col == gcore.Mac["BLACK"] && res == gcore.Mac["LOSS"] {
+            index = gcore.Mac["BLOSS"]
         }
 
         t.P[i].TN.Stat[index]++
@@ -1347,19 +1308,31 @@ func calcappg(points int, win int, draw int, loss int) float32 {
     return float32(points) / float32(sum)
 }
 
-// Updates APPG values per player object TODO: make pretty
+// Updates APPG values per player object TODO: simplify
 func updateappg(p gcore.Player) gcore.Player {
 
-    p.TN.WAPPG = calcappg(p.TN.Wpoints, p.TN.Stat[WWIN],
-                          p.TN.Stat[WDRAW], p.TN.Stat[WLOSS])
-    p.TN.BAPPG = calcappg(p.TN.Bpoints, p.TN.Stat[BWIN],
-                          p.TN.Stat[BDRAW], p.TN.Stat[BLOSS])
+    p.TN.WAPPG = calcappg(p.TN.Wpoints,
+                          p.TN.Stat[gcore.Mac["WWIN"]],
+                          p.TN.Stat[gcore.Mac["WDRAW"]],
+                          p.TN.Stat[gcore.Mac["WLOSS"]])
+
+    p.TN.BAPPG = calcappg(p.TN.Bpoints,
+                          p.TN.Stat[gcore.Mac["BWIN"]],
+                          p.TN.Stat[gcore.Mac["BDRAW"]],
+                          p.TN.Stat[gcore.Mac["BLOSS"]])
+
     p.TN.APPG = float32(p.TN.Points) / float32(p.TN.Ngames)
 
-    p.AT.WAPPG = calcappg(p.AT.Wpoints, p.AT.Stat[WWIN],
-                          p.AT.Stat[WDRAW], p.AT.Stat[WLOSS])
-    p.AT.BAPPG = calcappg(p.AT.Bpoints, p.AT.Stat[BWIN],
-                          p.AT.Stat[BDRAW], p.AT.Stat[BLOSS])
+    p.AT.WAPPG = calcappg(p.AT.Wpoints,
+                          p.AT.Stat[gcore.Mac["WWIN"]],
+                          p.AT.Stat[gcore.Mac["WDRAW"]],
+                          p.AT.Stat[gcore.Mac["WLOSS"]])
+
+    p.AT.BAPPG = calcappg(p.AT.Bpoints,
+                          p.AT.Stat[gcore.Mac["BWIN"]],
+                          p.AT.Stat[gcore.Mac["BDRAW"]],
+                          p.AT.Stat[gcore.Mac["BLOSS"]])
+
     p.AT.APPG = float32(p.AT.Points) / float32(p.AT.Ngames)
 
     return p
@@ -1393,7 +1366,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        emptyresp(w, TOURNAMENT)
+        emptyresp(w, gcore.Mac["TOURNAMENT"])
         return
     }
 
@@ -1413,8 +1386,8 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     } else {
         wcol := getcol(iid, t)
         t = addpoints(iid, a.Pwin, wcol, t)
-        t = addstat(iid, wcol, WIN, t)
-        t = addstat(gloser(iid, t), oppcol(wcol), LOSS, t)
+        t = addstat(iid, wcol, gcore.Mac["WIN"], t)
+        t = addstat(gloser(iid, t), oppcol(wcol), gcore.Mac["LOSS"], t)
 
         if a.Ploss != 0 { t = addpoints(gloser(iid, t), a.Ploss, oppcol(wcol), t) }
 
@@ -1460,7 +1433,7 @@ func sumslice(s1 []int, s2 []int) []int {
 func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
     if t.ID == 0 {
-        t.Status = S_ERR
+        t.Status = gcore.Mac["S_ERR"]
         fmt.Printf("No tournament running - cannot end\n")
 
     } else {
@@ -1473,7 +1446,7 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
         e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
         gcore.Cherr(e)
-        t.Status = S_OK
+        t.Status = gcore.Mac["S_OK"]
         fmt.Printf("Tournament %d ended at %d-%02d-%02d %02d:%02d\n", t.ID,
                 t.End.Year(), t.End.Month(), t.End.Day(),
                 t.End.Hour(), t.End.Minute())
@@ -1548,7 +1521,7 @@ func mkgamehandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        emptyresp(w, TOURNAMENT)
+        emptyresp(w, gcore.Mac["TOURNAMENT"])
         return
     }
 
@@ -1582,7 +1555,7 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     call := getcall(r)
 
     if !valskey(db, call.Skey) {
-        emptyresp(w, TOURNAMENT)
+        emptyresp(w, gcore.Mac["TOURNAMENT"])
         return
     }
 
@@ -1658,7 +1631,7 @@ func initadmin(db *bolt.DB) {
         a = setdefaultpoints(a)
     }
 
-    writeadmin(a, db)
+    gcore.Wradmin(a, db)
 }
 
 // Creates PID file and launches signal handler
@@ -1682,6 +1655,8 @@ func ginit(db *bolt.DB) {
 }
 
 func main() {
+
+    gcore.Mac = gcore.Setmac()
 
     pptr := flag.Int("p", gcore.DEF_PORT, "port number to listen")
     dbptr := flag.String("d", gcore.DEF_DBNAME, "specify database to open")

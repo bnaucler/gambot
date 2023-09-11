@@ -2,28 +2,7 @@
 let gid = document.getElementById.bind(document);
 let gss = sessionStorage.getItem.bind(sessionStorage);
 
-// Macro definitions for readability
-const S_OK = 0;
-const S_ERR = 1;
-
-const WWIN = 0;
-const WDRAW = 1;
-const WLOSS = 2;
-const BWIN = 3;
-const BDRAW = 4;
-const BLOSS = 5;
-
-const WHITE = 0;
-const BLACK = 1;
-const TOTAL = 2;
-
-const WIN = 0;
-const DRAW = 1;
-const LOSS = 2;
-
-const RANDOM = 0
-const WINWIN = 1
-const MONRAD = 2
+let mac;
 
 // HTTP request wrapper
 async function gofetch(ep, params, rfunc) {
@@ -397,17 +376,17 @@ function fillbar(col, win, draw, loss) {
     let wbar, dbar, lbar;
     let wwidth, dwidth, lwidth;
 
-    if(col == TOTAL) {
+    if(col == mac.TOTAL) {
         wbar = gid("indtwin");
         dbar = gid("indtdraw");
         lbar = gid("indtloss");
 
-    } else if(col == WHITE) {
+    } else if(col == mac.WHITE) {
         wbar = gid("indwwin");
         dbar = gid("indwdraw");
         lbar = gid("indwloss");
 
-    } else if(col == BLACK) {
+    } else if(col == mac.BLACK) {
         wbar = gid("indbwin");
         dbar = gid("indbdraw");
         lbar = gid("indbloss");
@@ -506,11 +485,11 @@ function showplayerdata(obj) {
         openplayeredit(obj[0].ID);
     });
 
-    fillbar(TOTAL, statobj.Stat[WWIN] + statobj.Stat[BWIN],
-                   statobj.Stat[WDRAW] + statobj.Stat[BDRAW],
-                   statobj.Stat[WLOSS] + statobj.Stat[BLOSS]);
-    fillbar(WHITE, statobj.Stat[WWIN], statobj.Stat[WDRAW], statobj.Stat[WLOSS]);
-    fillbar(BLACK, statobj.Stat[BWIN], statobj.Stat[BDRAW], statobj.Stat[BLOSS]);
+    fillbar(mac.TOTAL, statobj.Stat[mac.WWIN] + statobj.Stat[mac.BWIN],
+                   statobj.Stat[mac.WDRAW] + statobj.Stat[mac.BDRAW],
+                   statobj.Stat[mac.WLOSS] + statobj.Stat[mac.BLOSS]);
+    fillbar(mac.WHITE, statobj.Stat[mac.WWIN], statobj.Stat[mac.WDRAW], statobj.Stat[mac.WLOSS]);
+    fillbar(mac.BLACK, statobj.Stat[mac.BWIN], statobj.Stat[mac.BDRAW], statobj.Stat[mac.BLOSS]);
     showpopup("indplayer");
 }
 
@@ -565,7 +544,7 @@ function showplayers(obj) {
     pdiv.appendChild(br);
 
     for(const p of obj) {
-        if(p.Status == S_OK) showplayer(p, pdiv, intourn);
+        if(p.Status == mac.S_OK) showplayer(p, pdiv, intourn);
         else console.log("Error displaying player"); // TMP
     }
 
@@ -606,7 +585,7 @@ function tournamentstart(obj) {
     let date = obj.Start.slice(0, 10);
     let time = obj.Start.slice(11, 16);
 
-    if(obj.Status === S_ERR) log("Could not start new tournament");
+    if(obj.Status === mac.S_ERR) log("Could not start new tournament");
     else {
         log("Tournament " + obj.ID + " started at " + date + " "+ time);
 
@@ -623,13 +602,14 @@ function tournamentend(obj) {
     let date = obj.End.slice(0, 10);
     let time = obj.End.slice(11, 16);
 
-    if(obj.Status === S_ERR) log("No tournament running - cannot end!");
+    if(obj.Status === mac.S_ERR) log("No tournament running - cannot end!");
     else log("Tournament " + obj.ID + " ended at " + date + " "+ time);
 
     tournamentended();
     updatestatus(obj);
 }
 
+// Makes call to start tournament with selected algo
 function launchtournament(algo) {
 
     let params = "algo=" + algo + "&skey=" + gss("gambotkey");
@@ -651,17 +631,17 @@ function newtournament() {
     mkminipop(bpop);
 
     rndbtn.addEventListener("click", () => {
-        launchtournament(RANDOM);
+        launchtournament(mac.RANDOM);
         bpop.remove();
     });
 
     winwinbtn.addEventListener("click", () => {
-        launchtournament(WINWIN);
+        launchtournament(mac.WINWIN);
         bpop.remove();
     });
 
     monradbtn.addEventListener("click", () => {
-        launchtournament(MONRAD);
+        launchtournament(mac.MONRAD);
         bpop.remove();
     });
 
@@ -697,7 +677,7 @@ function veraddplayer(p) {
     let msg;
     console.log(p);
 
-    if(p[0].Status == S_OK) msg = p[0].Pi.Name + " added successfully";
+    if(p[0].Status == mac.S_OK) msg = p[0].Pi.Name + " added successfully";
     else msg = "Could not add player";
 
     log(msg);
@@ -895,7 +875,7 @@ function getthist(elem) {
 // Verifies server response after adjustment of admin settings
 function verchangeadmin(obj) {
 
-    if(obj.Status == S_ERR) {
+    if(obj.Status == mac.S_ERR) {
         logout();
 
     } else {
@@ -1129,13 +1109,29 @@ function checklogin() {
     chkskey();
 }
 
+// Loads default values from file
+function loaddefaults(obj) {
+
+    mac = obj;
+    console.log(obj);
+}
+
+// Retrieves macro definitions
+async function getdefaults() {
+
+    let resp = await fetch("../mac.json");
+    if(resp.ok) loaddefaults(await resp.json());
+}
+
 // Request necessary data after window refresh
 window.onbeforeunload = function() {
+    getdefaults();
     checklogin();
 };
 
 // Request necessary data after load
 window.onload = function() {
+    getdefaults();
     checklogin();
     sessionStorage.gambottopplayers = 5;
 }

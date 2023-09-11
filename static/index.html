@@ -66,7 +66,7 @@
     <div id="playermgmt" class="popup">
         <form id="getplayers" onsubmit="getplayers(this); return false;" method="post">
             <input id="pidtxt" type="text" name="ID" Placeholder="User ID"></input><br>
-            <input id="pntxt" type="text" name="name" Placeholder="Name contains"></input><br>
+            <input id="pntxt" type="text" name="name" autocomplete="off" Placeholder="Name contains"></input><br>
             <div class="tblabel">Show deactivated
                 <input id="showdeac" type="checkbox"></input><br>
             </div>
@@ -90,10 +90,10 @@
                 <option value="other">Other</option>
                 <option value="nosay">Prefer not to say</option>
             </select>
-            <input type="text" name="email" Placeholder="E-mail address"></input><br>
+            <input type="text" name="email" autocomplete="off" Placeholder="E-mail address"></input><br>
             <input type="text" name="postal" Placeholder="Postal address"></input><br>
             <input type="text" name="zip" Placeholder="Zip/postal code"></input><br>
-            <input type="text" name="phone" Placeholder="Phone number"></input><br>
+            <input type="text" name="phone" autocomplete="off" Placeholder="Phone number"></input><br>
             <input type="text" name="club" Placeholder="Club"></input><br>
             <input id="apsubmit" type="submit">
         </form>

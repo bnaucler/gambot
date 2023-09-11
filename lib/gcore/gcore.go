@@ -1,11 +1,13 @@
 package gcore
 
 import (
+    "os"
     "fmt"
     "log"
     "time"
     "strconv"
     "net/http"
+    "io/ioutil"
     "encoding/json"
 
     bolt "go.etcd.io/bbolt"
@@ -16,16 +18,13 @@ var Pbuc = []byte("pbuc")           // player bucket
 var Gbuc = []byte("gbuc")           // game bucket
 var Tbuc = []byte("tbuc")           // tournament bucket
 
-const DEF_PWIN = 2                  // Default point value for win
-const DEF_PDRAW = 1                 // Default point value for draw
-const DEF_PLOSS = 0                 // Default point value for loss
 const DEF_DBNAME = ".gambot.db"     // Default database filename
 const DEF_PORT = 9001               // Default server port
+const MAC_FILE = "static/mac.json"  // Macro definition file
 
 const NMAXLEN = 30                  // Player name max length
 
-const A_ID = 0                      // Administrator ID
-const CTINDEX = 0                   // Database key for current tournament
+var Mac map[string]int              // Global macro object
 
 // Handler function definition
 type Hfn func(http.ResponseWriter, *http.Request, *bolt.DB)
@@ -130,6 +129,23 @@ func Cherr(e error) {
     if e != nil { log.Fatal(e) }
 }
 
+// Loads defaults from config file
+func Setmac() map[string]int {
+
+    var ret map[string]int
+
+    f, e := os.Open(MAC_FILE)
+    Cherr(e)
+    defer f.Close()
+
+    b, e := ioutil.ReadAll(f)
+    Cherr(e)
+
+    json.Unmarshal(b, &ret)
+
+    return ret
+}
+
 // Write byte slice to DB
 func Wrdb(db *bolt.DB, k int, v []byte, cbuc []byte) (e error) {
 
@@ -163,11 +179,21 @@ func Getadmin(db *bolt.DB) (Admin, error) {
 
     a := Admin{}
 
-    ab, e := Rdb(db, A_ID, Abuc)
+    ab, e := Rdb(db, Mac["A_ID"], Abuc)
 
     json.Unmarshal(ab, &a)
 
     return a, e
+}
+
+// Stores admin object to database
+func Wradmin(a Admin, db *bolt.DB) {
+
+    buf, e := json.Marshal(a)
+    Cherr(e)
+
+    e = Wrdb(db, Mac["A_ID"], buf, Abuc)
+    Cherr(e)
 }
 
 // Returns slice containing all player objects in db

@@ -1,0 +1,36 @@
+{
+    "S_OK": 0,
+    "S_ERR": 1,
+
+    "WHITE": 0,
+    "BLACK": 1,
+    "TOTAL": 2,
+
+    "WIN": 0,
+    "DRAW": 1,
+    "LOSS": 2,
+
+    "WWIN": 0,
+    "WDRAW": 1,
+    "WLOSS": 2,
+    "BWIN": 3,
+    "BDRAW": 4,
+    "BLOSS": 5,
+
+    "ADMIN": 0,
+    "TOURNAMENT": 1,
+    "GAME": 2,
+    "PLAYER": 3,
+    "NULL": 4,
+
+    "RANDOM": 0,
+    "WINWIN": 1,
+    "MONRAD": 2,
+
+    "PWIN": 2,
+    "PDRAW": 1,
+    "PLOSS": 0,
+
+    "A_ID": 0,
+    "CTINDEX": 0
+}
