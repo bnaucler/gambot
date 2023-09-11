@@ -41,8 +41,8 @@ function getplayername(id, t) {
 // Requests processing of won game
 function declareresult(gid, pid, wname) {
 
-    if(pid === 0) log("Game " + gid + " is a draw.");
-    else log("Game " + gid + " won by " + wname);
+    if(pid === 0) statuspopup("Game " + gid + " is a draw.");
+    else statuspopup("Game " + gid + " won by " + wname);
 
     let params = "id=" + pid + "&game=" + gid + "&skey=" + gss("gambotkey");
 
@@ -336,7 +336,7 @@ function updatethist(ts) {
     gid("thist").innerHTML = "";
 
     if(ts.length === 0) {
-        log("No data received!");
+        statuspopup("No data received!");
         return;
     }
 
@@ -567,13 +567,11 @@ function timezero(ttime) {
 }
 
 // Creates an entry in the local log
-function log(data, pop) {
+function log(data) {
 
     let pdiv = gid("logwin");
     let item = mkobj("div", "log");
     let msg = mkobj("p", "", data);
-
-    if(pop) statuspopup(data);
 
     item.appendChild(msg);
     pdiv.appendChild(item);
@@ -585,9 +583,9 @@ function tournamentstart(obj) {
     let date = obj.Start.slice(0, 10);
     let time = obj.Start.slice(11, 16);
 
-    if(obj.Status === mac.S_ERR) log("Could not start new tournament");
+    if(obj.Status === mac.S_ERR) statuspopup("Could not start new tournament");
     else {
-        log("Tournament " + obj.ID + " started at " + date + " "+ time);
+        statuspopup("Tournament " + obj.ID + " started at " + date + " "+ time);
 
         if(obj.P === undefined) gid("games").innerHTML = "";
         else updatewindow(obj);
@@ -602,8 +600,8 @@ function tournamentend(obj) {
     let date = obj.End.slice(0, 10);
     let time = obj.End.slice(11, 16);
 
-    if(obj.Status === mac.S_ERR) log("No tournament running - cannot end!");
-    else log("Tournament " + obj.ID + " ended at " + date + " "+ time);
+    if(obj.Status === mac.S_ERR) statuspopup("No tournament running - cannot end!");
+    else statuspopup("Tournament " + obj.ID + " ended at " + date + " "+ time);
 
     tournamentended();
     updatestatus(obj);
@@ -679,7 +677,7 @@ function veraddplayer(p) {
     if(p[0].Status == mac.S_OK) msg = p[0].Pi.Name + " added successfully";
     else msg = "Could not add player";
 
-    log(msg);
+    statuspopup(msg);
 }
 
 // Requests adding new player to database
@@ -878,7 +876,7 @@ function verchangeadmin(obj) {
         logout();
 
     } else {
-        log("Admin settings successfully updated")
+        statuspopup("Admin settings successfully updated")
     }
 }
 
@@ -1077,9 +1075,10 @@ function chkskey() {
 function verplayeredit(obj) {
 
     if(obj.ID != undefined) {
-        log("Successfully updated player data");
+        statuspopup("Successfully updated player data");
+
     } else {
-        log("Error updating player data");
+        statuspopup("Error updating player data");
     }
 }
 
@@ -1111,7 +1110,7 @@ function checklogin() {
 // Displays log
 function verlog(llist) {
 
-    for(const l of llist) log(l, false);
+    for(const l of llist) log(l);
 }
 
 // Retrieves log from server
