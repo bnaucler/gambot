@@ -8,6 +8,8 @@ import (
     "sort"
     "flag"
     "time"
+    "bufio"
+    "slices"
     "regexp"
     "strings"
     "strconv"
@@ -1582,6 +1584,48 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(t)
 }
 
+// Returns log file object
+func openlogfile() *os.File {
+
+    prgname := filepath.Base(os.Args[0])
+    lfn := fmt.Sprintf("%s%s.log", gcore.DATAPATH, prgname)
+    f, e := os.OpenFile(lfn, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+    gcore.Cherr(e)
+
+    return f
+}
+
+// HTTP handler - server log
+func loghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    call := getcall(r)
+    var ret []string
+
+    i, e := strconv.Atoi(call.I)
+    if e != nil { i = 0 }
+
+    n, e := strconv.Atoi(call.N)
+    if e != nil { n = 0 }
+
+    f := openlogfile()
+    defer f.Close()
+
+    // TODO read file backwards instead
+    scanner := bufio.NewScanner(f)
+    for scanner.Scan() {
+        ret = append(ret, scanner.Text())
+    }
+
+    slices.Reverse(ret)
+    slen := len(ret)
+
+    if i > slen { i = slen - 1 }
+    if i + n > slen { n = slen }
+
+    enc := json.NewEncoder(w)
+    enc.Encode(ret[i:n])
+}
+
 // Launches mapped handler functions
 func starthlr(url string, fn gcore.Hfn, db *bolt.DB) {
 
@@ -1643,12 +1687,13 @@ func initlog(prgname string) {
     f, e := os.OpenFile(lfn, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 
     if e != nil {
-        log.Println("Cannot open/create log file - setting log to stdout only")
         log.SetOutput(os.Stdout)
+        log.Println("Cannot open/create log file - logging to stdout only")
 
     } else {
         wrt := io.MultiWriter(os.Stdout, f)
         log.SetOutput(wrt)
+        log.Printf("Starting logging to stdout and %s\n", lfn)
     }
 }
 
@@ -1713,6 +1758,7 @@ func main() {
         "/ts":              tshandler,      // Get tournament status
         "/th":              thhandler,      // Get tournament history
         "/dr":              drhandler,      // Declare game result
+        "/log":             loghandler,     // Server log
     }
 
     for url, fn := range hlrs { starthlr(url, fn, db) }
