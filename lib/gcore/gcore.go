@@ -124,9 +124,9 @@ type Game struct {
     Status int
 }
 
-// Check error and panic
+// Check and log errors
 func Cherr(e error) {
-    if e != nil { log.Fatal(e) }
+    if e != nil { log.Println(e) }
 }
 
 // Loads defaults from config file

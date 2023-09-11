@@ -3,6 +3,7 @@ package main
 import (
     "os"
     "fmt"
+    "log"
     "sort"
     "flag"
     "time"
@@ -162,7 +163,7 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         a.Pass = []byte("")
 
     } else if len(a.Pass) > 1 && !validateuser(a, call.Pass) {
-        fmt.Printf("Illegal admin registration attempt\n")
+        log.Printf("Illegal admin registration attempt\n")
         a = gcore.Admin{}
     }
 
@@ -179,13 +180,13 @@ func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     if e != nil { a = gcore.Admin{} }
 
     if validateuser(a, call.Pass) {
-        fmt.Printf("Admin login successful\n")
+        log.Printf("Admin login successful\n")
         a.Skey = randstr(30)
         gcore.Wradmin(a, db)
         a.Pass = []byte("")
 
     } else {
-        fmt.Printf("Admin login failed\n")
+        log.Printf("Admin login failed\n")
         a = gcore.Admin{}
     }
 
@@ -354,10 +355,10 @@ func togglepause(p gcore.Player) gcore.Player {
     p.Pause = !p.Pause
 
     if p.Pause {
-        fmt.Printf("Unpausing player %s\n", p.Pi.Name)
+        log.Printf("Unpausing player %s\n", p.Pi.Name)
 
     } else {
-        fmt.Printf("Pausing player %s\n", p.Pi.Name)
+        log.Printf("Pausing player %s\n", p.Pi.Name)
     }
 
     return p
@@ -406,11 +407,11 @@ func ephandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     if call.Action == "deac" {
         cplayer.Active = false
-        fmt.Printf("Deactivating player %d: %s\n", cplayer.ID, cplayer.Pi.Name)
+        log.Printf("Deactivating player %d: %s\n", cplayer.ID, cplayer.Pi.Name)
 
     } else if call.Action == "activate" {
         cplayer.Active = true
-        fmt.Printf("Activating player %d: %s\n", cplayer.ID, cplayer.Pi.Name)
+        log.Printf("Activating player %d: %s\n", cplayer.ID, cplayer.Pi.Name)
 
     } else if call.Action == "pause" {
         t, e := getct(db)
@@ -812,7 +813,7 @@ func gamefromslice(pids []int, t gcore.Tournament) gcore.Tournament {
 // Creates matchups within tournament (winner meets winner algo)
 func seedwinwin(t gcore.Tournament) gcore.Tournament {
 
-    fmt.Printf("W/W tournament %d, round %d\n", t.ID, t.Round)
+    log.Printf("W/W tournament %d, round %d\n", t.ID, t.Round)
 
     if t.Round == 1 {
         t = seedrandom(t)
@@ -877,12 +878,12 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         t.Status = gcore.Mac["S_ERR"]
         enc := json.NewEncoder(w)
         enc.Encode(t)
-        fmt.Printf("Tournament already ongoing!\n")
+        log.Printf("Tournament already ongoing!\n")
         return
 
     } else if !valskey(db, call.Skey) {
         emptyresp(w, gcore.Mac["TOURNAMENT"])
-        fmt.Printf("Admin verification failed\n")
+        log.Printf("Admin verification failed\n")
         return
     };
 
@@ -918,7 +919,7 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return e
     })
 
-    fmt.Printf("%s tournament (ID: %d) started at %d-%02d-%02d %02d:%02d\n",
+    log.Printf("%s tournament (ID: %d) started at %d-%02d-%02d %02d:%02d\n",
                 atxt, t.ID, t.Start.Year(), t.Start.Month(), t.Start.Day(),
                 t.Start.Hour(), t.Start.Minute())
 
@@ -984,7 +985,7 @@ func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         for _, elem := range qstr {
             clean := regexnum.ReplaceAllString(elem, "")
             if clean == "" {
-                fmt.Printf("No players to add\n")
+                log.Printf("No players to add\n")
                 break
             }
             ie, e := strconv.Atoi(clean)
@@ -1381,7 +1382,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     if iid == 0 {
         t = declaredraw(call.Game, a.Pdraw, t)
-        fmt.Printf("Game %s is a draw!\n", call.Game)
+        log.Printf("Game %s is a draw!\n", call.Game)
 
     } else {
         wcol := getcol(iid, t)
@@ -1391,7 +1392,7 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
         if a.Ploss != 0 { t = addpoints(gloser(iid, t), a.Ploss, oppcol(wcol), t) }
 
-        fmt.Printf("Game %s won by %s\n", call.Game, getplayername(db, iid))
+        log.Printf("Game %s won by %s\n", call.Game, getplayername(db, iid))
     }
 
     t = endgame(call.Game, iid, t)
@@ -1434,7 +1435,7 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
 
     if t.ID == 0 {
         t.Status = gcore.Mac["S_ERR"]
-        fmt.Printf("No tournament running - cannot end\n")
+        log.Printf("No tournament running - cannot end\n")
 
     } else {
         t.End = time.Now()
@@ -1447,7 +1448,7 @@ func endtournament(db *bolt.DB, t gcore.Tournament) gcore.Tournament {
         e = gcore.Wrdb(db, t.ID, []byte(wt), gcore.Tbuc)
         gcore.Cherr(e)
         t.Status = gcore.Mac["S_OK"]
-        fmt.Printf("Tournament %d ended at %d-%02d-%02d %02d:%02d\n", t.ID,
+        log.Printf("Tournament %d ended at %d-%02d-%02d %02d:%02d\n", t.ID,
                 t.End.Year(), t.End.Month(), t.End.Day(),
                 t.End.Hour(), t.End.Minute())
     }
@@ -1462,7 +1463,7 @@ func cancelgamebyuid(db *bolt.DB, uid int, t gcore.Tournament) gcore.Tournament 
         if !t.G[i].End.IsZero() { continue }
         if t.G[i].W == uid || t.G[i].B == uid {
             t.G[i].End = time.Now(); // Ngames is not incremented
-            fmt.Printf("Cancelling game %s\n", t.G[i].ID)
+            log.Printf("Cancelling game %s\n", t.G[i].ID)
         }
     }
 
@@ -1486,7 +1487,7 @@ func rtplayer(db *bolt.DB, pid int, t gcore.Tournament) gcore.Tournament {
 
     t.P = npl
     pn := getplayername(db, pid)
-    fmt.Printf("Removing %s (id: %d) from tournament %d\n", pn, pid, t.ID)
+    log.Printf("Removing %s (id: %d) from tournament %d\n", pn, pid, t.ID)
 
     return t
 }
@@ -1605,7 +1606,7 @@ func sighandler(pidfile string) {
     signal.Notify(sigc, os.Interrupt)
     go func(){
         for sig := range sigc {
-            fmt.Printf("Caught %+v - cleaning up.\n", sig)
+            log.Printf("Caught %+v - cleaning up.\n", sig)
             shutdown(pidfile)
         }
     }()
@@ -1657,6 +1658,9 @@ func ginit(db *bolt.DB) {
 func main() {
 
     gcore.Mac = gcore.Setmac()
+
+    dlog := log.Default()
+    dlog.SetOutput(os.Stdout)
 
     pptr := flag.Int("p", gcore.DEF_PORT, "port number to listen")
     dbptr := flag.String("d", gcore.DEF_DBNAME, "specify database to open")
