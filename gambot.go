@@ -5,6 +5,7 @@ import (
     "os"
     "fmt"
     "log"
+    "net"
     "sort"
     "flag"
     "time"
@@ -174,6 +175,15 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(a)
 }
 
+// Returns origin IP address from HTTP request
+func getreqip(r *http.Request) net.IP {
+
+    ip, _, e := net.SplitHostPort(r.RemoteAddr)
+    gcore.Cherr(e)
+
+    return net.ParseIP(ip)
+}
+
 // HTTP handler - admin login
 func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
@@ -183,13 +193,13 @@ func loginhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     if e != nil { a = gcore.Admin{} }
 
     if validateuser(a, call.Pass) {
-        log.Printf("Admin login successful\n")
+        log.Printf("Admin login successful (origin: %+v)\n", getreqip(r))
         a.Skey = randstr(30)
         gcore.Wradmin(a, db)
         a.Pass = []byte("")
 
     } else {
-        log.Printf("Admin login failed\n")
+        log.Printf("Admin login failed (origin: %+v)\n", getreqip(r))
         a = gcore.Admin{}
     }
 
