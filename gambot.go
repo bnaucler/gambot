@@ -1599,6 +1599,12 @@ func openlogfile() *os.File {
 func loghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     call := getcall(r)
+
+    if !valskey(db, call.Skey) {
+        emptyresp(w, gcore.Mac["NULL"])
+        return
+    }
+
     var ret []string
 
     i, e := strconv.Atoi(call.I)

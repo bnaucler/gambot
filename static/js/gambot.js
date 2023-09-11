@@ -1120,7 +1120,9 @@ function getlog(i, n) {
     if(i === undefined) i = 0;
     if(n === undefined) n = 10;
 
-    gofetch("/log", "i=" + i + "&n=" + n, verlog);
+    let params = "i=" + i + "&n=" + n + "&skey=" + gss("gambotkey");
+
+    gofetch("/log", params, verlog);
     showpopup("log");
 }
 

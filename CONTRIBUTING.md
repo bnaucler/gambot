@@ -16,7 +16,6 @@ Contributions are very welcome! At this early stage, this file will double as a 
 As you can see below, there is a VERY long list of things which need to be addressed. There should be ample opportunity to get involved. *But most importantly* - if you decide to give gambot a try at your club, let us know what kind of real-world issues you run into.
 
 ### TODO: core functionality
-* Skey verification on loghandler()
 * Clean up (remove) old frontend local log entries
 * Better (and consistent) backend error handling
 * Better player data validation
