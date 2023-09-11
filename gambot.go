@@ -1,6 +1,7 @@
 package main
 
 import (
+    "io"
     "os"
     "fmt"
     "log"
@@ -1635,15 +1636,33 @@ func initadmin(db *bolt.DB) {
     gcore.Wradmin(a, db)
 }
 
+// Opens logfile and starts logging
+func initlog(prgname string) {
+
+    lfn := fmt.Sprintf("%s%s.log", gcore.DATAPATH, prgname)
+    f, e := os.OpenFile(lfn, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+
+    if e != nil {
+        log.Println("Cannot open/create log file - setting log to stdout only")
+        log.SetOutput(os.Stdout)
+
+    } else {
+        wrt := io.MultiWriter(os.Stdout, f)
+        log.SetOutput(wrt)
+    }
+}
+
 // Creates PID file and launches signal handler
 func ginit(db *bolt.DB) {
 
     prgname := filepath.Base(os.Args[0])
     pid := os.Getpid()
 
-    pidfile := fmt.Sprintf("%s.pid", prgname)
+    pidfile := fmt.Sprintf("%s%s.pid", gcore.DATAPATH, prgname)
     e := ioutil.WriteFile(pidfile, []byte(strconv.Itoa(pid)), 0644)
     gcore.Cherr(e)
+
+    initlog(prgname)
 
     mkbucket(db, gcore.Abuc)
     mkbucket(db, gcore.Pbuc)
@@ -1658,9 +1677,6 @@ func ginit(db *bolt.DB) {
 func main() {
 
     gcore.Mac = gcore.Setmac()
-
-    dlog := log.Default()
-    dlog.SetOutput(os.Stdout)
 
     pptr := flag.Int("p", gcore.DEF_PORT, "port number to listen")
     dbptr := flag.String("d", gcore.DEF_DBNAME, "specify database to open")

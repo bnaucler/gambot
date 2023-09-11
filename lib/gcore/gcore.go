@@ -21,6 +21,7 @@ var Tbuc = []byte("tbuc")           // tournament bucket
 const DEF_DBNAME = ".gambot.db"     // Default database filename
 const DEF_PORT = 9001               // Default server port
 const MAC_FILE = "static/mac.json"  // Macro definition file
+const DATAPATH = "data/"
 
 const NMAXLEN = 30                  // Player name max length
 
