@@ -34,6 +34,10 @@ Usage of bin/dbdump:
   -t	dump tournament data
 ```
 
+## Tool - clean.sh
+Removes pidfile, all logs and databases from the `data/` directory.  
+Invoke with `-force` for a more aggressive approach. (Use with caution.)
+
 ## Contributing
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for best practices and information on how to get involved in the project.  
 Pull requests welcome!
