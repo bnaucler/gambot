@@ -12,12 +12,14 @@ import (
     bolt "go.etcd.io/bbolt"
 )
 
+const INDENT "    "                 // Indent with 4 spaces to make human-readable
+
 func dumpadmin(db *bolt.DB, j bool) {
     a, e := gcore.Getadmin(db)
     gcore.Cherr(e)
 
     if j {
-        wa, e := json.Marshal(a)
+        wa, e := json.MarshalIndent(a, "", INDENT)
         gcore.Cherr(e)
         fmt.Printf("%s\n", wa)
 
@@ -30,7 +32,7 @@ func dumpplayers(db *bolt.DB, j bool) {
     p := gcore.Getallplayers(db)
 
     if j {
-        wp, e := json.Marshal(p)
+        wp, e := json.MarshalIndent(p, "", INDENT)
         gcore.Cherr(e)
         fmt.Printf("%s\n", wp)
 
@@ -43,7 +45,7 @@ func dumptournaments(db *bolt.DB, j bool) {
     t := gcore.Getalltournaments(db)
 
     if j {
-        wt, e := json.Marshal(t)
+        wt, e := json.MarshalIndent(t, "", INDENT)
         gcore.Cherr(e)
         fmt.Printf("%s\n", wt)
 
