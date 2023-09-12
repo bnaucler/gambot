@@ -677,6 +677,7 @@ function veraddplayer(p) {
     else msg = "Could not add player";
 
     statuspopup(msg);
+    gettournamentstatus();
 }
 
 // Requests adding new player to database
