@@ -35,9 +35,9 @@ As you can see below, there is a VERY long list of things which need to be addre
 ### TODO: structure
 * Refactor (go & js) and divide in multiple source files
 * valskey() wrapper for sending empty responses
-* Refactor cthandler()
 * Merge ephandler() and aphandler()
 * Reorganize CSS and comment for readability
+* Move basic db functionality to gcore
 
 ### TODO: new functionality
 * Shutdown sequence

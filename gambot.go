@@ -879,6 +879,56 @@ func valskey(db *bolt.DB, skey string) bool {
     return false
 }
 
+// Stores tournament in db with new sequence number
+func tournamentnextseq(db *bolt.DB, t gcore.Tournament) (gcore.Tournament, error) {
+
+    e := db.Update(func(tx *bolt.Tx) error {
+        b, _ := tx.CreateBucketIfNotExists(gcore.Tbuc)
+
+        id, _ := b.NextSequence()
+        t.ID = int(id)
+        key := []byte(strconv.Itoa(t.ID))
+
+        buf, e := json.Marshal(t)
+        b.Put(key, buf)
+
+        return e
+    })
+
+    return t, e
+}
+
+// Creates and returns a new tournament object
+func newtournament(db *bolt.DB, call gcore.Apicall) gcore.Tournament {
+
+    t := gcore.Tournament{}
+
+    t.Start = time.Now()
+    t.Status = gcore.Mac["S_OK"]
+    t.Round = 1
+    algo, e := strconv.Atoi(call.Algo)
+    gcore.Cherr(e)
+    t.Algo = algo
+
+    var atxt string
+
+    if t.Algo == gcore.Mac["RANDOM"] {
+        atxt = "Random pair"
+
+    } else if t.Algo == gcore.Mac["WINWIN"] {
+        atxt = "Winner meets winner"
+
+    } else if t.Algo == gcore.Mac["MONRAD"] {
+        atxt = "Monrad"
+    }
+
+    t, e = tournamentnextseq(db, t)
+    gcore.Cherr(e)
+
+    log.Printf("%s tournament (ID: %d) started\n", atxt, t.ID)
+    return t
+}
+
 // HTTP handler - create new tournament
 func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
@@ -900,39 +950,7 @@ func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         return
     };
 
-    t = gcore.Tournament{}
-    t.Start = time.Now()
-    t.Status = gcore.Mac["S_OK"]
-    t.Round = 1
-    t.Algo, e = strconv.Atoi(call.Algo)
-    gcore.Cherr(e)
-
-    var atxt string
-
-    if t.Algo == gcore.Mac["RANDOM"] {
-        atxt = "Random pair"
-
-    } else if t.Algo == gcore.Mac["WINWIN"] {
-        atxt = "Winner meets winner"
-
-    } else if t.Algo == gcore.Mac["MONRAD"] {
-        atxt = "Monrad"
-    }
-
-    db.Update(func(tx *bolt.Tx) error {
-        b, _ := tx.CreateBucketIfNotExists(gcore.Tbuc)
-
-        id, _ := b.NextSequence()
-        t.ID = int(id)
-        key := []byte(strconv.Itoa(t.ID))
-
-        buf, e := json.Marshal(t)
-        b.Put(key, buf)
-
-        return e
-    })
-
-    log.Printf("%s tournament (ID: %d) started\n", atxt, t.ID)
+    t = newtournament(db, call)
 
     enc := json.NewEncoder(w)
     enc.Encode(t)
