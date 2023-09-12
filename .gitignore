@@ -1,6 +1,6 @@
 bin/*
 data/*
-!bin/build.sh
+!bin/*.sh
 !data/.gitkeep
 .gambot.db
 *.swp
