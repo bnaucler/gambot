@@ -18,7 +18,7 @@ var Pbuc = []byte("pbuc")           // player bucket
 var Gbuc = []byte("gbuc")           // game bucket
 var Tbuc = []byte("tbuc")           // tournament bucket
 
-const DEF_DBNAME = ".gambot.db"     // Default database filename
+const DEF_DBNAME = "data/gambot.db" // Default database filename
 const DEF_PORT = 9001               // Default server port
 const MAC_FILE = "static/mac.json"  // Macro definition file
 const DATAPATH = "data/"
