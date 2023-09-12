@@ -25,7 +25,6 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Mobile friendly / responsive UI
 * Better looking popups
 * Better looking minipops
-* Better looking log window
 * Better looking player data window
 * Showing multiple status popups on screen simultaneously
 * Same button for starting and ending tournament
@@ -36,6 +35,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Refactor (go & js) and divide in multiple source files
 * valskey() wrapper for sending empty responses
 * Merge ephandler() and aphandler()
+* Merge cthandler() and ethandler()
 * Reorganize CSS and comment for readability
 * Move basic db functionality to gcore
 

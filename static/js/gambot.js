@@ -569,11 +569,9 @@ function timezero(ttime) {
 // Creates an entry in the local log
 function log(data) {
 
-    let pdiv = gid("logwin");
-    let item = mkobj("div", "log");
-    let msg = mkobj("p", "", data);
+    let pdiv = gid("logdata");
+    let item = mkobj("div", "log", data);
 
-    item.appendChild(msg);
     pdiv.appendChild(item);
 }
 
@@ -674,7 +672,7 @@ function veraddplayer(p) {
 
     let msg;
 
-    if(p[0].Status == mac.S_OK) msg = p[0].Pi.Name + " added successfully";
+    if(p[0].Status == mac.S_OK) msg = p[0].Pi.Name + " added/edited successfully";
     else msg = "Could not add player";
 
     statuspopup(msg);
@@ -1110,6 +1108,7 @@ function checklogin() {
 // Displays log
 function verlog(llist) {
 
+    gid("logdata").innerHTML = "";
     for(const l of llist) log(l);
 }
 

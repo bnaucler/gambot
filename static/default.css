@@ -261,12 +261,14 @@ input[type=checkbox] {
 }
 
 .log {
-    background-color: #333;
     display: block;
-    font-size: 12px;
-    padding: 6px;
     color: #999;
-    margin: 5px;
+    padding: 6px;
+}
+
+#logdata {
+    background-color: #333;
+    font-size: 16px;
     border-radius: 4px;
 }
 
