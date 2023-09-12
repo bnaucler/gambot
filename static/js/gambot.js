@@ -423,6 +423,8 @@ function setapbutton(func) {
 // Populates the player edit window
 function popplayereditwin(obj) {
 
+    showpopup("addplayer"); // Needs to run before setting pd
+
     let form = gid("addplayerform");
     let pd = obj[0].Pi;
 
@@ -438,7 +440,6 @@ function popplayereditwin(obj) {
     form.club.value = pd.Club;
 
     setapbutton("edit");
-    showpopup("addplayer");
 }
 
 // Requests to open and populate the edit player data form
@@ -984,6 +985,7 @@ function showpopup(popup) {
             break;
 
         case "addplayer":
+            gid("addplayerform").reset();
             setdisp(elems, ["addplayer"]);
             break;
 
