@@ -1649,8 +1649,9 @@ func loghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     slices.Reverse(ret)
     slen := len(ret)
 
+    n += i
     if i > slen { i = slen - 1 }
-    if i + n > slen { n = slen }
+    if n > slen { n = slen }
 
     enc := json.NewEncoder(w)
     enc.Encode(ret[i:n])

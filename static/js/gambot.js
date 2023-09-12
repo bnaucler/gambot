@@ -1110,12 +1110,35 @@ function verlog(llist) {
 
     gid("logdata").innerHTML = "";
     for(const l of llist) log(l);
+    storelogindex(10);
+}
+
+// Returns current log number
+function getlogindex() {
+
+    return Number(gss("gambotlogindex"));
+}
+
+// Stores log index in session storage
+function storelogindex(n) {
+
+    let cur = getlogindex();
+
+    cur += n;
+
+    if(Number.isInteger(cur)) sessionStorage.gambotlogindex = cur;
 }
 
 // Retrieves log from server
 function getlog(i, n) {
 
-    if(i === undefined) i = 0;
+    let li = getlogindex();
+
+    if(i === undefined && li === "") i = 0;
+    else if(i === undefined) i = li;
+
+    if(i == 0) sessionStorage.gambotlogindex = 0;
+
     if(n === undefined) n = 10;
 
     let params = "i=" + i + "&n=" + n + "&skey=" + gss("gambotkey");
@@ -1142,4 +1165,5 @@ window.onload = function() {
     getdefaults();
     checklogin();
     sessionStorage.gambottopplayers = 5;
+    sessionStorage.gambotlogindex = 0;
 }

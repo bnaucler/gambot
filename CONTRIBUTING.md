@@ -29,7 +29,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Showing multiple status popups on screen simultaneously
 * Same button for starting and ending tournament
 * Move activate/deactivate button to edit player popup
-* Prev / next buttons for browsing through log
+* Prev button for browsing through log
 
 ### TODO: structure
 * Refactor (go & js) and divide in multiple source files
