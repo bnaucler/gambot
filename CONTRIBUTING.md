@@ -16,6 +16,10 @@ Contributions are very welcome! At this early stage, this file will double as a 
 As you can see below, there is a VERY long list of things which need to be addressed. There should be ample opportunity to get involved. *But most importantly* - if you decide to give gambot a try at your club, let us know what kind of real-world issues you run into.
 
 ### TODO: core functionality
+* X-forwarding IP resolution
+* Internal ELO
+* Public page
+* Database backup
 * Better (and consistent) backend error handling
 * Better player data validation
     - frontend
@@ -44,6 +48,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Monrad seeding algo
 * APPG based seeding for draws in Win/Win algo
 * Possibility to 'force' games with specified opponent
+* Pick player with fewest previous matchups when forcing
 * Tournament history search by date
     - next / prev buttons
 * Tool to import player & tournament JSON data to db
@@ -59,7 +64,6 @@ As you can see below, there is a VERY long list of things which need to be addre
     - If still equal: APPG as black
 * Logic to pick longest waiting bench player if all other things are equal
 * 'Soft end' to stop seeding
-* Make statuspop on/off defined per log item type
 
 ## Pull requests
 Are appreciated!

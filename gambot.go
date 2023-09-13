@@ -165,6 +165,7 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         a.Skey = randstr(30)
         gcore.Wradmin(a, db)
         a.Pass = []byte("")
+        log.Printf("Admin record updated\n")
 
     } else if len(a.Pass) > 1 && !validateuser(a, call.Pass) {
         log.Printf("Illegal admin registration attempt\n")
@@ -542,12 +543,15 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     if len(p.Pi.Name) < 3 {
         p.Status = gcore.Mac["S_ERR"]
+
     } else if p.ID > 0 {
         storeplayer(db, p)
+        log.Printf("Updating database record for player %s\n", p.Pi.Name)
 
     } else {
         storeplayerwithnewid(db, p)
         p.Status = gcore.Mac["S_OK"]
+        log.Printf("Adding new player: %s\n", p.Pi.Name)
     }
 
     players = append(players, p)
@@ -1750,12 +1754,26 @@ func ginit(db *bolt.DB) {
     sighandler(pidfile)
 }
 
+// Resets admin password and skey
+func resetpass(db *bolt.DB) {
+
+    a, e := gcore.Getadmin(db)
+    gcore.Cherr(e)
+
+    a.Pass = []byte{}
+    a.Skey = ""
+
+    gcore.Wradmin(a, db)
+    log.Printf("Admin password reset\n")
+}
+
 func main() {
 
     gcore.Mac = gcore.Setmac()
 
     pptr := flag.Int("p", gcore.DEF_PORT, "port number to listen")
     dbptr := flag.String("d", gcore.DEF_DBNAME, "specify database to open")
+    rptr := flag.Bool("r", false, "reset admin password")
     flag.Parse()
 
     rand.Seed(time.Now().UnixNano())
@@ -1765,6 +1783,8 @@ func main() {
     defer db.Close()
 
     ginit(db)
+
+    if *rptr { resetpass(db) }
 
     et := gcore.Tournament{}
     e = storect(db, et)
