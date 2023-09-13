@@ -12,7 +12,7 @@ import (
     bolt "go.etcd.io/bbolt"
 )
 
-const INDENT "    "                 // Indent with 4 spaces to make human-readable
+const INDENT = "    "                 // Indent with 4 spaces to make human-readable
 
 func dumpadmin(db *bolt.DB, j bool) {
     a, e := gcore.Getadmin(db)
