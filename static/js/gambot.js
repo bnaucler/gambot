@@ -979,7 +979,7 @@ async function setppbutton() {
 
     if(ppst.ok) resp = await ppst.json();
 
-    btn.innerHTML = resp == mac.FALSE ? "Enable public page" : "Disable public page";
+    btn.innerHTML = "Pulic page: " + (resp == mac.FALSE ? "disabled" : "enabled");
     sessionStorage.gambotppstat = resp;
 }
 
