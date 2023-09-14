@@ -18,6 +18,10 @@ As you can see below, there is a VERY long list of things which need to be addre
 ### TODO: core functionality
 * Internal ELO
 * Public page
+    - Admin logout brings user to public page
+    - Remove skey validation from gtphandler
+    - Add public variation of gphandler (remove most personal data)
+    - Separate js into public, core & admin scripts
 * Database backup
 * Better (and consistent) backend error handling
 * Better player data validation
