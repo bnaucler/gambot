@@ -179,8 +179,9 @@ func reghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 // Returns origin IP address from HTTP request
 func getreqip(r *http.Request) net.IP {
 
-    ip, _, e := net.SplitHostPort(r.RemoteAddr)
-    gcore.Cherr(e)
+    ip := r.Header.Get("x-real-ip")
+    if ip == "" { ip = r.Header.Get("x-forwarded-for") }
+    if ip == "" { ip = r.RemoteAddr }
 
     return net.ParseIP(ip)
 }

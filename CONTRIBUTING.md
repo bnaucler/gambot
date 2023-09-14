@@ -16,7 +16,6 @@ Contributions are very welcome! At this early stage, this file will double as a 
 As you can see below, there is a VERY long list of things which need to be addressed. There should be ample opportunity to get involved. *But most importantly* - if you decide to give gambot a try at your club, let us know what kind of real-world issues you run into.
 
 ### TODO: core functionality
-* X-forwarding IP resolution
 * Internal ELO
 * Public page
 * Database backup
@@ -34,6 +33,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Same button for starting and ending tournament
 * Move activate/deactivate button to edit player popup
 * Prev button for browsing through log
+* Show number of games within bars in player data
 
 ### TODO: structure
 * Refactor (go & js) and divide in multiple source files
@@ -64,6 +64,9 @@ As you can see below, there is a VERY long list of things which need to be addre
     - If still equal: APPG as black
 * Logic to pick longest waiting bench player if all other things are equal
 * 'Soft end' to stop seeding
+
+### TODO: known bugs
+* addplayer form not resetting properly
 
 ## Pull requests
 Are appreciated!
