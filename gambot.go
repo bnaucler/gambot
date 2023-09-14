@@ -96,9 +96,11 @@ func getcall(r *http.Request) gcore.Apicall {
         Pass:       r.FormValue("pass"),
         Opass:      r.FormValue("opass"),
         Skey:       r.FormValue("skey"),
+        Set:        r.FormValue("set"),
         Pwin:       r.FormValue("pwin"),
         Pdraw:      r.FormValue("pdraw"),
         Ploss:      r.FormValue("ploss"),
+        PPage:      r.FormValue("ppage"),
         Algo:       r.FormValue("algo"),
         N:          r.FormValue("n"),
         T:          r.FormValue("t"),
@@ -1662,6 +1664,37 @@ func loghandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     enc.Encode(ret[i:n])
 }
 
+// HTTP handler - Public page status / settings
+func ppstathandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+
+    call := getcall(r)
+    a, e := gcore.Getadmin(db)
+    gcore.Cherr(e)
+
+    enc := json.NewEncoder(w)
+
+    if call.PPage == "getstat" {
+        enc.Encode(a.PPstat)
+        return
+
+    } else if !valskey(db, call.Skey) {
+        emptyresp(w, gcore.Mac["ADMIN"])
+        return
+    }
+
+    if call.Set == "true" {
+        a.PPstat = 1
+        log.Printf("Enabling public page\n");
+
+    } else if call.Set == "false" {
+        a.PPstat = 0
+        log.Printf("Disabling public page\n");
+    }
+
+    gcore.Wradmin(a, db)
+    enc.Encode(a)
+}
+
 // Launches mapped handler functions
 func starthlr(url string, fn gcore.Hfn, db *bolt.DB) {
 
@@ -1799,6 +1832,7 @@ func main() {
         "/admin":           adminhandler,   // Admin settings
         "/chkadm":          chkadmhandler,  // Check if admin exists in db
         "/verskey":         verskeyhandler, // Verifies skey with database
+        "/ppstat":          ppstathandler,  // Public page status / settings
         "/mkgame":          mkgamehandler,  // Requests creation of new game
         "/ap":              aphandler,      // Add player
         "/ep":              ephandler,      // Edit player

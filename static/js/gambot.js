@@ -961,6 +961,28 @@ function setdisp(elem, popup) {
     }
 }
 
+// Requests change of the public page setting
+async function toggleppage() {
+
+    let cstat = Number(gss("gambotppstat"));
+    let ppreq = await fetch("/ppstat?set=" + !cstat + "&skey=" + gss("gambotkey"));
+
+    if(ppreq.ok) setppbutton();
+}
+
+// Sets correct text and action for ppage button
+async function setppbutton() {
+
+    let ppst = await fetch("/ppstat?ppage=getstat");
+    let btn = gid("toggleppage");
+    let resp;
+
+    if(ppst.ok) resp = await ppst.json();
+
+    btn.innerHTML = resp == mac.FALSE ? "Enable public page" : "Disable public page";
+    sessionStorage.gambotppstat = resp;
+}
+
 // Shows & hides popup windows
 function showpopup(popup) {
 
@@ -1002,6 +1024,7 @@ function showpopup(popup) {
 
         case "admin":
             setdisp(elems, ["admin"]);
+            setppbutton();
             gid("adminform").reset();
             getpcur();
             break;

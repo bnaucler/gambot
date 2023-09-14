@@ -36,9 +36,11 @@ type Apicall struct {
     Pass string
     Opass string
     Skey string
+    Set string
     Pwin string
     Pdraw string
     Ploss string
+    PPage string
     N string
     T string
     I string
@@ -77,6 +79,7 @@ type Admin struct {
     Pdraw int
     Ploss int
     Status int
+    PPstat int
 }
 
 type Pstat struct {
