@@ -841,7 +841,7 @@ func seedwinwin(t gcore.Tournament) gcore.Tournament {
 
     } else {
         bp := getbenchplayers(t)
-        if len(bp) > 3 {
+        if len(bp) > 3 { // TODO solve for 3 player tournaments
             w, l := getwinlose(bp, t)
             t = gamefromslice(w, t)
             t = gamefromslice(l, t)
@@ -1007,31 +1007,28 @@ func apt(db *bolt.DB, t gcore.Tournament, p int) gcore.Tournament {
 // HTTP handler - Add player to tournament
 func apthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
-    var regexnum = regexp.MustCompile(`[^\p{N} ]+`)
-
     call := getcall(r)
 
-    qmap := r.Form["?id"]
+    qmap := r.Form["id"]
     qstr := strings.Split(qmap[0], ",")
+
+    if !valskey(db, call.Skey) {
+        emptyresp(w, gcore.Mac["TOURNAMENT"])
+        return
+    }
 
     t, e := getct(db)
     gcore.Cherr(e)
 
-    if valskey(db, call.Skey) {
-        for _, elem := range qstr {
-            clean := regexnum.ReplaceAllString(elem, "")
-            if clean == "" {
-                log.Printf("No players to add\n")
-                break
-            }
-            ie, e := strconv.Atoi(clean)
-            gcore.Cherr(e)
+    for _, elem := range qstr {
+        ie, e := strconv.Atoi(elem)
+        if e == nil {
             t = apt(db, t, ie)
             storeplayer(db, gettplayerbyid(ie, t))
         }
-        t = seed(t)
     }
 
+    t = seed(t)
     e = storect(db, t)
     gcore.Cherr(e)
 
