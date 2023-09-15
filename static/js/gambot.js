@@ -1,6 +1,6 @@
 // Alias to reduce typing
-let gid = document.getElementById.bind(document);
-let gss = sessionStorage.getItem.bind(sessionStorage);
+const gid = document.getElementById.bind(document);
+const gss = sessionStorage.getItem.bind(sessionStorage);
 
 let mac;
 
@@ -20,7 +20,7 @@ function mkobj(type, cl, txt) {
     if(cl !== undefined && cl != "") ret.classList.add(cl);
 
     if(txt !== undefined) {
-        let tc = document.createTextNode(txt);
+        const tc = document.createTextNode(txt);
         ret.appendChild(tc);
     }
 
@@ -64,7 +64,7 @@ function ingame(id, t) {
 // Creates a minipop element
 function mkminipop() {
 
-    let elem = mkobj("div", "minipop");
+    const elem = mkobj("div", "minipop");
 
     elem.style.left = (event.clientX - 5) + "px";
     elem.style.top = (event.clientY - 5) + "px";
@@ -97,13 +97,12 @@ async function togglepause(id) {
 // Creates a popup menu for bench players
 function benchpopup(id, t, pstat) {
 
-    let bpop = mkminipop();
-    let pdiv = gid("tnmt");
-    let ptext = pstat ? "Unpause" : "Pause";
-
-    let rembtn = mkobj("div", "minipopitem", "Remove");
-    let forcebtn = mkobj("div", "minipopitem", "Force");
-    let pausebtn = mkobj("div", "minipopitem", ptext);
+    const bpop = mkminipop();
+    const pdiv = gid("tnmt");
+    const ptext = pstat ? "Unpause" : "Pause";
+    const rembtn = mkobj("div", "minipopitem", "Remove");
+    const forcebtn = mkobj("div", "minipopitem", "Force");
+    const pausebtn = mkobj("div", "minipopitem", ptext);
 
     mkminipop(bpop);
 
@@ -131,14 +130,14 @@ function benchpopup(id, t, pstat) {
 // Creates popup menu for in-game players
 function igppopup(id, gameid, t) {
 
-    let bpop = mkminipop();
-    let dwbtn = mkobj("div", "minipopitem", "Declare win");
-    let rembtn = mkobj("div", "minipopitem", "Remove");
-    let pausebtn = mkobj("div", "minipopitem", "Pause");
-    let pdiv = gid("tnmt");
+    const bpop = mkminipop();
+    const dwbtn = mkobj("div", "minipopitem", "Declare win");
+    const rembtn = mkobj("div", "minipopitem", "Remove");
+    const pausebtn = mkobj("div", "minipopitem", "Pause");
+    const pdiv = gid("tnmt");
 
     dwbtn.addEventListener("click", () => {
-        let pname = getplayername(id, t);
+        const pname = getplayername(id, t);
         declareresult(gameid, id, pname);
         bpop.remove();
     });
@@ -172,12 +171,12 @@ function getpstat(id, t) {
 // Adds player to bench by id
 function addbench(id, t) {
 
-    let pdiv = gid("bench");
-    let player = mkobj("div", "benchp", getplayername(id, t));
-    let pstat = getpstat(id, t);
+    const pdiv = gid("bench");
+    const player = mkobj("div", "benchp", getplayername(id, t));
+    const pstat = getpstat(id, t);
 
     if(pstat) {
-        let picon = mkobj("div", "picon");
+        const picon = mkobj("div", "picon");
         player.appendChild(picon);
     }
 
@@ -206,14 +205,13 @@ function popbench(t) {
 // Adds a game to the display window
 function addgame(g, t) {
 
-    let pdiv = gid("games");
-
-    let game = mkobj("div", "game");
-    let bw = mkobj("div", "bw");
-    let W = mkobj("div", "wp", getplayername(g.W, t));
-    let B = mkobj("div", "bp", getplayername(g.B, t));
-    let draw = mkobj("div", "draw");
-    let dtext = mkobj("span", "", "draw");
+    const pdiv = gid("games");
+    const game = mkobj("div", "game");
+    const bw = mkobj("div", "bw");
+    const W = mkobj("div", "wp", getplayername(g.W, t));
+    const B = mkobj("div", "bp", getplayername(g.B, t));
+    const draw = mkobj("div", "draw");
+    const dtext = mkobj("span", "", "draw");
 
     W.addEventListener("click", () => {
         igppopup(g.W, g.ID, t);
@@ -238,8 +236,8 @@ function addgame(g, t) {
 // Updates game window with tournament data
 function updatewindow(t) {
 
-    let pdiv = gid("games");
-    let bench = mkobj("div");
+    const pdiv = gid("games");
+    const bench = mkobj("div");
 
     pdiv.innerHTML = "";
     bench.id = "bench";
@@ -272,7 +270,7 @@ function ttop(n, t) {
 
     let tc = structuredClone(t.P)
     let ret = [];
-    let plen = tc.length;
+    const plen = tc.length;
 
     tc.sort((i, j) => i.TN.Points - j.TN.Points);
     tc.reverse();
@@ -298,11 +296,11 @@ function createtlistplayer(t, td) {
 // Creates list item for tournament history
 function createtlistitem(t) {
 
-    let pdiv = gid("thist");
-    let td = mkobj("div", "tlitm");
-    let id = mkobj("p", "tid", t.ID);
-    let stext = formatdate(t.Start) + " - " + formatdate(t.End);
-    let stime = mkobj("p", "ttime", stext);
+    const pdiv = gid("thist");
+    const td = mkobj("div", "tlitm");
+    const id = mkobj("p", "tid", t.ID);
+    const stext = formatdate(t.Start) + " - " + formatdate(t.End);
+    const stime = mkobj("p", "ttime", stext);
 
     td.appendChild(id);
     td.appendChild(stime);
@@ -387,7 +385,7 @@ async function openplayeredit(id) {
 
     showpopup("addplayer"); // Needs to run before setting pd
 
-    let form = gid("addplayerform");
+    const form = gid("addplayerform");
     const pd = resp[0].Pi;
 
     form.id.value = resp[0].ID;
@@ -454,8 +452,8 @@ async function getplayerdata(p) {
 // Adds player to list
 function showplayer(p, pdiv, intourn) {
 
-    let pl = mkobj("div", "pln");
-    let name = mkobj("p", "pntxt", p.Pi.Name);
+    const pl = mkobj("div", "pln");
+    const name = mkobj("p", "pntxt", p.Pi.Name);
 
     pl.appendChild(name);
 
@@ -463,7 +461,7 @@ function showplayer(p, pdiv, intourn) {
         pl.style.backgroundColor = "#772222";
 
     } else if(p.Active == true && intourn == 1) {
-        let cb = mkobj("input", "", "");
+        const cb = mkobj("input", "", "");
 
         cb.type = "checkbox";
         cb.name = "selected";
@@ -492,8 +490,8 @@ function timezero(ttime) {
 // Creates an entry in the local log
 function log(data) {
 
-    let pdiv = gid("logdata");
-    let item = mkobj("div", "log", data);
+    const pdiv = gid("logdata");
+    const item = mkobj("div", "log", data);
 
     pdiv.appendChild(item);
 }
@@ -536,14 +534,11 @@ async function launchtournament(algo) {
 // Requests start of new tournament
 function newtournament() {
 
-    let bpop = mkminipop();
-    let pdiv = gid("tnmt");
-
-    let rndbtn = mkobj("div", "minipopitem", "Random");
-    let winwinbtn = mkobj("div", "minipopitem", "Winner meets winner");
-    let monradbtn = mkobj("div", "minipopitem", "Monrad");
-
-    mkminipop(bpop);
+    const bpop = mkminipop();
+    const pdiv = gid("tnmt");
+    const rndbtn = mkobj("div", "minipopitem", "Random");
+    const winwinbtn = mkobj("div", "minipopitem", "Winner meets winner");
+    const monradbtn = mkobj("div", "minipopitem", "Monrad");
 
     rndbtn.addEventListener("click", () => {
         launchtournament(mac.RANDOM);
@@ -572,8 +567,6 @@ async function edittournament(action, id) {
     const url = "/et?action=" + action + "&id=" + id + "&skey=" + gss("gambotkey");
     const resp = await gofetch(url);
 
-    console.log(resp);
-
     if(timezero(resp.End)) {
         statuspopup("Player removed from tournament");
         updatestatus(resp);
@@ -586,8 +579,8 @@ async function edittournament(action, id) {
 // Shows a temporary status message on the screen
 function statuspopup(msg) {
 
-    let mdiv = mkobj("div", "statuspop", msg);
-    let pdiv = gid("tnmt");
+    const mdiv = mkobj("div", "statuspop", msg);
+    const pdiv = gid("tnmt");
 
     setTimeout(() => { mdiv.remove(); }, 4000);
     setTimeout(() => { mdiv.classList.add("fade-out"); }, 3000);
@@ -641,14 +634,12 @@ async function getplayers(elem) {
     const id = elem.elements["ID"].value;
     const name = elem.elements["name"].value;
     const cb = gid("showdeac").checked;
+    const pdiv = gid("playerdata");
+    const br = mkobj("br", "", "");
     const url = "/gp?id=" + id + "&name=" + name + "&skey=" + gss("gambotkey");
-
-    sessionStorage.gambotshowdeac = cb;
-
     const resp = await gofetch(url);
 
-    let pdiv = gid("playerdata");
-    let br = mkobj("br", "", "");
+    sessionStorage.gambotshowdeac = cb;
 
     pdiv.innerHTML = "";
     pdiv.style.display = "block";
@@ -659,7 +650,7 @@ async function getplayers(elem) {
     }
 
     if(intourn == 1) {
-        let btn = mkobj("button", "", "Add selected players to tournament");
+        const btn = mkobj("button", "", "Add selected players to tournament");
 
         btn.addEventListener("click", () => {
             playertotournament(pdiv);
@@ -692,8 +683,8 @@ function addtopplayer(p, s, pdiv) {
     if(s == "a") text = p.Pi.Name + " " + p.AT.Points;
     else if(s == "c") text = p.Pi.Name + " " + p.TN.Points;
 
-    let item = mkobj("div", "topplayer");
-    let name = mkobj("p", "tpname", text);
+    const item = mkobj("div", "topplayer");
+    const name = mkobj("p", "tpname", text);
 
     name.addEventListener("click", () => {
         getplayerdata(item);
@@ -724,7 +715,7 @@ function addtpcount(n) {
 // Adds 'more' button to top player list
 function addtopmorebtn(s, pdiv) {
 
-    let morebtn = mkobj("p", "morebtn", "more");
+    const morebtn = mkobj("p", "morebtn", "more");
 
     morebtn.addEventListener("click", () => {
         addtpcount(5);
@@ -737,7 +728,7 @@ function addtopmorebtn(s, pdiv) {
 // Adds 'less' button to top player list
 function addtoplessbtn(s, pdiv) {
 
-    let lessbtn = mkobj("p", "lessbtn", "less");
+    const lessbtn = mkobj("p", "lessbtn", "less");
     let nop = gettpcount() - 5;
 
     if(nop < 5 || nop === undefined || nop == NaN) nop = 5;
@@ -827,9 +818,8 @@ async function gettopplayers(n, t) { // TODO refactor
 
     const url = "/gtp?n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
     const resp = await gofetch(url);
-
-    let pdiv = gid("topfivecontents");
-    let plen = resp.P.length;
+    const pdiv = gid("topfivecontents");
+    const plen = resp.P.length;
 
     pdiv.innerHTML = "";
 
@@ -905,8 +895,7 @@ async function toggleppage() {
 async function setppbutton() {
 
     const resp = await gofetch("/ppstat?ppage=getstat");
-
-    let btn = gid("toggleppage");
+    const btn = gid("toggleppage");
 
     btn.innerHTML = "Pulic page: " + (resp == mac.FALSE ? "disabled" : "enabled");
     sessionStorage.gambotppstat = resp;
@@ -1093,13 +1082,13 @@ async function getdefaults() {
 }
 
 // Request necessary data after window refresh
-window.onbeforeunload = function() {
+window.onbeforeunload = () => {
     getdefaults();
     checklogin();
 };
 
 // Request necessary data after load
-window.onload = function() {
+window.onload = () => {
     getdefaults();
     checklogin();
     sessionStorage.gambottopplayers = 5;
