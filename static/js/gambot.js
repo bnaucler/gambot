@@ -5,12 +5,11 @@ let gss = sessionStorage.getItem.bind(sessionStorage);
 let mac;
 
 // HTTP request wrapper
-async function gofetch(ep, params, rfunc) {
+async function gofetch(url) {
 
-    let url = ep + "?" + params;
-    let resp = await fetch(url);
+    const resp = await fetch(url);
 
-    if(resp.ok) rfunc(await resp.json());
+    if(resp.ok) return resp.json();
 }
 
 // Returns DOM object of requested type, and with class & text defined if requested
@@ -39,14 +38,15 @@ function getplayername(id, t) {
 }
 
 // Requests processing of won game
-function declareresult(gid, pid, wname) {
+async function declareresult(gid, pid, wname) {
+
+    const url = "/dr?id=" + pid + "&game=" + gid + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
+
+    if(resp.P != undefined) updatewindow(resp);
 
     if(pid === 0) statuspopup("Game " + gid + " is a draw.");
     else statuspopup("Game " + gid + " won by " + wname);
-
-    let params = "id=" + pid + "&game=" + gid + "&skey=" + gss("gambotkey");
-
-    gofetch("/dr", params, playersadded); // TOOD temp
 }
 
 // Returns true if player with name ID is currently in a game
@@ -77,25 +77,21 @@ function mkminipop() {
 }
 
 // Requests a game when seeding algo is not automatically creating one
-function forcegame(id) {
+async function forcegame(id) {
 
-    let params = "id=" + id + "&skey=" + gss("gambotkey");
+    const url = "/mkgame?id=" + id + "&skey=" + gss("gambotkey");
 
-    gofetch("/mkgame", params, playersadded); // TODO
-}
-
-// Verifies receipt of player object and calls for refresh
-function verpauseplayer(p) {
-
-    if(p.ID != 0) gettournamentstatus();
+    const resp = await gofetch(url);
+    if(resp.P != undefined) updatewindow(resp);
 }
 
 // Puts a player on pause to exclude from game seeding
-function togglepause(id) {
+async function togglepause(id) {
 
-    let params = "id=" + id + "&action=pause&skey=" + gss("gambotkey");
+    const url = "/ep?id=" + id + "&action=pause&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
-    gofetch("/ep", params, verpauseplayer);
+    if(resp.ID != 0) gettournamentstatus();
 }
 
 // Creates a popup menu for bench players
@@ -239,22 +235,14 @@ function addgame(g, t) {
     pdiv.appendChild(game);
 }
 
-// Creates bench element
-function makebench(pdiv) {
-
-    let bench = document.createElement("div");
-
-    bench.id = "bench";
-
-    pdiv.appendChild(bench);
-}
-
 // Updates game window with tournament data
 function updatewindow(t) {
 
     let pdiv = gid("games");
+    let bench = mkobj("div");
 
     pdiv.innerHTML = "";
+    bench.id = "bench";
 
     if(t.P == null) return;
     if(t.ID != 0) gettopplayers(5, "c");
@@ -266,15 +254,15 @@ function updatewindow(t) {
         }
     }
 
-    makebench(pdiv);
+    pdiv.appendChild(bench);
     popbench(t);
 }
 
 // Formats server date codes to a more easily readable format
 function formatdate(d) {
 
-    let date = d.substring(0, 10);
-    let time = d.substring(11, 16);
+    const date = d.substring(0, 10);
+    const time = d.substring(11, 16);
 
     return date + " " + time;
 }
@@ -299,10 +287,10 @@ function ttop(n, t) {
 // Adds individual player & score to tournament history list
 function createtlistplayer(t, td) {
 
-    let tpl = ttop(3, t);
+    const tpl = ttop(3, t);
 
     for(const p of tpl) {
-        let tp = mkobj("p", "ttp", p);
+        const tp = mkobj("p", "ttp", p);
         td.appendChild(tp);
     }
 }
@@ -323,56 +311,35 @@ function createtlistitem(t) {
         createtlistplayer(t, td);
 
     } else {
-        let tp = mkobj("p", "ttp", "No players in tournament");
+        const tp = mkobj("p", "ttp", "No players in tournament");
         td.appendChild(tp);
     }
 
     pdiv.appendChild(td);
 }
 
-// Displays tournament history
-function updatethist(ts) {
-
-    gid("thist").innerHTML = "";
-
-    if(ts.length === 0) {
-        statuspopup("No data received!");
-        return;
-    }
-
-    for(const t of ts) {
-        if(!timezero(t.End)) createtlistitem(t);
-    }
-}
-
-// Call updatewindow() if request contains players
-function playersadded(t) {
-
-    if(t.P != undefined) updatewindow(t);
-}
-
 // Request adding selected players to current tournament
-function playertotournament(elem) {
+async function playertotournament(elem) {
 
-    let selectedplayers = document.querySelectorAll('input[name="selected"]:checked');
+    const selectedplayers = document.querySelectorAll('input[name="selected"]:checked');
     let ids = [];
 
     selectedplayers.forEach((checkbox) => {
         ids.push(checkbox.value);
     });
 
-    let olen = ids.length;
-    let params = "?id=" + JSON.stringify(ids) + "&skey=" + gss("gambotkey");
+    const url = "/apt?id=" + ids.toString() + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
-    gofetch("/apt", params, playersadded);
+    if(resp.P != undefined) updatewindow(resp);
 
-    gid("playerdata").style.display = "none"; // TODO
+    showpopup("none");
 }
 
 // Fills the horizontal bar for win / draw / loss
 function fillbar(col, win, draw, loss) {
 
-    let sum = win + draw + loss;
+    const sum = win + draw + loss;
     let wbar, dbar, lbar;
     let wwidth, dwidth, lwidth;
 
@@ -409,26 +376,21 @@ function fillbar(col, win, draw, loss) {
 // Sets form submit button to add or edit player
 function setapbutton(func) {
 
-    let btn = gid("apsubmit");
-    let form = gid("addplayerform");
-
-    if(func == "edit") {
-        btn.value = "Edit player";
-
-    } else {
-        btn.value = "Add new player";
-    }
+    gid("apsubmit").value = func == "edit" ? "Edit player" : "Add new player";
 }
 
-// Populates the player edit window
-function popplayereditwin(obj) {
+// Requests to open and populate the edit player data form
+async function openplayeredit(id) {
+
+    const url = "/gp?id=" + id + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
     showpopup("addplayer"); // Needs to run before setting pd
 
     let form = gid("addplayerform");
-    let pd = obj[0].Pi;
+    const pd = resp[0].Pi;
 
-    form.id.value = obj[0].ID;
+    form.id.value = resp[0].ID;
     form.fname.value = pd.FName;
     form.lname.value = pd.LName;
     form.dbirth.value = timezero(pd.Dbirth) ? "" : pd.Dbirth.slice(0, 10);
@@ -442,30 +404,25 @@ function popplayereditwin(obj) {
     setapbutton("edit");
 }
 
-// Requests to open and populate the edit player data form
-function openplayeredit(id) {
+// Retrieves and displays data on individual player
+async function getplayerdata(p) {
 
-    let params = "id=" + id + "&skey=" + gss("gambotkey");
+    const url = "/gp?id=" + p.getAttribute("name") + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
-    gofetch("/gp", params, popplayereditwin);
-}
+    const pname = gid("indplayername");
+    const indgames = gid("indgamesval");
+    const indpoints = gid("indpointsval");
+    const indppg = gid("indppgval");
+    const indppgw = gid("indppgwval");
+    const indppgb = gid("indppgbval");
+    const editbtn = gid("editplayer");
+    const editdatabtn = gid("indplayeredit");
+    const intourn = gss("gambotintournament");
+    const statobj = intourn == 1 ? resp[0].TN : resp[0].AT;
 
-// Shows data on individual player
-function showplayerdata(obj) {
-
-    let pname = gid("indplayername");
-    let indgames = gid("indgamesval");
-    let indpoints = gid("indpointsval");
-    let indppg = gid("indppgval");
-    let indppgw = gid("indppgwval");
-    let indppgb = gid("indppgbval");
-    let editbtn = gid("editplayer");
-    let editdatabtn = gid("indplayeredit");
-    let intourn = gss("gambotintournament");
-    let statobj = intourn == 1 ? obj[0].TN : obj[0].AT;
-
-    pname.innerHTML = obj[0].Pi.Name;
-    pname.setAttribute("name", obj[0].ID);
+    pname.innerHTML = resp[0].Pi.Name;
+    pname.setAttribute("name", resp[0].ID);
 
     indgames.innerHTML = statobj.Ngames;
     indpoints.innerHTML = statobj.Points;
@@ -473,7 +430,7 @@ function showplayerdata(obj) {
     indppgw.innerHTML = statobj.WAPPG.toFixed(2);
     indppgb.innerHTML = statobj.BAPPG.toFixed(2);
 
-    if(obj[0].Active == true) {
+    if(resp[0].Active == true) {
         editbtn.innerHTML = "Deactivate";
         editbtn.setAttribute("name", "deac");
 
@@ -483,7 +440,7 @@ function showplayerdata(obj) {
     }
 
     editdatabtn.addEventListener("click", () => {
-        openplayeredit(obj[0].ID);
+        openplayeredit(resp[0].ID);
     });
 
     fillbar(mac.TOTAL, statobj.Stat[mac.WWIN] + statobj.Stat[mac.BWIN],
@@ -492,14 +449,6 @@ function showplayerdata(obj) {
     fillbar(mac.WHITE, statobj.Stat[mac.WWIN], statobj.Stat[mac.WDRAW], statobj.Stat[mac.WLOSS]);
     fillbar(mac.BLACK, statobj.Stat[mac.BWIN], statobj.Stat[mac.BDRAW], statobj.Stat[mac.BLOSS]);
     showpopup("indplayer");
-}
-
-// Requests player data
-function getplayerdata(p) {
-
-    let params = "id=" + p.getAttribute("name") + "&skey=" + gss("gambotkey");
-
-    gofetch("/gp", params, showplayerdata);
 }
 
 // Adds player to list
@@ -533,33 +482,6 @@ function showplayer(p, pdiv, intourn) {
     pdiv.appendChild(pl);
 }
 
-// Displays list of players
-function showplayers(obj) {
-
-    let pdiv = gid("playerdata");
-    let intourn = gss("gambotintournament");
-    let br = mkobj("br", "", "");
-
-    pdiv.innerHTML = "";
-    pdiv.style.display = "block";
-    pdiv.appendChild(br);
-
-    for(const p of obj) {
-        if(p.Status == mac.S_OK) showplayer(p, pdiv, intourn);
-        else console.log("Error displaying player"); // TMP
-    }
-
-    if(intourn == 1) {
-        let btn = mkobj("button", "", "Add selected players to tournament");
-
-        btn.addEventListener("click", () => {
-            playertotournament(pdiv);
-        });
-
-        pdiv.appendChild(btn);
-    }
-}
-
 // Returns true if time object is zero / null
 function timezero(ttime) {
 
@@ -576,28 +498,11 @@ function log(data) {
     pdiv.appendChild(item);
 }
 
-// Processes tournament start request and creates appropriate log entries
-function tournamentstart(obj) {
-
-    let date = obj.Start.slice(0, 10);
-    let time = obj.Start.slice(11, 16);
-
-    if(obj.Status === mac.S_ERR) statuspopup("Could not start new tournament");
-    else {
-        statuspopup("Tournament " + obj.ID + " started at " + date + " "+ time);
-
-        if(obj.P === undefined) gid("games").innerHTML = "";
-        else updatewindow(obj);
-    }
-
-    tournamentstarted();
-}
-
-// Processes tournament end request and creates appropriate log entries
+// Processes tournament end request and creates appropriate statuspops
 function tournamentend(obj) {
 
-    let date = obj.End.slice(0, 10);
-    let time = obj.End.slice(11, 16);
+    const date = obj.End.slice(0, 10);
+    const time = obj.End.slice(11, 16);
 
     if(obj.Status === mac.S_ERR) statuspopup("No tournament running - cannot end!");
     else statuspopup("Tournament " + obj.ID + " ended at " + date + " "+ time);
@@ -607,12 +512,25 @@ function tournamentend(obj) {
 }
 
 // Makes call to start tournament with selected algo
-function launchtournament(algo) {
+async function launchtournament(algo) {
 
-    let params = "algo=" + algo + "&skey=" + gss("gambotkey");
+    const url = "/ct?algo=" + algo + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
-    gofetch("/ct", params, tournamentstart);
     gettopplayers(5);
+
+    const date = resp.Start.slice(0, 10);
+    const time = resp.Start.slice(11, 16);
+
+    if(resp.Status === mac.S_ERR) statuspopup("Could not start new tournament");
+    else {
+        statuspopup("Tournament " + resp.ID + " started at " + date + " "+ time);
+
+        if(resp.P === undefined) gid("games").innerHTML = "";
+        else updatewindow(resp);
+    }
+
+    tournamentstarted();
 }
 
 // Requests start of new tournament
@@ -648,12 +566,21 @@ function newtournament() {
     pdiv.appendChild(bpop);
 }
 
-// Requests ending current tournament
-function edittournament(action, id) {
+// Requests edit of current tournament
+async function edittournament(action, id) {
 
-    let params = "action=" + action + "&id=" + id + "&skey=" + gss("gambotkey");
+    const url = "/et?action=" + action + "&id=" + id + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
-    gofetch("/et", params, tournamentend); // TODO
+    console.log(resp);
+
+    if(timezero(resp.End)) {
+        statuspopup("Player removed from tournament");
+        updatestatus(resp);
+
+    } else {
+        tournamentend(resp);
+    }
 }
 
 // Shows a temporary status message on the screen
@@ -668,61 +595,78 @@ function statuspopup(msg) {
     pdiv.appendChild(mdiv);
 }
 
-// Processes confirmation of added player
-function veraddplayer(p) {
+// Requests adding new player to database
+async function addplayer(elem) {
+
+    const id = elem.elements["id"].value;
+    const fname = elem.elements["fname"].value;
+    const lname = elem.elements["lname"].value;
+    const dbirth = elem.elements["dbirth"].value;
+    const gender = elem.elements["gender"].value;
+    const email = elem.elements["email"].value;
+    const postal = elem.elements["postal"].value;
+    const zip = elem.elements["zip"].value;
+    const phone = elem.elements["phone"].value;
+    const club = elem.elements["club"].value;
+
+    const url = "/ap?id=" + id +
+                "&fname=" + fname +
+                "&lname=" + lname +
+                "&dbirth=" + dbirth +
+                "&gender=" + gender +
+                "&email=" + email +
+                "&postal=" + postal +
+                "&zip=" + zip +
+                "&phone=" + phone +
+                "&club=" + club +
+                "&skey=" + gss("gambotkey");
+
+    gid("addplayerform").reset();
+    showpopup("pmgmt");
 
     let msg;
+    const resp = await gofetch(url);
 
-    if(p[0].Status == mac.S_OK) msg = p[0].Pi.Name + " added/edited successfully";
+    if(resp[0].Status == mac.S_OK) msg = resp[0].Pi.Name + " added/edited successfully";
     else msg = "Could not add player";
 
     statuspopup(msg);
     gettournamentstatus();
 }
 
-// Requests adding new player to database
-function addplayer(elem) {
-
-    let id = elem.elements["id"].value;
-    let fname = elem.elements["fname"].value;
-    let lname = elem.elements["lname"].value;
-    let dbirth = elem.elements["dbirth"].value;
-    let gender = elem.elements["gender"].value;
-    let email = elem.elements["email"].value;
-    let postal = elem.elements["postal"].value;
-    let zip = elem.elements["zip"].value;
-    let phone = elem.elements["phone"].value;
-    let club = elem.elements["club"].value;
-
-    let params = "id=" + id +
-                 "&fname=" + fname +
-                 "&lname=" + lname +
-                 "&dbirth=" + dbirth +
-                 "&gender=" + gender +
-                 "&email=" + email +
-                 "&postal=" + postal +
-                 "&zip=" + zip +
-                 "&phone=" + phone +
-                 "&club=" + club +
-                 "&skey=" + gss("gambotkey");
-
-    gid("addplayerform").reset();
-    showpopup("pmgmt");
-
-    gofetch("/ap", params, veraddplayer);
-}
-
 // Sends request to search database for players
-function getplayers(elem) {
+async function getplayers(elem) {
 
-    let id = elem.elements["ID"].value;
-    let name = elem.elements["name"].value;
-    let cb = gid("showdeac").checked;
-    let params = "id=" + id + "&name=" + name + "&skey=" + gss("gambotkey");
+    const intourn = gss("gambotintournament");
+    const id = elem.elements["ID"].value;
+    const name = elem.elements["name"].value;
+    const cb = gid("showdeac").checked;
+    const url = "/gp?id=" + id + "&name=" + name + "&skey=" + gss("gambotkey");
 
     sessionStorage.gambotshowdeac = cb;
 
-    gofetch("/gp", params, showplayers);
+    const resp = await gofetch(url);
+
+    let pdiv = gid("playerdata");
+    let br = mkobj("br", "", "");
+
+    pdiv.innerHTML = "";
+    pdiv.style.display = "block";
+    pdiv.appendChild(br);
+
+    for(const p of resp) {
+        if(p.Status == mac.S_OK) showplayer(p, pdiv, intourn);
+    }
+
+    if(intourn == 1) {
+        let btn = mkobj("button", "", "Add selected players to tournament");
+
+        btn.addEventListener("click", () => {
+            playertotournament(pdiv);
+        });
+
+        pdiv.appendChild(btn);
+    }
 }
 
 // Shows & hides appropriate divs for in-tournament-mode
@@ -806,37 +750,6 @@ function addtoplessbtn(s, pdiv) {
     pdiv.appendChild(lessbtn);
 }
 
-// Updates top list
-function updatetopplayers(obj) {
-
-    let pdiv = gid("topfivecontents");
-    let oplen = obj.P.length;
-
-    pdiv.innerHTML = "";
-
-    if(obj.S == "a" || oplen == 0) {
-        gid("games").style.width = "0";
-        gid("topfive").style.width = "100%";
-        gid("topfive").style.display = "block";
-        gid("topfiveheader").innerHTML = "ALL TIME TOP " + oplen;
-
-    } else if (obj.S == "c" && obj.P.length > 0) {
-        gid("games").style.width = "75%";
-        gid("topfive").style.width = "25%";
-        gid("topfive").style.display = "block";
-        gid("topfiveheader").innerHTML = "TOP " + oplen;
-
-    } else {
-        gid("topfive").style.display = "none";
-    }
-
-    for(const p of obj.P) addtopplayer(p, obj.S, pdiv);
-
-    if(!obj.Ismax) addtopmorebtn(obj.S, pdiv);
-
-    if(oplen > 5) addtoplessbtn(obj.S, pdiv);
-}
-
 // Process tournament status request and sets appropriate mode
 function updatestatus(obj) {
 
@@ -853,69 +766,94 @@ function updatestatus(obj) {
 }
 
 // Requests tournament status
-function gettournamentstatus() {
+async function gettournamentstatus() {
 
-    let params = "skey=" + gss("gambotkey");
-    gofetch("/ts", params, updatestatus);
+    const url = "/ts?skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
+
+    updatestatus(resp);
 }
 
 // Requests tournament history (n games starting at index i)
-function getthist(elem) {
+async function getthist(elem) {
 
-    let id = elem.elements["ID"].value;
-    let n = elem.elements["n"].value;
-    let params = "i=" + id + "&n=" + n + "&skey=" + gss("gambotkey");
+    const id = elem.elements["ID"].value;
+    const n = elem.elements["n"].value;
+    const url = "/th?i=" + id + "&n=" + n + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
-    gofetch("/th", params, updatethist);
-}
+    gid("thist").innerHTML = "";
 
-// Verifies server response after adjustment of admin settings
-function verchangeadmin(obj) {
+    if(resp.length === 0) {
+        statuspopup("No data received!");
+        return;
+    }
 
-    if(obj.Status == mac.S_ERR) {
-        logout();
-
-    } else {
-        statuspopup("Admin settings successfully updated")
+    for(const t of resp) {
+        if(!timezero(t.End)) createtlistitem(t);
     }
 }
 
-// Updates fields of current values for pwin, pdraw & ploss
-function updatepcur(obj) {
-
-    gid("pwinnum").value = obj.Pwin;
-    gid("pdrawnum").value = obj.Pdraw;
-    gid("plossnum").value = obj.Ploss;
-}
-
 // Gets current values for pwin, pdraw and ploss
-function getpcur() {
+async function getpcur() {
 
-    let params = "skey=" + gss("gambotkey");
+    const url = "/admin?skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
-    gofetch("/admin", params, updatepcur);
+    gid("pwinnum").value = resp.Pwin;
+    gid("pdrawnum").value = resp.Pdraw;
+    gid("plossnum").value = resp.Ploss;
 }
 
 // Submits change of admin settings
-function changeadmin(elem) {
+async function changeadmin(elem) {
 
-    let pwin = elem.elements["pwin"].value;
-    let pdraw = elem.elements["pdraw"].value;
-    let ploss = elem.elements["ploss"].value;
-    let params = "pwin=" + pwin + "&pdraw=" + pdraw + "&ploss=" + ploss + "&skey=" + gss("gambotkey");
+    const pwin = elem.elements["pwin"].value;
+    const pdraw = elem.elements["pdraw"].value;
+    const ploss = elem.elements["ploss"].value;
+    const url = "/admin?pwin=" + pwin + "&pdraw=" + pdraw +
+                "&ploss=" + ploss + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
     gid("adminform").reset();
     showpopup("none");
 
-    gofetch("/admin", params, verchangeadmin);
+    if(resp.Status == mac.S_ERR) logout();
+    else statuspopup("Admin settings successfully updated");
 }
 
 // Requests top players (n players of type t: (a)ll or (c)urrent)
-function gettopplayers(n, t) {
+async function gettopplayers(n, t) { // TODO refactor
 
-    let params = "n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
+    const url = "/gtp?n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
-    gofetch("/gtp", params, updatetopplayers);
+    let pdiv = gid("topfivecontents");
+    let plen = resp.P.length;
+
+    pdiv.innerHTML = "";
+
+    if(resp.S == "a" || plen == 0) {
+        gid("games").style.width = "0";
+        gid("topfive").style.width = "100%";
+        gid("topfive").style.display = "block";
+        gid("topfiveheader").innerHTML = "ALL TIME TOP " + plen;
+
+    } else if (resp.S == "c" && resp.P.length > 0) {
+        gid("games").style.width = "75%";
+        gid("topfive").style.width = "25%";
+        gid("topfive").style.display = "block";
+        gid("topfiveheader").innerHTML = "TOP " + plen;
+
+    } else {
+        gid("topfive").style.display = "none";
+    }
+
+    for(const p of resp.P) addtopplayer(p, resp.S, pdiv);
+
+    if(!resp.Ismax) addtopmorebtn(resp.S, pdiv);
+
+    if(plen > 5) addtoplessbtn(resp.S, pdiv);
 }
 
 // Checks for session key
@@ -929,28 +867,49 @@ function trylogin(obj) {
 }
 
 // Initiates login procedure
-function loginuser(form) {
+async function loginuser(form) {
 
-    let pass = gid("loginpass").value;
-    let ep = gid("logintype").value;
+    const pass = gid("loginpass").value;
+    const ep = gid("logintype").value;
+    const url = ep + "?pass=" + pass;
 
     form.preventDefault();
     gid("loginform").reset();
-    gofetch(ep, "pass=" + pass, trylogin);
+
+    trylogin(await gofetch(url));
 }
 
 // Changes admin password
-function chpass(elem) {
+async function chpass(elem) {
 
-    let opass = elem.elements["opass"].value;
-    let npass = elem.elements["npass"].value;
-
-    let params = "pass=" + npass + "&opass=" + opass;
+    const opass = elem.elements["opass"].value;
+    const npass = elem.elements["npass"].value;
+    const url = "/reg?pass=" + npass + "&opass=" + opass;
 
     gid("apassform").reset();
-
-    gofetch("/reg", params, trylogin); // TODO: Update with proper logging / user feedback
     showpopup("none");
+
+    trylogin(await gofetch(url));
+}
+
+// Requests change of the public page setting
+async function toggleppage() {
+
+    const cstat = Number(gss("gambotppstat"));
+    const req = await fetch("/ppstat?set=" + !cstat + "&skey=" + gss("gambotkey"));
+
+    if(req.ok) setppbutton();
+}
+
+// Sets correct text and action for ppage button
+async function setppbutton() {
+
+    const resp = await gofetch("/ppstat?ppage=getstat");
+
+    let btn = gid("toggleppage");
+
+    btn.innerHTML = "Pulic page: " + (resp == mac.FALSE ? "disabled" : "enabled");
+    sessionStorage.gambotppstat = resp;
 }
 
 // Iterates through elem list and selected popups to show / hide
@@ -959,28 +918,6 @@ function setdisp(elem, popup) {
     for(let pg in elem) {
         elem[pg].style.display = popup.indexOf(pg) < 0 ? "none" : "block";
     }
-}
-
-// Requests change of the public page setting
-async function toggleppage() {
-
-    let cstat = Number(gss("gambotppstat"));
-    let ppreq = await fetch("/ppstat?set=" + !cstat + "&skey=" + gss("gambotkey"));
-
-    if(ppreq.ok) setppbutton();
-}
-
-// Sets correct text and action for ppage button
-async function setppbutton() {
-
-    let ppst = await fetch("/ppstat?ppage=getstat");
-    let btn = gid("toggleppage");
-    let resp;
-
-    if(ppst.ok) resp = await ppst.json();
-
-    btn.innerHTML = "Pulic page: " + (resp == mac.FALSE ? "disabled" : "enabled");
-    sessionStorage.gambotppstat = resp;
 }
 
 // Shows & hides popup windows
@@ -1052,15 +989,46 @@ function logout() {
     adminindb();
 }
 
-// Receives data on if admin exists in db and changes button endpoint accordingly
-function veradminindb(res) {
+// Validates local skey with backend
+async function chkskey() {
 
-    let btn = gid("loginbutton");
-    let type = gid("logintype");
-    let form = gid("loginform");
+    const url = "/verskey?skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
+
+    if(resp == true) {
+        gid("login").style.display = "none";
+        gettournamentstatus();
+
+    } else {
+        logout();
+    }
+}
+
+// Requests edit of player properties
+async function editplayer() {
+
+    const pid = gid("indplayername").getAttribute("name");
+    const action = gid("editplayer").getAttribute("name");
+    const url = "/ep?id=" + pid + "&action=" + action + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
+
+    if(resp.ID != undefined) statuspopup("Successfully updated player data");
+    else statuspopup("Error updating player data");
+
+    showpopup("pmgmt");
+}
+
+// Checks if admin account exists in db
+async function adminindb() {
+
+    const btn = gid("loginbutton");
+    const type = gid("logintype");
+    const form = gid("loginform");
+    const resp = await gofetch("/chkadm");
+
     let btxt;
 
-    if(res == true) {
+    if(resp == true) {
         btxt = "Login";
         type.value = "/login";
 
@@ -1073,70 +1041,11 @@ function veradminindb(res) {
     form.addEventListener("submit", loginuser);
 }
 
-// Verifies skey match and shows appropriate window
-function verskey(res) {
-
-    let lgwin = gid("login");
-
-    if(res == true) {
-        lgwin.style.display = "none";
-        gettournamentstatus();
-
-    } else {
-        logout();
-    }
-}
-
-// Validates local skey with backend
-function chkskey() {
-
-    let params = "skey=" + gss("gambotkey");
-
-    gofetch("/verskey", params, verskey);
-}
-
-// Verifies player edit response
-function verplayeredit(obj) {
-
-    if(obj.ID != undefined) {
-        statuspopup("Successfully updated player data");
-
-    } else {
-        statuspopup("Error updating player data");
-    }
-}
-
-// Requests edit of player properties
-function editplayer() {
-
-    let pid = gid("indplayername").getAttribute("name");
-    let action = gid("editplayer").getAttribute("name");
-    let params = "id=" + pid + "&action=" + action + "&skey=" + gss("gambotkey");
-
-    gofetch("/ep", params, verplayeredit);
-
-    showpopup("pmgmt");
-}
-
-// Checks if admin account exists in db
-function adminindb() {
-
-    gofetch("/chkadm", "", veradminindb);
-}
-
 // Checks if admin is logged in
 function checklogin() {
 
     adminindb();
     chkskey();
-}
-
-// Displays log
-function verlog(llist) {
-
-    gid("logdata").innerHTML = "";
-    for(const l of llist) log(l);
-    storelogindex(10);
 }
 
 // Returns current log number
@@ -1156,9 +1065,9 @@ function storelogindex(n) {
 }
 
 // Retrieves log from server
-function getlog(i, n) {
+async function getlog(i, n) {
 
-    let li = getlogindex();
+    const li = getlogindex();
 
     if(i === undefined && li === "") i = 0;
     else if(i === undefined) i = li;
@@ -1167,17 +1076,20 @@ function getlog(i, n) {
 
     if(n === undefined) n = 10;
 
-    let params = "i=" + i + "&n=" + n + "&skey=" + gss("gambotkey");
+    const url = "/log?i=" + i + "&n=" + n + "&skey=" + gss("gambotkey");
+    const resp = await gofetch(url);
 
-    gofetch("/log", params, verlog);
     showpopup("log");
+
+    gid("logdata").innerHTML = "";
+    for(const l of resp) log(l);
+    storelogindex(10);
 }
 
 // Retrieves macro definitions
 async function getdefaults() {
 
-    let resp = await fetch("../mac.json");
-    if(resp.ok) mac = await resp.json();
+    mac = await gofetch("../mac.json");
 }
 
 // Request necessary data after window refresh

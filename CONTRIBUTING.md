@@ -40,8 +40,11 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Show number of games within bars in player data
 
 ### TODO: structure
+* Replace trylogin()
+* Look if playertotournament() can be more streamlined
+* merge adminindb() with check for enabled public page
 * Refactor (go & js) and divide in multiple source files
-* valskey() wrapper for sending empty responses
+* Single valskey response error object
 * Merge ephandler() and aphandler()
 * Merge cthandler() and ethandler()
 * Reorganize CSS and comment for readability
@@ -71,6 +74,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 
 ### TODO: known bugs
 * addplayer form not resetting properly
+* All time top displayed when refreshing empty tournament
 
 ## Pull requests
 Are appreciated!

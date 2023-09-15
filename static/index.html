@@ -49,13 +49,16 @@
 
         <div class="smallgap"></div>
 
-        <button id="tstart" class="msb" type="button" onclick="newtournament(); return false;">Start new tournament</button>
-        <button id="tend" class="msb" type="button" onclick="edittournament('end'); return false;">End tournament</button>
-        <button id="showpmgmt" class="msb" onclick="showpopup('pmgmt'); return false;">Player management</button>
-        <button id="showtmgmt" class="msb" onclick="showpopup('tmgmt'); return false;">Tournament history</button>
-        <button type="button" class="msb" onclick="showpopup('admin'); return false;">Admin settings</button>
-        <button type="button" class="msb" onclick="getlog(0, 10); return false;">Show log</button>
-        <button type="button" class="msb" onclick="logout(); return false;">Logout</button>
+        <div id="ctrlbtns">
+            <button id="tstart" class="msb" type="button" onclick="newtournament(); return false;">Start new tournament</button>
+            <button id="tend" class="msb" type="button" onclick="edittournament('end'); return false;">End tournament</button>
+            <button id="showpmgmt" class="msb" onclick="showpopup('pmgmt'); return false;">Player management</button>
+            <button id="showtmgmt" class="msb" onclick="showpopup('tmgmt'); return false;">Tournament history</button>
+            <button type="button" class="msb" onclick="showpopup('admin'); return false;">Admin settings</button>
+            <button type="button" class="msb" onclick="getlog(0, 10); return false;">Show log</button>
+            <button type="button" class="msb" onclick="logout(); return false;">Logout</button>
+        </div>
+        <!-- <button id="openloginbtn" type="button" onclick="openlogin(); return false;">Admin login</button> -->
 
         <div class="clear"></div>
         <div class="smallgap"></div>
