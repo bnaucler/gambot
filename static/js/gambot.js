@@ -134,8 +134,7 @@ function igppopup(id, gameid, t) {
     const pdiv = gid("tnmt");
 
     dwbtn.addEventListener("click", () => {
-        const pname = getplayername(id, t);
-        declareresult(gameid, id, pname);
+        declareresult(gameid, id, getplayername(id, t));
         bpop.remove();
     });
 
@@ -465,7 +464,7 @@ function showplayer(p, pdiv, intourn) {
 function timezero(ttime) {
 
     if(ttime.startsWith("0001")) return true;
-    else return false;
+    return false;
 }
 
 // Creates an entry in the local log
@@ -561,7 +560,7 @@ async function edittournament(action, id) {
 function statuspopup(msg) {
 
     const mdiv = mkobj("div", "statuspop", msg);
-    const pdiv = gid("tnmt");
+    const pdiv = gid("spopcontainer");
 
     setTimeout(() => { mdiv.remove(); }, 4000);
     setTimeout(() => { mdiv.classList.add("fade-out"); }, 3000);

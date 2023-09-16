@@ -33,7 +33,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Better looking popups
 * Better looking minipops
 * Better looking player data window
-* Showing multiple status popups on screen simultaneously
+* Click to remove statuspop
 * Same button for starting and ending tournament
 * Move activate/deactivate button to edit player popup
 * Prev button for browsing through log
