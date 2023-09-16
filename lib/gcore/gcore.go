@@ -79,7 +79,7 @@ type Admin struct {
     Pdraw int
     Ploss int
     Status int
-    PPstat int
+    PPstat bool
 }
 
 type Pstat struct {

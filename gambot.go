@@ -33,6 +33,12 @@ type Tpresp struct {
     Ismax bool
 }
 
+type Statresp struct {
+    PPstat bool
+    AIDB bool
+    Valskey bool
+}
+
 // Create random string of length ln
 func randstr(ln int) (string){
 
@@ -82,6 +88,11 @@ func emptyresp(w http.ResponseWriter, t int) {
             p := gcore.Player{}
             p.Status = gcore.Mac["S_ERR"]
             enc.Encode(p)
+
+        case gcore.Mac["TPRESP"]:
+            r := Tpresp{}
+            r.S = "err"
+            enc.Encode(r)
     }
 }
 
@@ -299,8 +310,11 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     resp := Tpresp{}
     call := getcall(r)
 
-    if !valskey(db, call.Skey) {
-        emptyresp(w, gcore.Mac["NULL"])
+    a, e := gcore.Getadmin(db)
+    gcore.Cherr(e)
+
+    if !a.PPstat && !valskey(db, call.Skey) {
+        emptyresp(w, gcore.Mac["TPRESP"])
         return
     }
 
@@ -1046,36 +1060,27 @@ func revtslice(ts []gcore.Tournament) []gcore.Tournament {
     return ts
 }
 
-// HTTP handler - Verifies skey against database
-func verskeyhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
+// HTTP handler - Reports general status on instance
+func stathandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
-    var ret bool
-
+    ret := Statresp{}
     call := getcall(r)
     a, e := gcore.Getadmin(db)
 
-    if e != nil || call.Skey != a.Skey || len(a.Skey) < 1 {
-        ret = false
+    if e != nil || len(a.Pass) < 1 {
+        ret.AIDB = false
+        ret.PPstat = false
 
     } else {
-        ret = true
+        ret.AIDB = true
+        ret.PPstat = a.PPstat
     }
 
-    enc := json.NewEncoder(w)
-    enc.Encode(ret)
-}
-
-// HTTP handler - Check if admin exists in db
-func chkadmhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
-
-    var ret bool
-
-    a, e := gcore.Getadmin(db)
-    if e != nil || len(a.Pass) < 1 {
-        ret = false
+    if valskey(db, call.Skey) {
+        ret.Valskey = true
 
     } else {
-        ret = true
+        ret.Valskey = false
     }
 
     enc := json.NewEncoder(w)
@@ -1123,13 +1128,16 @@ func thhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 // HTTP handler - get tournament status
 func tshandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
+    call := getcall(r)
     t, e := getct(db)
     gcore.Cherr(e)
 
-    call := getcall(r)
     enc := json.NewEncoder(w)
 
-    if !valskey(db, call.Skey) { t = gcore.Tournament{} }
+    a, e := gcore.Getadmin(db)
+    gcore.Cherr(e)
+
+    if !a.PPstat && !valskey(db, call.Skey) { t = gcore.Tournament{} }
 
     enc.Encode(t)
 }
@@ -1680,15 +1688,16 @@ func ppstathandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     }
 
     if call.Set == "true" {
-        a.PPstat = 1
+        a.PPstat = true
         log.Printf("Enabling public page\n");
 
     } else if call.Set == "false" {
-        a.PPstat = 0
+        a.PPstat = false
         log.Printf("Disabling public page\n");
     }
 
     gcore.Wradmin(a, db)
+    a.Pass = []byte("")
     enc.Encode(a)
 }
 
@@ -1827,8 +1836,7 @@ func main() {
         "/reg":             reghandler,     // Admin registration
         "/login":           loginhandler,   // Admin login
         "/admin":           adminhandler,   // Admin settings
-        "/chkadm":          chkadmhandler,  // Check if admin exists in db
-        "/verskey":         verskeyhandler, // Verifies skey with database
+        "/stat":            stathandler,    // Checks general status
         "/ppstat":          ppstathandler,  // Public page status / settings
         "/mkgame":          mkgamehandler,  // Requests creation of new game
         "/ap":              aphandler,      // Add player

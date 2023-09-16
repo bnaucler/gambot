@@ -783,14 +783,14 @@ async function changeadmin(elem) {
     gid("adminform").reset();
     showpopup("none");
 
-    if(resp.Status == mac.S_ERR) logout();
+    if(resp.Status == mac.S_ERR) getstat();
     else statuspopup("Admin settings successfully updated");
 }
 
 // Requests top players (n players of type t: (a)ll or (c)urrent)
 async function gettopplayers(n, t) { // TODO refactor
 
-    const url = "/gtp?n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
+    const url = "/gtp?n=" + n + "&t=" + t;
     const resp = await gofetch(url);
     const pdiv = gid("topfivecontents");
     const plen = resp.P.length;
@@ -824,8 +824,9 @@ async function gettopplayers(n, t) { // TODO refactor
 function trylogin(obj) {
 
     if(obj.Skey) {
-        gettournamentstatus();
         sessionStorage.gambotkey = obj.Skey;
+        getstat();
+        gettournamentstatus();
         gid("login").style.display = "none";
     }
 }
@@ -859,8 +860,9 @@ async function chpass(elem) {
 // Requests change of the public page setting
 async function toggleppage() {
 
-    const cstat = Number(gss("gambotppstat"));
-    const req = await fetch("/ppstat?set=" + !cstat + "&skey=" + gss("gambotkey"));
+    const cstat = JSON.parse(gss("gambotppage"));
+    const url = "/ppstat?set=" + !cstat + "&skey=" + gss("gambotkey");
+    const req = await fetch(url);
 
     if(req.ok) setppbutton();
 }
@@ -869,10 +871,10 @@ async function toggleppage() {
 async function setppbutton() {
 
     const resp = await gofetch("/ppstat?ppage=getstat");
-    const btn = gid("toggleppage");
+    let btn = gid("toggleppage");
 
-    btn.innerHTML = "Pulic page: " + (resp == mac.FALSE ? "disabled" : "enabled");
-    sessionStorage.gambotppstat = resp;
+    btn.innerHTML = "Pulic page: " + (resp == false ? "disabled" : "enabled");
+    sessionStorage.gambotppage = resp;
 }
 
 // Iterates through elem list and selected popups to show / hide
@@ -944,27 +946,21 @@ function showpopup(popup) {
     }
 }
 
+// Shows login screen
+function openlogin() {
+    gid("login").style.display = "block";
+}
+
 // Resets skey and shows login screen
 function logout() {
 
-    gid("login").style.display = "block";
+    const ppstat = gss("gambotppage");
+
+    if(ppstat == "false") gid("login").style.display = "block";
+
+    amode(false);
     sessionStorage.gambotkey = "";
-    adminindb();
-}
-
-// Validates local skey with backend
-async function chkskey() {
-
-    const url = "/verskey?skey=" + gss("gambotkey");
-    const resp = await gofetch(url);
-
-    if(resp == true) {
-        gid("login").style.display = "none";
-        gettournamentstatus();
-
-    } else {
-        logout();
-    }
+    sessionStorage.gambotamode = false;
 }
 
 // Requests edit of player properties
@@ -982,16 +978,15 @@ async function editplayer() {
 }
 
 // Checks if admin account exists in db
-async function adminindb() {
+function adminindb(stat) {
 
     const btn = gid("loginbutton");
     const type = gid("logintype");
     const form = gid("loginform");
-    const resp = await gofetch("/chkadm");
 
     let btxt;
 
-    if(resp == true) {
+    if(stat.AIDB == true) {
         btxt = "Login";
         type.value = "/login";
 
@@ -1004,11 +999,34 @@ async function adminindb() {
     form.addEventListener("submit", loginuser);
 }
 
-// Checks if admin is logged in
-function checklogin() {
+// Displays appropriate controls based on admin mode
+function amode(stat) {
 
-    adminindb();
-    chkskey();
+    if(stat == true) {
+        gid("ctrlbtns").style.display = "block";
+        gid("openloginbtn").style.display = "none";
+
+    } else {
+        gid("ctrlbtns").style.display = "none";
+        gid("openloginbtn").style.display = "block";
+    }
+
+    gettournamentstatus();
+}
+
+// Retrieves global status and puts gambot in appropriate mode
+async function getstat() {
+
+    const resp = await gofetch("/stat?skey=" + gss("gambotkey"));
+
+    adminindb(resp);
+
+    sessionStorage.gambotamode = resp.Valskey;
+    sessionStorage.gambotppage = resp.PPstat;
+
+    if(!resp.Valskey && !resp.PPstat) logout();                 // Show login screen
+    else if(resp.Valskey) amode(true);                          // Goes into admin mode
+    else amode(false);                                          // Displays public page
 }
 
 // Returns current log number
@@ -1050,21 +1068,24 @@ async function getlog(i, n) {
 }
 
 // Retrieves macro definitions
-async function getdefaults() {
+async function ginit() {
 
-    mac = await gofetch("../mac.json");
+    fetch("../mac.json")
+        .then(resp => resp.json())
+        .then(data => mac = data)
+        .then(() => getstat());
+
+    // mac = gofetch("../mac.json").then(getstat());
 }
 
 // Request necessary data after window refresh
 window.onbeforeunload = () => {
-    getdefaults();
-    checklogin();
+    ginit();
 };
 
 // Request necessary data after load
 window.onload = () => {
-    getdefaults();
-    checklogin();
+    ginit();
     sessionStorage.gambottopplayers = 5;
     sessionStorage.gambotlogindex = 0;
 }

@@ -1,7 +1,4 @@
 {
-    "FALSE": 0,
-    "TRUE": 1,
-
     "S_OK": 0,
     "S_ERR": 1,
 
@@ -25,6 +22,7 @@
     "GAME": 2,
     "PLAYER": 3,
     "NULL": 4,
+    "TPRESP": 5,
 
     "RANDOM": 0,
     "WINWIN": 1,

@@ -232,7 +232,7 @@ input[type=checkbox] {
     position: absolute;
     left: 0;
     top: 0;
-    display: block;
+    display: none;
     height: 100vh;
     width: 100%;
     background-color: #222;
@@ -567,4 +567,8 @@ input[type=checkbox] {
     top: 0;
     width: 100vw;
     z-index: 100;
+}
+
+#ctrlbtns {
+    display: none;
 }
