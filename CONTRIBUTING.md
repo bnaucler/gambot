@@ -21,7 +21,7 @@ As you can see below, there is a VERY long list of things which need to be addre
     - Admin logout brings user to public page
     - Remove skey validation from gtphandler
     - Add public variation of gphandler (remove most personal data)
-    - Separate js into public, core & admin scripts
+    - Separate js into public & admin scripts
 * Database backup
 * Better (and consistent) backend error handling
 * Better player data validation
@@ -42,7 +42,9 @@ As you can see below, there is a VERY long list of things which need to be addre
 ### TODO: structure
 * Replace trylogin()
 * Look if playertotournament() can be more streamlined
-* merge adminindb() with check for enabled public page
+* create new stathandler()
+    - merge chkadmhandler()
+    - merge ppstathandler()
 * Refactor (go & js) and divide in multiple source files
 * Single valskey response error object
 * Merge ephandler() and aphandler()

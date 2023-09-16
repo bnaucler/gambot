@@ -68,10 +68,7 @@ function mkminipop() {
 
     elem.style.left = (event.clientX - 5) + "px";
     elem.style.top = (event.clientY - 5) + "px";
-
-    elem.addEventListener("mouseleave", function(event) {
-        elem.remove();
-    });
+    elem.addEventListener("mouseleave", (event) => elem.remove());
 
     return elem;
 }
@@ -180,9 +177,7 @@ function addbench(id, t) {
         player.appendChild(picon);
     }
 
-    player.addEventListener("click", () => {
-        benchpopup(id, t, pstat);
-    });
+    player.addEventListener("click", () => benchpopup(id, t, pstat));
 
     pdiv.appendChild(player);
 }
@@ -213,17 +208,9 @@ function addgame(g, t) {
     const draw = mkobj("div", "draw");
     const dtext = mkobj("span", "", "draw");
 
-    W.addEventListener("click", () => {
-        igppopup(g.W, g.ID, t);
-    });
-
-    B.addEventListener("click", () => {
-        igppopup(g.B, g.ID, t);
-    });
-
-    draw.addEventListener("click", () => {
-        declareresult(g.ID, 0, "");
-    });
+    W.addEventListener("click", () => igppopup(g.W, g.ID, t));
+    B.addEventListener("click", () => igppopup(g.B, g.ID, t));
+    draw.addEventListener("click", () => declareresult(g.ID, 0, ""));
 
     bw.appendChild(W);
     bw.appendChild(B);
@@ -322,9 +309,7 @@ async function playertotournament(elem) {
     const selectedplayers = document.querySelectorAll('input[name="selected"]:checked');
     let ids = [];
 
-    selectedplayers.forEach((checkbox) => {
-        ids.push(checkbox.value);
-    });
+    selectedplayers.forEach((checkbox) => ids.push(checkbox.value));
 
     const url = "/apt?id=" + ids.toString() + "&skey=" + gss("gambotkey");
     const resp = await gofetch(url);
@@ -437,9 +422,7 @@ async function getplayerdata(p) {
         editbtn.setAttribute("name", "activate");
     }
 
-    editdatabtn.addEventListener("click", () => {
-        openplayeredit(resp[0].ID);
-    });
+    editdatabtn.addEventListener("click", () => openplayeredit(resp[0].ID));
 
     fillbar(mac.TOTAL, statobj.Stat[mac.WWIN] + statobj.Stat[mac.BWIN],
                    statobj.Stat[mac.WDRAW] + statobj.Stat[mac.BDRAW],
@@ -472,9 +455,7 @@ function showplayer(p, pdiv, intourn) {
         return;
     }
 
-    name.addEventListener("click", () => {
-        getplayerdata(pl);
-    });
+    name.addEventListener("click", () => getplayerdata(pl));
 
     pl.setAttribute("name", p.ID);
     pdiv.appendChild(pl);
@@ -652,10 +633,7 @@ async function getplayers(elem) {
     if(intourn == 1) {
         const btn = mkobj("button", "", "Add selected players to tournament");
 
-        btn.addEventListener("click", () => {
-            playertotournament(pdiv);
-        });
-
+        btn.addEventListener("click", () => playertotournament(pdiv));
         pdiv.appendChild(btn);
     }
 }
@@ -686,10 +664,7 @@ function addtopplayer(p, s, pdiv) {
     const item = mkobj("div", "topplayer");
     const name = mkobj("p", "tpname", text);
 
-    name.addEventListener("click", () => {
-        getplayerdata(item);
-    });
-
+    name.addEventListener("click", () => getplayerdata(item));
     item.setAttribute("name", p.ID);
 
     item.appendChild(name);
