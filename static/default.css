@@ -232,7 +232,7 @@ input[type=checkbox] {
     position: absolute;
     left: 0;
     top: 0;
-    display: none;
+    display: block;
     height: 100vh;
     width: 100%;
     background-color: #222;
@@ -526,6 +526,7 @@ input[type=checkbox] {
 }
 
 #indplayeredit {
+    display: none;
     position: absolute;
     font-size: 14px;
     right: 0;

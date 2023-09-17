@@ -830,6 +830,7 @@ function trylogin(obj) {
         getstat();
         gettournamentstatus();
         gid("login").style.display = "none";
+        gid("indplayeredit").style.display = "block";
     }
 }
 
@@ -964,6 +965,7 @@ function logout() {
     amode(false);
     sessionStorage.gambotkey = "";
     sessionStorage.gambotamode = false;
+    gid("indplayeredit").style.display = "none";
 }
 
 // Requests edit of player properties

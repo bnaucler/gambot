@@ -27,7 +27,6 @@ As you can see below, there is a VERY long list of things which need to be addre
 
 ### TODO: look & feel
 * Mobile friendly / responsive UI
-* Remove edit button in public page player window
 * Better looking popups
 * Better looking minipops
 * Better looking player data window
@@ -51,6 +50,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Shutdown sequence
 * Monrad seeding algo
 * APPG based seeding for draws in Win/Win algo
+* Avoid immediate rematches in Win/Win algo
 * Possibility to 'force' games with specified opponent
 * Pick player with fewest previous matchups when forcing
 * Tournament history search by date
