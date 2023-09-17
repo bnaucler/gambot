@@ -338,8 +338,22 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
         resp.S = "err"
     }
 
+    if !valskey(db, call.Skey) { resp.P = rempdata(resp.P) }
+
     enc := json.NewEncoder(w)
     enc.Encode(resp)
+}
+
+// Anonymizes player data for public display
+func rempdata(players []gcore.Player) []gcore.Player {
+
+    for i := 0; i < len(players); i++ {
+        tmp := players[i].Pi.Name
+        players[i].Pi = gcore.Pdata{}
+        players[i].Pi.Name = tmp
+    }
+
+    return players
 }
 
 // HTTP handler - get player(s)
@@ -348,7 +362,10 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     players := []gcore.Player{}
     call := getcall(r)
 
-    if !valskey(db, call.Skey) {
+    a, e := gcore.Getadmin(db)
+    gcore.Cherr(e)
+
+    if !valskey(db, call.Skey) && !a.PPstat {
         emptyresp(w, gcore.Mac["NULL"])
         return
     }
@@ -375,6 +392,8 @@ func gphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
             }
         }
     }
+
+    if !valskey(db, call.Skey) { players = rempdata(players) }
 
     enc := json.NewEncoder(w)
     enc.Encode(players)

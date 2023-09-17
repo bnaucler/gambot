@@ -18,7 +18,6 @@ As you can see below, there is a VERY long list of things which need to be addre
 ### TODO: core functionality
 * Internal ELO
 * Public page
-    - Add public variation of gphandler (remove most personal data)
     - Separate js into public & admin scripts
 * Database backup
 * Better (and consistent) backend error handling
@@ -28,6 +27,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 
 ### TODO: look & feel
 * Mobile friendly / responsive UI
+* Remove edit button in public page player window
 * Better looking popups
 * Better looking minipops
 * Better looking player data window
