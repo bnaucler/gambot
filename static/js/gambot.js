@@ -728,7 +728,6 @@ function updatestatus(obj) {
     } else {
         tournamentstarted();
         updatewindow(obj);
-        gettopplayers(gettpcount(), "c");
     }
 }
 
