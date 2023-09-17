@@ -913,6 +913,7 @@ function showpopup(popup) {
 
         case "addplayer":
             gid("addplayerform").reset();
+            gid("addplayerform").id.value = "";
             setdisp(elems, ["addplayer"]);
             break;
 

@@ -70,8 +70,6 @@ As you can see below, there is a VERY long list of things which need to be addre
 * 'Soft end' to stop seeding
 
 ### TODO: known bugs
-* addplayer form not resetting properly
-* All time top displayed when refreshing empty tournament
 
 ## Pull requests
 Are appreciated!
