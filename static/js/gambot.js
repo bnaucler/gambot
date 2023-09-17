@@ -565,6 +565,8 @@ function statuspopup(msg) {
     setTimeout(() => { mdiv.remove(); }, 4000);
     setTimeout(() => { mdiv.classList.add("fade-out"); }, 3000);
 
+    mdiv.addEventListener("click", () => mdiv.remove());
+
     pdiv.appendChild(mdiv);
 }
 
