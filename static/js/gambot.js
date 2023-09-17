@@ -790,7 +790,7 @@ async function changeadmin(elem) {
 // Requests top players (n players of type t: (a)ll or (c)urrent)
 async function gettopplayers(n, t) { // TODO refactor
 
-    const url = "/gtp?n=" + n + "&t=" + t;
+    const url = "/gtp?n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
     const resp = await gofetch(url);
     const pdiv = gid("topfivecontents");
 
