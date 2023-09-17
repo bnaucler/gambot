@@ -793,6 +793,8 @@ async function gettopplayers(n, t) { // TODO refactor
     const url = "/gtp?n=" + n + "&t=" + t;
     const resp = await gofetch(url);
     const pdiv = gid("topfivecontents");
+
+    if(resp === undefined || resp.P === null) return;
     const plen = resp.P.length;
 
     pdiv.innerHTML = "";
