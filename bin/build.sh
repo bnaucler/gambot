@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TOOLS=("dbdump")
+TOOLS=("dbdump resetelo")
 TPATH="tools"
 
 echo "Building gambot"

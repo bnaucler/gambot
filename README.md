@@ -35,6 +35,18 @@ Usage of bin/dbdump:
   -t	dump tournament data
 ```
 
+## Tool - resetelo
+Sets/resets all players ELO to a specific value  
+Output of `bin/resetelo -h`:  
+```
+Usage of bin/resetelo:
+  -d string
+    	specify database to open (default "data/gambot.db")
+  -e int
+    	ELO value to set (default 1000)
+```
+**NB!** This is destructive and will wipe all players ELO. There is currently no way to revert this change or to manually adjust the values.
+
 ## Tool - clean.sh
 Removes pidfile, all logs and databases from the `data/` directory.  
 Invoke with `-force` for a more aggressive approach. (Use with caution.)
