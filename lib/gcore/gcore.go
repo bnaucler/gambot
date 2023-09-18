@@ -44,6 +44,7 @@ type Apicall struct {
     N string
     T string
     I string
+    Tpt string
     ID string
     Game string
     Name string

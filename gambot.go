@@ -31,6 +31,7 @@ import (
 type Tpresp struct {
     P []gcore.Player
     S string
+    Tpt string
     Ismax bool
 }
 
@@ -117,6 +118,7 @@ func getcall(r *http.Request) gcore.Apicall {
         N:          r.FormValue("n"),
         T:          r.FormValue("t"),
         I:          r.FormValue("i"),
+        Tpt:        r.FormValue("tpt"),
         ID:         r.FormValue("id"),
         Game:       r.FormValue("game"),
         Name:       r.FormValue("name"),
@@ -266,16 +268,29 @@ func rmdeacplayers(pl []gcore.Player) []gcore.Player {
 }
 
 // Returns slice with top n players from tournament t
-func currenttop(db *bolt.DB, n int, t gcore.Tournament) ([]gcore.Player, bool) {
+func currenttop(db *bolt.DB, n int, tpt string, t gcore.Tournament) ([]gcore.Player, bool) {
 
     var ismax bool = false
 
     players := make([]gcore.Player, len(t.P))
     copy(players, t.P)
 
-    sort.Slice(players, func(i, j int) bool {
-        return players[i].TN.Points > players[j].TN.Points
-    })
+    switch tpt {
+        case "points":
+            sort.Slice(players, func(i, j int) bool {
+                return players[i].TN.Points > players[j].TN.Points
+            })
+
+        case "rating":
+            sort.Slice(players, func(i, j int) bool {
+                return players[i].ELO > players[j].ELO
+            })
+
+        case "appg":
+            sort.Slice(players, func(i, j int) bool {
+                return players[i].TN.APPG > players[j].TN.APPG
+            })
+    }
 
     if n >= len(players) {
         n = len(players)
@@ -286,16 +301,29 @@ func currenttop(db *bolt.DB, n int, t gcore.Tournament) ([]gcore.Player, bool) {
 }
 
 // Returns slice with all time top n players
-func alltimetop(db *bolt.DB, n int) ([]gcore.Player, bool) {
+func alltimetop(db *bolt.DB, n int, tpt string) ([]gcore.Player, bool) {
 
     var ismax bool = false
 
     players := gcore.Getallplayers(db)
     players = rmdeacplayers(players)
 
-    sort.Slice(players, func(i, j int) bool {
-        return players[i].AT.Points > players[j].AT.Points
-    })
+    switch tpt {
+        case "points":
+            sort.Slice(players, func(i, j int) bool {
+                return players[i].AT.Points > players[j].AT.Points
+            })
+
+        case "rating":
+            sort.Slice(players, func(i, j int) bool {
+                return players[i].ELO > players[j].ELO
+            })
+
+        case "appg":
+            sort.Slice(players, func(i, j int) bool {
+                return players[i].AT.APPG > players[j].AT.APPG
+            })
+    }
 
     if n >= len(players) {
         n = len(players)
@@ -328,16 +356,18 @@ func gtphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     resp.P = make([]gcore.Player, n)
 
     if call.T == "a" {
-        resp.P, resp.Ismax = alltimetop(db, n)
+        resp.P, resp.Ismax = alltimetop(db, n, call.Tpt)
         resp.S = "a"
 
     } else if call.T == "c" {
-        resp.P, resp.Ismax = currenttop(db, n, t)
+        resp.P, resp.Ismax = currenttop(db, n, call.Tpt, t)
         resp.S = "c"
 
     } else {
         resp.S = "err"
     }
+
+    resp.Tpt = call.Tpt
 
     if !valskey(db, call.Skey) { resp.P = rempdata(resp.P) }
 

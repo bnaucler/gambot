@@ -56,7 +56,6 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Tournament history search by date
     - next / prev buttons
 * Tool to import player & tournament JSON data to db
-* Alternate top 5 with APPG instead of total points
 * Participant attendance & results report per tournament
 * See all games in tournament history
 * See all players and respective scores in tournament history

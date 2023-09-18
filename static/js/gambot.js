@@ -154,6 +154,42 @@ function igppopup(id, gameid, t) {
     pdiv.appendChild(bpop);
 }
 
+// Creates popup menu to select top list type
+function topplayerpopup() {
+
+    const pop = mkminipop();
+    const pdiv = gid("tnmt");
+    const tpbtn = mkobj("div", "minipopitem", "Total points");
+    const ratingbtn = mkobj("div", "minipopitem", "Rating");
+    const appgbtn = mkobj("div", "minipopitem", "APPG");
+    const intourn = gss("gambotintournament");
+
+    let tpt = Number(intourn) == 0 ? "a" : "c";
+
+    tpbtn.addEventListener("click", () => {
+        sessionStorage.gambottptype = "points";
+        gettopplayers(5, tpt);
+        pop.remove();
+    });
+
+    ratingbtn.addEventListener("click", () => {
+        sessionStorage.gambottptype = "rating";
+        gettopplayers(5, tpt);
+        pop.remove();
+    });
+
+    appgbtn.addEventListener("click", () => {
+        sessionStorage.gambottptype = "appg";
+        gettopplayers(5, tpt);
+        pop.remove();
+    });
+
+    pop.appendChild(tpbtn)
+    pop.appendChild(ratingbtn)
+    pop.appendChild(appgbtn)
+    pdiv.appendChild(pop);
+}
+
 // Returns player pause stat by id
 function getpstat(id, t) {
 
@@ -658,11 +694,14 @@ function tournamentended() {
 }
 
 // Adds top player to list
-function addtopplayer(p, s, pdiv) {
-    let text;
+function addtopplayer(p, s, tpt, pdiv) {
 
-    if(s == "a") text = p.Pi.Name + " " + p.AT.Points;
-    else if(s == "c") text = p.Pi.Name + " " + p.TN.Points;
+    let text;
+    let statobj = s == "a" ? p.AT : p.TN;
+
+    if(tpt == "points") text = p.Pi.Name + " " + statobj.Points;
+    else if(tpt == "rating") text = p.Pi.Name + " (" + Math.floor(p.ELO) + ")";
+    else if(tpt == "appg") text = p.Pi.Name + " " + statobj.APPG.toFixed(2);
 
     const item = mkobj("div", "topplayer");
     const name = mkobj("p", "tpname", text);
@@ -793,7 +832,8 @@ async function changeadmin(elem) {
 // Requests top players (n players of type t: (a)ll or (c)urrent)
 async function gettopplayers(n, t) { // TODO refactor
 
-    const url = "/gtp?n=" + n + "&t=" + t + "&skey=" + gss("gambotkey");
+    const tpt = gss("gambottptype");
+    const url = "/gtp?n=" + n + "&t=" + t + "&tpt=" + tpt + "&skey=" + gss("gambotkey");
     const resp = await gofetch(url);
     const pdiv = gid("topfivecontents");
 
@@ -818,7 +858,7 @@ async function gettopplayers(n, t) { // TODO refactor
         gid("topfive").style.display = "none";
     }
 
-    for(const p of resp.P) addtopplayer(p, resp.S, pdiv);
+    for(const p of resp.P) addtopplayer(p, resp.S, tpt, pdiv);
 
     if(!resp.Ismax) addtopmorebtn(resp.S, pdiv);
 
@@ -1082,8 +1122,6 @@ async function ginit() {
         .then(resp => resp.json())
         .then(data => mac = data)
         .then(() => getstat());
-
-    // mac = gofetch("../mac.json").then(getstat());
 }
 
 // Request necessary data after window refresh
@@ -1094,6 +1132,7 @@ window.onbeforeunload = () => {
 // Request necessary data after load
 window.onload = () => {
     ginit();
+    sessionStorage.gambottptype = "points";
     sessionStorage.gambottopplayers = 5;
     sessionStorage.gambotlogindex = 0;
 }
