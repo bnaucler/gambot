@@ -69,6 +69,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * 'Soft end' to stop seeding
 
 ### TODO: known bugs
+* Disappearing edit button for player data
 
 ## Pull requests
 Are appreciated!

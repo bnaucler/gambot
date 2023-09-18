@@ -57,6 +57,7 @@ type Apicall struct {
     Zip string
     Phone string
     Club string
+    LichessUser string
 }
 
 type Pdata struct {
@@ -65,7 +66,7 @@ type Pdata struct {
     LName string
     Dbirth time.Time
     Email string
-    LicessUser string
+    LichessUser string
     PostalAddr string
     Zip string
     Gender string

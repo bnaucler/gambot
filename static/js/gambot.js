@@ -418,8 +418,17 @@ async function openplayeredit(id) {
     form.zip.value = pd.Zip;
     form.phone.value = pd.Phone;
     form.club.value = pd.Club;
+    form.lichessuser.value = pd.LichessUser;
 
     setapbutton("edit");
+}
+
+// Opens a new tab and brings user to Lichess user
+function gotolichess(uname) {
+
+    const url = "https://lichess.org/@/" + uname;
+
+    window.open(url);
 }
 
 // Retrieves and displays data on individual player
@@ -439,6 +448,11 @@ async function getplayerdata(p) {
     const editdatabtn = gid("indplayeredit");
     const intourn = gss("gambotintournament");
     const statobj = intourn == 1 ? resp[0].TN : resp[0].AT;
+
+    if(resp[0].Pi.LichessUser.length > 1) {
+        // TODO - lichess username is in database
+    } else {
+    }
 
     pname.innerHTML = resp[0].Pi.Name;
     pname.setAttribute("name", resp[0].ID);
@@ -621,6 +635,7 @@ async function addplayer(elem) {
     const zip = elem.elements["zip"].value;
     const phone = elem.elements["phone"].value;
     const club = elem.elements["club"].value;
+    const lichessuser = elem.elements["lichessuser"].value;
 
     const url = "/ap?id=" + id +
                 "&fname=" + fname +
@@ -632,6 +647,7 @@ async function addplayer(elem) {
                 "&zip=" + zip +
                 "&phone=" + phone +
                 "&club=" + club +
+                "&lichessuser=" + lichessuser +
                 "&skey=" + gss("gambotkey");
 
     gid("addplayerform").reset();
