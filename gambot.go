@@ -22,6 +22,7 @@ import (
     "encoding/json"
 
     "github.com/bnaucler/gambot/lib/gcore"
+    "github.com/bnaucler/gambot/lib/gelo"
 
     bolt "go.etcd.io/bbolt"
     bcrypt "golang.org/x/crypto/bcrypt"
@@ -558,6 +559,7 @@ func aphandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     } else { // No ID, creating new player
         p.Active = true;
+        p.ELO = float64(gcore.Mac["ELO_INIT"])
         p.TN.Stat = make([]int, 6)
         p.AT.Stat = make([]int, 6)
     }
@@ -1457,6 +1459,9 @@ func drhandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
 
     t = endgame(call.Game, iid, t)
     t = updateappgbygid(call.Game, t)
+    t = gelo.Geloupdate(t, call.Game, gcore.Mac["ELO_K"], iid)
+    gcore.Cherr(e)
+
     storegameplayers(db, call.Game, t)
     t = seed(t)
 

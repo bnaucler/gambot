@@ -96,6 +96,7 @@ type Pstat struct {
 type Player struct {
     ID int
     Uname string
+    ELO float64
     Pass []byte
     Pi Pdata
     TN Pstat

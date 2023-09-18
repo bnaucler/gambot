@@ -16,7 +16,6 @@ Contributions are very welcome! At this early stage, this file will double as a 
 As you can see below, there is a VERY long list of things which need to be addressed. There should be ample opportunity to get involved. *But most importantly* - if you decide to give gambot a try at your club, let us know what kind of real-world issues you run into.
 
 ### TODO: core functionality
-* Internal ELO
 * Public page
     - Separate js into public & admin scripts
 * Database backup
@@ -47,6 +46,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Create JSON object with wrapper functions for session storage items
 
 ### TODO: new functionality
+* Display ELO on player info page
 * Shutdown sequence
 * Monrad seeding algo
 * APPG based seeding for draws in Win/Win algo
