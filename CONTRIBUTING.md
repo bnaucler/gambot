@@ -46,7 +46,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Create JSON object with wrapper functions for session storage items
 
 ### TODO: new functionality
-* Display ELO on player info page
+* Implement player K value for ELO
 * Shutdown sequence
 * Monrad seeding algo
 * APPG based seeding for draws in Win/Win algo

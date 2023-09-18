@@ -1,7 +1,6 @@
 package gelo
 
 import (
-    "fmt"
     "math"
 
     "github.com/bnaucler/gambot/lib/gcore"
@@ -73,9 +72,6 @@ func Geloupdate(t gcore.Tournament, gid string, K int, winner int) gcore.Tournam
     } else {
         t.P[widx].ELO, t.P[bidx].ELO = gelocalc(wpelo, bpelo, K, gcore.Mac["DRAW"])
     }
-
-    fmt.Printf("DEBUG: Updating gELO for %s: %.2f -> %.2f\n", t.P[widx].Pi.Name, wpelo, t.P[widx].ELO)
-    fmt.Printf("DEBUG: Updating gELO for %s: %.2f -> %.2f\n", t.P[bidx].Pi.Name, bpelo, t.P[bidx].ELO)
 
     return t
 }

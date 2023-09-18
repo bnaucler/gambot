@@ -393,6 +393,7 @@ async function getplayerdata(p) {
     const resp = await gofetch(url);
 
     const pname = gid("indplayername");
+    const pelo = gid("indeloval");
     const indgames = gid("indgamesval");
     const indpoints = gid("indpointsval");
     const indppg = gid("indppgval");
@@ -405,6 +406,7 @@ async function getplayerdata(p) {
 
     pname.innerHTML = resp[0].Pi.Name;
     pname.setAttribute("name", resp[0].ID);
+    pelo.innerHTML = Math.floor(resp[0].ELO);
 
     indgames.innerHTML = statobj.Ngames;
     indpoints.innerHTML = statobj.Points;
