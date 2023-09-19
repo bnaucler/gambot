@@ -25,6 +25,7 @@ As you can see below, there is a VERY long list of things which need to be addre
     - backend
 
 ### TODO: look & feel
+* Make player edit button look "normal"
 * Mobile friendly / responsive UI
 * Better looking popups
 * Better looking minipops
@@ -47,6 +48,8 @@ As you can see below, there is a VERY long list of things which need to be addre
 
 ### TODO: new functionality
 * Implement player K value for ELO
+* Possibility to edit ELO init value in admin interface
+* Interactive elo edit per player in resetelo.go
 * Shutdown sequence
 * Monrad seeding algo
 * APPG based seeding for draws in Win/Win algo
@@ -69,7 +72,6 @@ As you can see below, there is a VERY long list of things which need to be addre
 * 'Soft end' to stop seeding
 
 ### TODO: known bugs
-* Disappearing edit button for player data
 
 ## Pull requests
 Are appreciated!

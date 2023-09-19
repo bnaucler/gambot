@@ -167,6 +167,7 @@ input[type=checkbox] {
 #indplayername {
     font-size: 24px;
     margin-bottom: 20px;
+    margin-top: 10px;
 }
 
 .header {
@@ -530,11 +531,11 @@ input[type=checkbox] {
     display: none;
     position: absolute;
     font-size: 14px;
-    right: 0;
     top: 0;
+    left: 0;
     color: #222;
     background-color: #ccc;
-    border-radius: 0 0 0 4px;
+    border-radius: 0 0 4px 0;
     padding: 3px;
     opacity: .8;
     transition: .3s;
@@ -592,4 +593,23 @@ input[type=checkbox] {
 
 #topfiveselbtn:hover {
     opacity: 1;
+}
+
+.lichessicon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 35px;
+    width: 35px;
+    background: url("/img/ico/lichess.png") no-repeat center;
+	background-size: contain;
+    cursor: pointer;
+    margin-top: 25px;
+    margin-right: 10px;
+    opacity: .5;
+    transition: .3s;
+}
+
+.lichessicon:hover {
+    opacity: .8;
 }

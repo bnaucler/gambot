@@ -423,14 +423,6 @@ async function openplayeredit(id) {
     setapbutton("edit");
 }
 
-// Opens a new tab and brings user to Lichess user
-function gotolichess(uname) {
-
-    const url = "https://lichess.org/@/" + uname;
-
-    window.open(url);
-}
-
 // Retrieves and displays data on individual player
 async function getplayerdata(p) {
 
@@ -450,8 +442,14 @@ async function getplayerdata(p) {
     const statobj = intourn == 1 ? resp[0].TN : resp[0].AT;
 
     if(resp[0].Pi.LichessUser.length > 1) {
-        // TODO - lichess username is in database
+        let lico = mkobj("a", "lichessicon");
+        lico.target = "_blank";
+        lico.href = "https://lichess.org/@/" + resp[0].Pi.LichessUser;
+        gid("indplayer").appendChild(lico);
+
     } else {
+        let ch = document.getElementsByClassName("lichessicon");
+        while(ch[0]) ch[0].parentNode.removeChild(ch[0]);
     }
 
     pname.innerHTML = resp[0].Pi.Name;
@@ -1069,6 +1067,7 @@ function amode(stat) {
     if(stat == true) {
         gid("ctrlbtns").style.display = "block";
         gid("openloginbtn").style.display = "none";
+        gid("indplayeredit").style.display = "block";
 
     } else {
         gid("ctrlbtns").style.display = "none";
