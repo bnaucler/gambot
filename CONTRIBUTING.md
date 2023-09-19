@@ -36,11 +36,11 @@ As you can see below, there is a VERY long list of things which need to be addre
 
 ### TODO: structure
 * Replace trylogin()
+* Clean up ethandler()
 * Look if playertotournament() can be more streamlined
 * Refactor (go & js) and divide in multiple source files
 * Single valskey response error object
 * Merge ephandler() and aphandler()
-* Merge cthandler() and ethandler()
 * Reorganize CSS and comment for readability
 * Move basic db functionality to gcore
 * Create JSON object with wrapper functions for session storage items
@@ -68,7 +68,6 @@ As you can see below, there is a VERY long list of things which need to be addre
     - APPG based
     - If still equal: APPG as black
 * Logic to pick longest waiting bench player if all other things are equal
-* 'Soft end' to stop seeding
 
 ### TODO: known bugs
 

@@ -928,6 +928,8 @@ func seedmonrad(t gcore.Tournament) gcore.Tournament {
 // Selects seeding algorithm
 func seed(t gcore.Tournament) gcore.Tournament {
 
+    if t.Seeding == false { return t }
+
     switch t.Algo {
         case gcore.Mac["RANDOM"]:
             t = seedrandom(t)
@@ -978,8 +980,9 @@ func newtournament(db *bolt.DB, call gcore.Apicall) gcore.Tournament {
     t := gcore.Tournament{}
 
     t.Start = time.Now()
-    t.Status = gcore.Mac["S_OK"]
+    t.Status = gcore.Mac["S_STARTED"]
     t.Round = 1
+    t.Seeding = true
     algo, e := strconv.Atoi(call.Algo)
     gcore.Cherr(e)
     t.Algo = algo
@@ -1001,36 +1004,6 @@ func newtournament(db *bolt.DB, call gcore.Apicall) gcore.Tournament {
 
     log.Printf("%s tournament (ID: %d) started\n", atxt, t.ID)
     return t
-}
-
-// HTTP handler - create new tournament
-func cthandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
-
-    call := getcall(r)
-
-    t, e := getct(db)
-    gcore.Cherr(e)
-
-    if t.ID != 0 {
-        t.Status = gcore.Mac["S_ERR"]
-        enc := json.NewEncoder(w)
-        enc.Encode(t)
-        log.Printf("Tournament already ongoing!\n")
-        return
-
-    } else if !valskey(db, call.Skey) {
-        emptyresp(w, gcore.Mac["TOURNAMENT"])
-        log.Printf("Admin verification failed\n")
-        return
-    };
-
-    t = newtournament(db, call)
-
-    enc := json.NewEncoder(w)
-    enc.Encode(t)
-
-    e  = storect(db, t)
-    gcore.Cherr(e)
 }
 
 // Returns true if player enrolled in tournament
@@ -1661,16 +1634,35 @@ func ethandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) {
     t, e := getct(db)
     gcore.Cherr(e)
 
-    if call.Action == "end" {
+    if call.Action == "new" {
+        if t.ID != 0 {
+            t.Status = gcore.Mac["S_ERR"]
+            log.Printf("Tournament already ongoing!\n")
+
+        } else {
+            t = newtournament(db, call)
+            e = storect(db, t)
+            gcore.Cherr(e)
+        }
+
+    } else if call.Action == "end" {
         t = endtournament(db, t)
         et := gcore.Tournament{}
         e = storect(db, et)
         gcore.Cherr(e)
+        t.Status = gcore.Mac["S_TEND"]
 
     } else if call.Action == "rem" {
         id, e := strconv.Atoi(call.ID)
         gcore.Cherr(e)
         t = rtplayer(db, id, t)
+        e = storect(db, t)
+        gcore.Cherr(e)
+        t.Status = gcore.Mac["S_REMPLAYER"]
+
+    } else if call.Action == "stopseed" {
+        t.Seeding = false
+        t.Status = gcore.Mac["S_STOPSEED"]
         e = storect(db, t)
         gcore.Cherr(e)
     }
@@ -1902,7 +1894,6 @@ func main() {
         "/ep":              ephandler,      // Edit player
         "/gp":              gphandler,      // Get player
         "/gtp":             gtphandler,     // Get top players
-        "/ct":              cthandler,      // Create tournament
         "/et":              ethandler,      // Edit tournament
         "/apt":             apthandler,     // Add player to tournament
         "/ts":              tshandler,      // Get tournament status

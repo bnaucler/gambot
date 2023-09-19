@@ -544,14 +544,14 @@ function tournamentend(obj) {
     if(obj.Status === mac.S_ERR) statuspopup("No tournament running - cannot end!");
     else statuspopup("Tournament " + obj.ID + " ended at " + date + " "+ time);
 
-    tournamentended();
+    settournamentstatus(mac.S_END);
     updatestatus(obj);
 }
 
 // Makes call to start tournament with selected algo
 async function launchtournament(algo) {
 
-    const url = "/ct?algo=" + algo + "&skey=" + gss("gambotkey");
+    const url = "/et?action=new&algo=" + algo + "&skey=" + gss("gambotkey");
     const resp = await gofetch(url);
 
     gettopplayers(5);
@@ -567,7 +567,7 @@ async function launchtournament(algo) {
         else updatewindow(resp);
     }
 
-    tournamentstarted();
+    settournamentstatus(mac.S_STARTED);
 }
 
 // Requests start of new tournament
@@ -606,11 +606,15 @@ async function edittournament(action, id) {
     const url = "/et?action=" + action + "&id=" + id + "&skey=" + gss("gambotkey");
     const resp = await gofetch(url);
 
-    if(timezero(resp.End)) {
+    if(resp.Status == mac.S_REM) {
         statuspopup("Player removed from tournament");
         updatestatus(resp);
 
-    } else {
+    } else if(resp.Status == mac.S_STOPSEED) {
+        // tournamentseedstopped(resp);
+        settournamentstatus(mac.S_STOPSEED);
+
+    } else if(resp.Status == mac.S_TEND) {
         tournamentend(resp);
     }
 }
@@ -700,26 +704,30 @@ async function getplayers(elem) {
     }
 }
 
-// Shows & hides appropriate divs for in-tournament-mode
-function tournamentstarted() {
+// Sets tbtn and sessionstorage based on stat
+function settournamentstatus(stat) {
 
-    const tbtn = gid("tbtn");
+    let tbtn = gid("tbtn");
 
-    tbtn.innerHTML = "End tournament";
-    tbtn.addEventListener("click", () => edittournament("end"));
+    if(stat == mac.S_STARTED) {
+        tbtn.innerHTML = "Stop seeding";
+        tbtn.onclick = () => edittournament("stopseed");
 
-    sessionStorage.gambotintournament = 1;
-}
+        sessionStorage.gambotintournament = 1;
 
-// Shows & hides appropriate divs for no-tournament-mode
-function tournamentended() {
+    } else if(stat == mac.S_STOPSEED) {
+        tbtn.innerHTML = "End tournament";
+        tbtn.onclick = () => edittournament("end");
 
-    const tbtn = gid("tbtn");
+    } else if(stat == mac.S_END) {
+        tbtn.innerHTML = "Start new tournament";
+        tbtn.onclick = () => newtournament();
 
-    tbtn.innerHTML = "Start new tournament";
-    tbtn.addEventListener("click", () => newtournament());
+        sessionStorage.gambotintournament = 0;
 
-    sessionStorage.gambotintournament = 0;
+    } else {
+        statuspopup("Invalid tournament status request!");
+    }
 }
 
 // Adds top player to list
@@ -791,12 +799,12 @@ function addtoplessbtn(s, pdiv) {
 function updatestatus(obj) {
 
     if(obj.ID === 0 || !timezero(obj.End)) {
-        tournamentended();
+        settournamentstatus(mac.S_END);
         gettopplayers(gettpcount(), "a");
         gid("games").innerHTML = "";
 
     } else {
-        tournamentstarted();
+        settournamentstatus(mac.S_STARTED);
         updatewindow(obj);
     }
 }

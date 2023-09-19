@@ -1,6 +1,11 @@
 {
     "S_OK": 0,
     "S_ERR": 1,
+    "S_STARTED": 2,
+    "S_STOPSEED": 3,
+    "S_END": 4,
+    "S_TEND": 5,
+    "S_REMPLAYER": 6,
 
     "WHITE": 0,
     "BLACK": 1,
