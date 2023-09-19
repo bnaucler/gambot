@@ -1151,4 +1151,13 @@ window.onload = () => {
     sessionStorage.gambottptype = "points";
     sessionStorage.gambottopplayers = 5;
     sessionStorage.gambotlogindex = 0;
+
+    document.onkeydown = (evt) => {
+        evt = evt || window.event;
+        let esc = false;
+
+        if("key" in evt) esc = (evt.key === "Escape" || evt.key === "Esc");
+        else esc = (evt.keyCode === 27);
+        if(esc) showpopup("none");
+    };
 }
