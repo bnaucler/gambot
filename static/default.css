@@ -605,17 +605,17 @@ input[type=checkbox] {
     position: absolute;
     right: 0;
     top: 0;
-    height: 35px;
-    width: 35px;
+    height: 28px;
+    width: 28px;
     background: url("/img/ico/lichess.png") no-repeat center;
 	background-size: contain;
     cursor: pointer;
-    margin-top: 25px;
+    margin-top: 28px;
     margin-right: 10px;
-    opacity: .5;
+    opacity: .6;
     transition: .3s;
 }
 
 .lichessicon:hover {
-    opacity: .8;
+    opacity: 1;
 }
