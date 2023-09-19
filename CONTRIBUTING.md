@@ -26,7 +26,6 @@ As you can see below, there is a VERY long list of things which need to be addre
     - backend
 
 ### TODO: look & feel
-* Make player edit button look "normal"
 * Mobile friendly / responsive UI
 * Better looking popups
 * Better looking minipops
