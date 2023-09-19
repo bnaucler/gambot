@@ -32,7 +32,6 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Better looking minipops
 * Better looking player data window
 * Prev button for browsing through log
-* Show number of games within bars in player data
 
 ### TODO: structure
 * Replace trylogin()
@@ -62,7 +61,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * See all games in tournament history
 * See all players and respective scores in tournament history
 * Tournament history data download
-* Licess API bindings
+* Lichess API bindings
 * Selector to display tournament or all-time stats in player info window
 * Logic to determine top players when points are equal
     - APPG based

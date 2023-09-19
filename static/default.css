@@ -431,7 +431,13 @@ input[type=checkbox] {
 }
 
 .hbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    overflow: hidden;
     height: 15px;
+    color: #eee;
     float: left;
 }
 

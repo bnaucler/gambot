@@ -354,6 +354,18 @@ async function playertotournament(elem) {
     showpopup("none");
 }
 
+// Returns the appropriate text for bar segment
+function setbartext(n, p) {
+
+    let ret;
+
+    if(p > 20) ret = n + " (" + p + "%)";
+    else if(p > 10) ret = n;
+    else ret = "";
+
+    return ret;
+}
+
 // Fills the horizontal bar for win / draw / loss
 function fillbar(col, win, draw, loss) {
 
@@ -385,6 +397,10 @@ function fillbar(col, win, draw, loss) {
         dwidth = Math.floor(draw / sum * 100);
         lwidth = Math.floor(loss / sum * 100);
     }
+
+    wbar.innerHTML = setbartext(win, wwidth);
+    dbar.innerHTML = setbartext(draw, dwidth);
+    lbar.innerHTML = setbartext(loss, lwidth);
 
     wbar.style.width = wwidth + "%";
     dbar.style.width = dwidth + "%";
