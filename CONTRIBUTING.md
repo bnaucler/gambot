@@ -31,7 +31,6 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Better looking popups
 * Better looking minipops
 * Better looking player data window
-* Same button for starting and ending tournament
 * Prev button for browsing through log
 * Show number of games within bars in player data
 

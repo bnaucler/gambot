@@ -703,16 +703,22 @@ async function getplayers(elem) {
 // Shows & hides appropriate divs for in-tournament-mode
 function tournamentstarted() {
 
-    gid("tstart").style.display = "none";
-    gid("tend").style.display = "block";
+    const tbtn = gid("tbtn");
+
+    tbtn.innerHTML = "End tournament";
+    tbtn.addEventListener("click", () => edittournament("end"));
+
     sessionStorage.gambotintournament = 1;
 }
 
 // Shows & hides appropriate divs for no-tournament-mode
 function tournamentended() {
 
-    gid("tstart").style.display = "inline-block";
-    gid("tend").style.display = "none";
+    const tbtn = gid("tbtn");
+
+    tbtn.innerHTML = "Start new tournament";
+    tbtn.addEventListener("click", () => newtournament());
+
     sessionStorage.gambotintournament = 0;
 }
 
