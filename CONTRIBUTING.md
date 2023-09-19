@@ -19,6 +19,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Public page
     - Separate js into public & admin scripts
 * Database backup
+* Logout handler to erase skey in backend
 * Better (and consistent) backend error handling
 * Better player data validation
     - frontend

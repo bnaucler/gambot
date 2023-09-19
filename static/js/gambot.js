@@ -404,6 +404,7 @@ async function openplayeredit(id) {
     const resp = await gofetch(url);
 
     showpopup("addplayer"); // Needs to run before setting pd
+    gid("editplayer").style.display = "block";
 
     const form = gid("addplayerform");
     const pd = resp[0].Pi;
@@ -421,6 +422,14 @@ async function openplayeredit(id) {
     form.lichessuser.value = pd.LichessUser;
 
     setapbutton("edit");
+}
+
+// Opens add player window, setting up for new player
+function openaddplayer() {
+
+    showpopup("addplayer");
+    setapbutton("add");
+    gid("editplayer").style.display = "none";
 }
 
 // Retrieves and displays data on individual player
