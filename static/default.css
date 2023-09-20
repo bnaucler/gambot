@@ -604,3 +604,53 @@ input[type=checkbox] {
 .lichessicon:hover {
     opacity: 1;
 }
+
+@media only screen and (max-width: 600px) {
+
+    #container {
+        width: 90%;
+    }
+
+    .msb {
+        width: 90%;
+        float: none;
+        clear: both;
+    }
+
+    #ctrlbtns {
+    }
+
+    #logincontainer {
+        padding: 20px;
+        width: calc(100vw - 20px);
+        height: 100vh;
+    }
+
+    .popup {
+        left: 0;
+        top: 0;
+        width: calc(100vw - 20px);
+        height: 100vh;
+        border: none;
+        padding: 20px;
+    }
+
+    .barcontainer {
+        width: 90%;
+    }
+
+    .lichessicon {
+        display: none;
+    }
+
+    input[type=submit], button {
+        width: 90%;
+        margin: 0 auto;
+    }
+
+    input[type=text], input[type=password], input[type=number], select {
+        width: 90%;
+        margin: 0 auto;
+        margin-bottom: 10px;
+    }
+}

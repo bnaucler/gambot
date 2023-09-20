@@ -26,11 +26,12 @@ As you can see below, there is a VERY long list of things which need to be addre
     - backend
 
 ### TODO: look & feel
-* Mobile friendly / responsive UI
 * Better looking popups
 * Better looking minipops
 * Better looking player data window
 * Prev button for browsing through log
+* Working minipops for touch
+* Cancel login button to return to public page (if available)
 
 ### TODO: structure
 * Replace trylogin()
@@ -66,8 +67,11 @@ As you can see below, there is a VERY long list of things which need to be addre
     - APPG based
     - If still equal: APPG as black
 * Logic to pick longest waiting bench player if all other things are equal
+* Per-player anonymization setting
 
 ### TODO: known bugs
+* Player edit window not properly cleared at close
+* Sometimes 'less' button in top player list needs to be pressed multiple times
 
 ## Pull requests
 Are appreciated!
