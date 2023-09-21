@@ -1039,6 +1039,9 @@ func apt(db *bolt.DB, t gcore.Tournament, p int) gcore.Tournament {
     cp.TN.APPG = 0
     cp.TN.WAPPG = 0
     cp.TN.BAPPG = 0
+    cp.TN.Points = 0
+    cp.TN.Bpoints = 0
+    cp.TN.Wpoints = 0
     cp.TN.Stat = make([]int, len(cp.AT.Stat))
     cp.TN.Ngames = 0
 

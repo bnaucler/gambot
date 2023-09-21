@@ -72,6 +72,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 ### TODO: known bugs
 * Player edit window not properly cleared at close
 * Sometimes 'less' button in top player list needs to be pressed multiple times
+* Edit player 'cycles' through players, does not pick correct one
 
 ## Pull requests
 Are appreciated!
