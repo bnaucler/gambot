@@ -496,7 +496,7 @@ async function getplayerdata(p) {
         editbtn.setAttribute("name", "activate");
     }
 
-    editdatabtn.addEventListener("click", () => openplayeredit(resp[0].ID));
+    editdatabtn.onclick = () => openplayeredit(resp[0].ID);
 
     fillbar(mac.TOTAL, statobj.Stat[mac.WWIN] + statobj.Stat[mac.BWIN],
                    statobj.Stat[mac.WDRAW] + statobj.Stat[mac.BDRAW],
@@ -529,8 +529,7 @@ function showplayer(p, pdiv, intourn) {
         return;
     }
 
-    name.addEventListener("click", () => getplayerdata(pl));
-
+    name.onclick = getplayerdata(pl);
     pl.setAttribute("name", p.ID);
     pdiv.appendChild(pl);
 }
