@@ -80,6 +80,17 @@ input[type=checkbox] {
     float: right;
 }
 
+#invisible {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    opacity: 0;
+    display: none;
+}
+
 #container {
     width: 800px;
     margin: 0 auto;
@@ -605,19 +616,20 @@ input[type=checkbox] {
     opacity: 1;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 800px) {
 
     #container {
         width: 90%;
     }
 
     .msb {
-        width: 90%;
         float: none;
-        clear: both;
+        width: 90%;
     }
 
     #ctrlbtns {
+        width: 100%;
+        display: block;
     }
 
     #logincontainer {
@@ -639,18 +651,29 @@ input[type=checkbox] {
         width: 90%;
     }
 
+    #logincontainer {
+        width: 90%;
+        margin: 0 auto;
+        padding: 0;
+    }
+
     .lichessicon {
         display: none;
     }
 
+    #loginpass {
+        margin-bottom: 0;
+    }
+
     input[type=submit], button {
+        display: block;
         width: 90%;
-        margin: 0 auto;
+        margin: 10px auto !important;
     }
 
     input[type=text], input[type=password], input[type=number], select {
+        display: block;
         width: 90%;
-        margin: 0 auto;
-        margin-bottom: 10px;
+        margin: 5px auto !important;
     }
 }
