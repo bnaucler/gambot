@@ -96,17 +96,6 @@ input[type=checkbox] {
     margin: 0 auto;
 }
 
-#logwin {
-    display: none;
-    position: absolute;
-    background-color: #222;
-    border: 1px #fff solid;
-    border-radius: 5px;
-    padding: 20px;
-    left: 100px;
-    top: 100px;
-}
-
 #tstart:hover {
     background-color: #272;
     color: #fff;
