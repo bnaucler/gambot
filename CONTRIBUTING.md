@@ -27,10 +27,8 @@ As you can see below, there is a VERY long list of things which need to be addre
 
 ### TODO: look & feel
 * Better looking popups
-* Better looking minipops
 * Better looking player data window
 * Prev button for browsing through log
-* Working minipops for touch
 * Cancel login button to return to public page (if available)
 
 ### TODO: structure
@@ -43,6 +41,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Reorganize CSS and comment for readability
 * Move basic db functionality to gcore
 * Create JSON object with wrapper functions for session storage items
+* Replace event listeners with onclick whereever suitable
 
 ### TODO: new functionality
 * Implement player K value for ELO

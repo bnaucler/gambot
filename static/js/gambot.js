@@ -61,14 +61,44 @@ function ingame(id, t) {
     return false;
 }
 
+// Click anywhere outside popup pop to close
+function closeonanywhere(pop) {
+
+    const invis = gid("invisible");
+
+    invis.onclick = () => {
+        pop.remove();
+        invis.style.display = "none";
+    }
+
+    invis.style.display = "block";
+    invis.style.zIndex = "3";
+    pop.style.zIndex = "4";
+}
+
+// Returns true if user is on touch device
+function istouch() {
+
+  return (('ontouchstart' in window) ||
+     (navigator.maxTouchPoints > 0) ||
+     (navigator.msMaxTouchPoints > 0));
+}
+
 // Creates a minipop element
 function mkminipop() {
 
     const elem = mkobj("div", "minipop");
 
-    elem.style.left = (event.clientX - 5) + "px";
-    elem.style.top = (event.clientY - 5) + "px";
-    elem.addEventListener("mouseleave", (event) => elem.remove());
+    if(istouch()) {
+        elem.style.left = (event.clientX - 80) + "px";
+        elem.style.top = (event.clientY - 50) + "px";
+        closeonanywhere(elem);
+
+    } else {
+        elem.style.left = (event.clientX - 5) + "px";
+        elem.style.top = (event.clientY - 5) + "px";
+        elem.addEventListener("mouseleave", (event) => elem.remove());
+    }
 
     return elem;
 }
