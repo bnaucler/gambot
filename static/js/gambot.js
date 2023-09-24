@@ -270,18 +270,22 @@ function addgame(g, t) {
     const bw = mkobj("div", "bw");
     const W = mkobj("div", "wp", getplayername(g.W, t));
     const B = mkobj("div", "bp", getplayername(g.B, t));
-    const draw = mkobj("div", "draw");
-    const dtext = mkobj("span", "", "draw");
-
-    W.addEventListener("click", () => igppopup(g.W, g.ID, t));
-    B.addEventListener("click", () => igppopup(g.B, g.ID, t));
-    draw.addEventListener("click", () => declareresult(g.ID, 0, ""));
 
     bw.appendChild(W);
     bw.appendChild(B);
-    draw.appendChild(dtext);
     game.appendChild(bw);
-    game.appendChild(draw);
+
+    if(gss("gambotamode") == "true") {
+        W.onclick = () => igppopup(g.W, g.ID, t);
+        B.onclick = () => igppopup(g.B, g.ID, t);
+
+        const draw = mkobj("div", "draw");
+        const dtext = mkobj("span", "", "draw");
+        draw.addEventListener("click", () => declareresult(g.ID, 0, ""));
+        draw.appendChild(dtext);
+        game.appendChild(draw);
+    }
+
     pdiv.appendChild(game);
 }
 
@@ -656,7 +660,6 @@ async function edittournament(action, id) {
         updatestatus(resp);
 
     } else if(resp.Status == mac.S_STOPSEED) {
-        // tournamentseedstopped(resp);
         settournamentstatus(mac.S_STOPSEED);
 
     } else if(resp.Status == mac.S_TEND) {
