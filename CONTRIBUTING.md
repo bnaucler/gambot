@@ -30,6 +30,8 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Better looking player data window
 * Prev button for browsing through log
 * Cancel login button to return to public page (if available)
+* Remove 'more' button when top list is hidden
+* Include 'showtopbtn' on public page / mobile
 
 ### TODO: structure
 * Replace trylogin()
@@ -67,6 +69,7 @@ As you can see below, there is a VERY long list of things which need to be addre
     - If still equal: APPG as black
 * Logic to pick longest waiting bench player if all other things are equal
 * Per-player anonymization setting
+* Show seeding status on public page
 
 ### TODO: known bugs
 * Player edit window not properly cleared at close

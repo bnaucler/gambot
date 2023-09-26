@@ -242,7 +242,9 @@ function addbench(id, t) {
         player.appendChild(picon);
     }
 
-    player.addEventListener("click", () => benchpopup(id, t, pstat));
+    if(gss("gambotamode") == "true") {
+        player.addEventListener("click", () => benchpopup(id, t, pstat));
+    }
 
     pdiv.appendChild(player);
 }
@@ -914,6 +916,10 @@ async function changeadmin(elem) {
     else statuspopup("Admin settings successfully updated");
 }
 
+// Processes click on 'showtopbtn' to show top list while in tournament
+function expandtopplayers() {
+}
+
 // Requests top players (n players of type t: (a)ll or (c)urrent)
 async function gettopplayers(n, t) { // TODO refactor
 
@@ -927,17 +933,26 @@ async function gettopplayers(n, t) { // TODO refactor
 
     pdiv.innerHTML = "";
 
-    if(resp.S == "a" || plen == 0) {
+    if(istouch() && resp.S == "c") {
+        gid("games").style.width = "100%"; // TMP
+        // gid("showtopbtn").style.display = "block";
+        // gid("showtopbtn").style.width = "6%";
+        // gid("games").style.width = "94%";
+        gid("topfive").style.display = "none";
+
+    } else if(resp.S == "a" || plen == 0) {
         gid("games").style.width = "0";
         gid("topfive").style.width = "100%";
         gid("topfive").style.display = "block";
         gid("topfiveheader").innerHTML = "ALL TIME TOP " + plen;
+        gid("topfive").style.display = "block";
 
     } else if (resp.S == "c" && resp.P.length > 0) {
         gid("games").style.width = "75%";
         gid("topfive").style.width = "25%";
         gid("topfive").style.display = "block";
         gid("topfiveheader").innerHTML = "TOP " + plen;
+        gid("topfive").style.display = "block";
 
     } else {
         gid("topfive").style.display = "none";

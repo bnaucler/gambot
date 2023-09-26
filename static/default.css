@@ -609,6 +609,14 @@ input[type=checkbox] {
     opacity: 1;
 }
 
+#showtopbtn {
+    display: none;
+    float: left;
+    min-height: 100%;
+    width: 50px;
+    background-color: #ccc;
+}
+
 @media only screen and (max-width: 800px) {
 
     #container {
@@ -648,6 +656,16 @@ input[type=checkbox] {
         width: 90%;
         margin: 0 auto;
         padding: 0;
+    }
+
+    .game {
+        margin: 10px auto;
+        width: 90%;
+    }
+
+    #bench {
+        margin: 10px auto;
+        width: 90%;
     }
 
     .lichessicon {
