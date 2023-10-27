@@ -1246,3 +1246,5 @@ window.onload = () => {
         if(esc) showpopup("none");
     };
 }
+
+window.setInterval(getstat, 5000);

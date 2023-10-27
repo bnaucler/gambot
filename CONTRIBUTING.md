@@ -69,6 +69,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Logic to pick longest waiting bench player if all other things are equal
 * Per-player anonymization setting
 * Show seeding status on public page
+* Shareable results link per tournament
 
 ### TODO: known bugs
 * Player edit window not properly cleared at close
