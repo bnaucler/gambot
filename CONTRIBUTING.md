@@ -32,6 +32,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Include 'showtopbtn' on public page / mobile
 
 ### TODO: structure
+* Rename resetelo
 * Separate js into public & admin scripts
 * Replace trylogin()
 * Clean up ethandler()
@@ -75,6 +76,7 @@ As you can see below, there is a VERY long list of things which need to be addre
 * Player edit window not properly cleared at close
 * Sometimes 'less' button in top player list needs to be pressed multiple times
 * APPG calculation errors when in tournament
+* Automatic reload shrinks top list
 
 ## Pull requests
 Are appreciated!
